@@ -25,4 +25,37 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+/**
+ * Standards table - stores the 11 standards
+ */
+export const standards = mysqlTable("standards", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  orderIndex: int("orderIndex").notNull(), // للترتيب من 1 إلى 11
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  createdBy: int("createdBy").notNull(),
+});
+
+export type Standard = typeof standards.$inferSelect;
+export type InsertStandard = typeof standards.$inferInsert;
+
+/**
+ * Evidence table - stores evidence linked to standards
+ */
+export const evidence = mysqlTable("evidence", {
+  id: int("id").autoincrement().primaryKey(),
+  standardId: int("standardId").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  fileUrl: text("fileUrl"), // رابط الملف في S3
+  fileKey: text("fileKey"), // مفتاح الملف في S3
+  fileType: varchar("fileType", { length: 100 }), // نوع الملف (pdf, image, doc, etc)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  createdBy: int("createdBy").notNull(),
+});
+
+export type Evidence = typeof evidence.$inferSelect;
+export type InsertEvidence = typeof evidence.$inferInsert;

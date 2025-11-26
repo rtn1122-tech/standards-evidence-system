@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, standards, evidence, InsertStandard, InsertEvidence } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,87 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// ========== Standards Functions ==========
+
+export async function getAllStandards() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(standards).orderBy(standards.orderIndex);
+}
+
+export async function getStandardById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(standards).where(eq(standards.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createStandard(data: InsertStandard) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(standards).values(data);
+  return result;
+}
+
+export async function updateStandard(id: number, data: Partial<InsertStandard>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(standards).set(data).where(eq(standards.id, id));
+}
+
+export async function deleteStandard(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(standards).where(eq(standards.id, id));
+}
+
+// ========== Evidence Functions ==========
+
+export async function getEvidenceByStandardId(standardId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(evidence).where(eq(evidence.standardId, standardId)).orderBy(desc(evidence.createdAt));
+}
+
+export async function getAllEvidence() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(evidence).orderBy(desc(evidence.createdAt));
+}
+
+export async function getEvidenceById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(evidence).where(eq(evidence.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createEvidence(data: InsertEvidence) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(evidence).values(data);
+  return result;
+}
+
+export async function updateEvidence(id: number, data: Partial<InsertEvidence>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(evidence).set(data).where(eq(evidence.id, id));
+}
+
+export async function deleteEvidence(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(evidence).where(eq(evidence.id, id));
+}
