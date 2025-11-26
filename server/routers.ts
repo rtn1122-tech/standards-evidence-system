@@ -117,6 +117,97 @@ export const appRouter = router({
       }),
   }),
 
+  evidence: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getUserEvidenceByUserId(ctx.user.id);
+    }),
+    
+    listByStandard: protectedProcedure
+      .input(z.object({ standardId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        const allEvidence = await db.getUserEvidenceByUserId(ctx.user.id);
+        return allEvidence.filter(e => e.standardId === input.standardId);
+      }),
+    
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input, ctx }) => {
+        const evidence = await db.getUserEvidenceById(input.id);
+        if (evidence && evidence.userId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        return evidence;
+      }),
+    
+    create: protectedProcedure
+      .input(z.object({
+        evidenceTemplateId: z.number(),
+        standardId: z.number(),
+        page1Title: z.string().optional(),
+        page1Content: z.string().optional(),
+        page1Images: z.string().optional(),
+        page2Title: z.string().optional(),
+        page2Content: z.string().optional(),
+        page2Images: z.string().optional(),
+        eventDate: z.date().optional(),
+        lessonName: z.string().optional(),
+        celebrationName: z.string().optional(),
+        initiativeName: z.string().optional(),
+        additionalData: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await db.createUserEvidence({
+          userId: ctx.user.id,
+          ...input,
+        });
+        
+        return { success: true };
+      }),
+    
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        page1Title: z.string().optional(),
+        page1Content: z.string().optional(),
+        page1Images: z.string().optional(),
+        page2Title: z.string().optional(),
+        page2Content: z.string().optional(),
+        page2Images: z.string().optional(),
+        eventDate: z.date().optional(),
+        lessonName: z.string().optional(),
+        celebrationName: z.string().optional(),
+        initiativeName: z.string().optional(),
+        additionalData: z.string().optional(),
+        isCompleted: z.boolean().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { id, ...data } = input;
+        const evidence = await db.getUserEvidenceById(id);
+        
+        if (!evidence || evidence.userId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        await db.updateUserEvidence(id, data);
+        
+        return { success: true };
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const evidence = await db.getUserEvidenceById(input.id);
+        
+        if (!evidence || evidence.userId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        await db.deleteUserEvidence(input.id);
+        
+        return { success: true };
+      }),
+  }),
+
   userEvidence: router({
     list: protectedProcedure.query(async ({ ctx }) => {
       return await db.getUserEvidenceByUserId(ctx.user.id);

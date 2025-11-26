@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { getLoginUrl } from "@/const";
@@ -8,7 +9,9 @@ import { FileText, LogOut, Settings, CheckCircle2 } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Home() {
-  const { user, loading, isAuthenticated, logout } = useAuth();
+  const { user, loading, error, isAuthenticated, logout } = useAuth();
+  const [, setLocation] = useLocation();
+  
   const { data: standards, isLoading: standardsLoading } = trpc.standards.list.useQuery();
   const { data: userEvidenceList } = trpc.userEvidence.list.useQuery(undefined, {
     enabled: isAuthenticated,
@@ -177,7 +180,11 @@ export default function Home() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button variant="outline" className="w-full">
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => setLocation(`/standard/${standard.id}`)}
+                    >
                       عرض التفاصيل
                     </Button>
                   </CardContent>
