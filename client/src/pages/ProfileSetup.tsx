@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import { trpc } from "@/lib/trpc";
 import { ArrowRight, Save } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -204,22 +204,18 @@ export default function ProfileSetup() {
 
               {/* المرحلة */}
               <div className="space-y-2">
-                <Label htmlFor="stage">المرحلة التعليمية</Label>
-                <Select
+                <Label>المرحلة التعليمية</Label>
+                <RadioGroup
                   value={formData.stage}
                   onValueChange={(value) => setFormData({ ...formData, stage: value })}
                 >
-                  <SelectTrigger id="stage">
-                    <SelectValue placeholder="اختر المرحلة" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {STAGES.map((stage) => (
-                      <SelectItem key={stage} value={stage}>
-                        {stage}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  {STAGES.map((stage) => (
+                    <div key={stage} className="flex items-center space-x-2 space-x-reverse">
+                      <RadioGroupItem value={stage} id={`stage-${stage}`} />
+                      <Label htmlFor={`stage-${stage}`} className="cursor-pointer">{stage}</Label>
+                    </div>
+                  ))}
+                </RadioGroup>
               </div>
 
               {/* المواد التدريسية */}
