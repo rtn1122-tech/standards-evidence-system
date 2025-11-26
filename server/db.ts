@@ -1,11 +1,23 @@
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, standards, evidence, InsertStandard, InsertEvidence } from "../drizzle/schema";
+import { 
+  InsertUser, 
+  users, 
+  standards, 
+  InsertStandard,
+  teacherProfiles,
+  InsertTeacherProfile,
+  evidenceTemplates,
+  InsertEvidenceTemplate,
+  userEvidence,
+  InsertUserEvidence,
+  backgrounds,
+  InsertBackground
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
@@ -128,48 +140,101 @@ export async function deleteStandard(id: number) {
   await db.delete(standards).where(eq(standards.id, id));
 }
 
-// ========== Evidence Functions ==========
+// ========== Teacher Profile Functions ==========
 
-export async function getEvidenceByStandardId(standardId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  
-  return await db.select().from(evidence).where(eq(evidence.standardId, standardId)).orderBy(desc(evidence.createdAt));
-}
-
-export async function getAllEvidence() {
-  const db = await getDb();
-  if (!db) return [];
-  
-  return await db.select().from(evidence).orderBy(desc(evidence.createdAt));
-}
-
-export async function getEvidenceById(id: number) {
+export async function getTeacherProfileByUserId(userId: number) {
   const db = await getDb();
   if (!db) return undefined;
   
-  const result = await db.select().from(evidence).where(eq(evidence.id, id)).limit(1);
+  const result = await db.select().from(teacherProfiles).where(eq(teacherProfiles.userId, userId)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
-export async function createEvidence(data: InsertEvidence) {
+export async function upsertTeacherProfile(data: InsertTeacherProfile) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const result = await db.insert(evidence).values(data);
+  await db.insert(teacherProfiles).values(data).onDuplicateKeyUpdate({
+    set: data,
+  });
+}
+
+// ========== Evidence Template Functions ==========
+
+export async function getEvidenceTemplatesByStandardId(standardId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(evidenceTemplates).where(eq(evidenceTemplates.standardId, standardId)).orderBy(evidenceTemplates.orderIndex);
+}
+
+export async function getAllEvidenceTemplates() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(evidenceTemplates).orderBy(evidenceTemplates.standardId, evidenceTemplates.orderIndex);
+}
+
+export async function createEvidenceTemplate(data: InsertEvidenceTemplate) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(evidenceTemplates).values(data);
   return result;
 }
 
-export async function updateEvidence(id: number, data: Partial<InsertEvidence>) {
+// ========== User Evidence Functions ==========
+
+export async function getUserEvidenceByUserId(userId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) return [];
   
-  await db.update(evidence).set(data).where(eq(evidence.id, id));
+  return await db.select().from(userEvidence).where(eq(userEvidence.userId, userId)).orderBy(desc(userEvidence.updatedAt));
 }
 
-export async function deleteEvidence(id: number) {
+export async function getUserEvidenceById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(userEvidence).where(eq(userEvidence.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createUserEvidence(data: InsertUserEvidence) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  await db.delete(evidence).where(eq(evidence.id, id));
+  const result = await db.insert(userEvidence).values(data);
+  return result;
+}
+
+export async function updateUserEvidence(id: number, data: Partial<InsertUserEvidence>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(userEvidence).set(data).where(eq(userEvidence.id, id));
+}
+
+export async function deleteUserEvidence(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(userEvidence).where(eq(userEvidence.id, id));
+}
+
+// ========== Background Functions ==========
+
+export async function getAllBackgrounds() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(backgrounds).where(eq(backgrounds.isActive, true)).orderBy(backgrounds.orderIndex);
+}
+
+export async function createBackground(data: InsertBackground) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(backgrounds).values(data);
+  return result;
 }

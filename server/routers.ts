@@ -35,16 +35,14 @@ export const appRouter = router({
         title: z.string().min(1),
         description: z.string().optional(),
         orderIndex: z.number(),
+        weight: z.number(),
       }))
       .mutation(async ({ input, ctx }) => {
         if (ctx.user.role !== 'admin') {
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
         }
         
-        await db.createStandard({
-          ...input,
-          createdBy: ctx.user.id,
-        });
+        await db.createStandard(input);
         
         return { success: true };
       }),
@@ -55,6 +53,7 @@ export const appRouter = router({
         title: z.string().min(1).optional(),
         description: z.string().optional(),
         orderIndex: z.number().optional(),
+        weight: z.number().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         if (ctx.user.role !== 'admin') {
@@ -80,36 +79,79 @@ export const appRouter = router({
       }),
   }),
 
-  evidence: router({
+  teacherProfile: router({
+    get: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getTeacherProfileByUserId(ctx.user.id);
+    }),
+    
+    upsert: protectedProcedure
+      .input(z.object({
+        educationDepartment: z.string().optional(),
+        schoolName: z.string().optional(),
+        teacherName: z.string().optional(),
+        principalName: z.string().optional(),
+        gender: z.enum(["male", "female"]),
+        stage: z.string().optional(),
+        subjects: z.string().optional(), // JSON string
+        selectedBackground: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await db.upsertTeacherProfile({
+          userId: ctx.user.id,
+          ...input,
+        });
+        
+        return { success: true };
+      }),
+  }),
+
+  evidenceTemplates: router({
     list: publicProcedure.query(async () => {
-      return await db.getAllEvidence();
+      return await db.getAllEvidenceTemplates();
     }),
     
     getByStandardId: publicProcedure
       .input(z.object({ standardId: z.number() }))
       .query(async ({ input }) => {
-        return await db.getEvidenceByStandardId(input.standardId);
+        return await db.getEvidenceTemplatesByStandardId(input.standardId);
       }),
+  }),
+
+  userEvidence: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getUserEvidenceByUserId(ctx.user.id);
+    }),
     
-    getById: publicProcedure
+    getById: protectedProcedure
       .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => {
-        return await db.getEvidenceById(input.id);
+      .query(async ({ input, ctx }) => {
+        const evidence = await db.getUserEvidenceById(input.id);
+        if (evidence && evidence.userId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        return evidence;
       }),
     
     create: protectedProcedure
       .input(z.object({
+        evidenceTemplateId: z.number(),
         standardId: z.number(),
-        title: z.string().min(1),
-        description: z.string().optional(),
-        fileUrl: z.string().optional(),
-        fileKey: z.string().optional(),
-        fileType: z.string().optional(),
+        page1Title: z.string().optional(),
+        page1Content: z.string().optional(),
+        page1Images: z.string().optional(),
+        page2Title: z.string().optional(),
+        page2Content: z.string().optional(),
+        page2Images: z.string().optional(),
+        eventDate: z.date().optional(),
+        lessonName: z.string().optional(),
+        celebrationName: z.string().optional(),
+        initiativeName: z.string().optional(),
+        additionalData: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        await db.createEvidence({
+        await db.createUserEvidence({
+          userId: ctx.user.id,
           ...input,
-          createdBy: ctx.user.id,
         });
         
         return { success: true };
@@ -118,15 +160,28 @@ export const appRouter = router({
     update: protectedProcedure
       .input(z.object({
         id: z.number(),
-        title: z.string().min(1).optional(),
-        description: z.string().optional(),
-        fileUrl: z.string().optional(),
-        fileKey: z.string().optional(),
-        fileType: z.string().optional(),
+        page1Title: z.string().optional(),
+        page1Content: z.string().optional(),
+        page1Images: z.string().optional(),
+        page2Title: z.string().optional(),
+        page2Content: z.string().optional(),
+        page2Images: z.string().optional(),
+        eventDate: z.date().optional(),
+        lessonName: z.string().optional(),
+        celebrationName: z.string().optional(),
+        initiativeName: z.string().optional(),
+        additionalData: z.string().optional(),
+        isCompleted: z.boolean().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const { id, ...data } = input;
-        await db.updateEvidence(id, data);
+        const evidence = await db.getUserEvidenceById(id);
+        
+        if (!evidence || evidence.userId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        await db.updateUserEvidence(id, data);
         
         return { success: true };
       }),
@@ -134,10 +189,22 @@ export const appRouter = router({
     delete: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input, ctx }) => {
-        await db.deleteEvidence(input.id);
+        const evidence = await db.getUserEvidenceById(input.id);
+        
+        if (!evidence || evidence.userId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        await db.deleteUserEvidence(input.id);
         
         return { success: true };
       }),
+  }),
+
+  backgrounds: router({
+    list: publicProcedure.query(async () => {
+      return await db.getAllBackgrounds();
+    }),
   }),
 });
 

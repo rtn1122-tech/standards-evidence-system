@@ -1,125 +1,192 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { FileText, LogIn, LogOut, Settings } from "lucide-react";
+import { FileText, LogOut, Settings, CheckCircle2 } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Home() {
-  const { user, isAuthenticated, logout } = useAuth();
-  const { data: standards, isLoading } = trpc.standards.list.useQuery();
+  const { user, loading, isAuthenticated, logout } = useAuth();
+  const { data: standards, isLoading: standardsLoading } = trpc.standards.list.useQuery();
+  const { data: userEvidenceList } = trpc.userEvidence.list.useQuery(undefined, {
+    enabled: isAuthenticated,
+  });
+  const { data: profile } = trpc.teacherProfile.get.useQuery(undefined, {
+    enabled: isAuthenticated,
+  });
+
+  const logoutMutation = trpc.auth.logout.useMutation({
+    onSuccess: () => {
+      logout();
+      window.location.reload();
+    },
+  });
+
+  // حساب التقدم
+  const totalEvidence = standards?.length || 0;
+  const completedEvidence = userEvidenceList?.filter(e => e.isCompleted).length || 0;
+  const progressPercentage = totalEvidence > 0 ? (completedEvidence / totalEvidence) * 100 : 0;
+
+  if (loading || standardsLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">جاري التحميل...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+              <FileText className="h-8 w-8 text-blue-600" />
+            </div>
+            <CardTitle className="text-2xl">نظام الأداء المهني للمعلمين</CardTitle>
+            <CardDescription>
+              نظام متكامل لتوثيق وإدارة معايير الأداء المهني للمعلمين
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild className="w-full" size="lg">
+              <a href={getLoginUrl()}>تسجيل الدخول</a>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <FileText className="h-8 w-8 text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">نظام إدارة المعايير والشواهد</h1>
-          </div>
-          
+      <header className="bg-white shadow-sm border-b">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {isAuthenticated ? (
-              <>
-                <span className="text-sm text-gray-600">مرحباً، {user?.name}</span>
-                {user?.role === 'admin' && (
-                  <Link href="/admin">
-                    <Button variant="outline" size="sm">
-                      <Settings className="h-4 w-4 ml-2" />
-                      لوحة التحكم
-                    </Button>
-                  </Link>
-                )}
-                <Button variant="outline" size="sm" onClick={() => logout()}>
-                  <LogOut className="h-4 w-4 ml-2" />
-                  تسجيل الخروج
-                </Button>
-              </>
-            ) : (
-              <a href={getLoginUrl()}>
-                <Button size="sm">
-                  <LogIn className="h-4 w-4 ml-2" />
-                  تسجيل الدخول
-                </Button>
-              </a>
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
+              <FileText className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">نظام الأداء المهني للمعلمين</h1>
+              <p className="text-sm text-gray-600">مرحباً، {user?.name}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {!profile && (
+              <Button asChild variant="outline" size="sm">
+                <Link href="/profile-setup">
+                  <Settings className="h-4 w-4 ml-2" />
+                  إعداد الملف الشخصي
+                </Link>
+              </Button>
             )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => logoutMutation.mutate()}
+              disabled={logoutMutation.isPending}
+            >
+              <LogOut className="h-4 w-4 ml-2" />
+              تسجيل الخروج
+            </Button>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto text-center max-w-3xl">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            منصة شاملة لإدارة المعايير والشواهد
-          </h2>
-          <p className="text-lg text-gray-600 mb-8">
-            نظام متكامل يساعدك على تنظيم وإدارة المعايير الـ 11 مع إمكانية ربط كل معيار بشواهد متعددة وملفات داعمة
-          </p>
-        </div>
-      </section>
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
+        {/* Progress Card */}
+        {profile && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>التقدم الإجمالي</CardTitle>
+              <CardDescription>
+                أكملت {completedEvidence} من {totalEvidence} معيار
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Progress value={progressPercentage} className="h-3" />
+                <p className="text-sm text-gray-600 text-center">
+                  {progressPercentage.toFixed(0)}% مكتمل
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-      {/* Standards Grid */}
-      <section className="py-8 px-4 pb-16">
-        <div className="container mx-auto">
-          <h3 className="text-2xl font-bold text-gray-900 mb-6">المعايير</h3>
-          
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(11)].map((_, i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardHeader>
-                    <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-full"></div>
-                  </CardHeader>
-                </Card>
-              ))}
-            </div>
-          ) : standards && standards.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {standards.map((standard) => (
-                <Link key={standard.id} href={`/standard/${standard.id}`}>
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-                    <CardHeader>
-                      <div className="flex items-start justify-between mb-2">
-                        <CardTitle className="text-lg">المعيار {standard.orderIndex}</CardTitle>
-                        <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
-                          {standard.orderIndex}
-                        </div>
-                      </div>
-                      <CardTitle className="text-xl mb-2">{standard.title}</CardTitle>
-                      <CardDescription className="line-clamp-3">
-                        {standard.description || "لا يوجد وصف"}
-                      </CardDescription>
-                    </CardHeader>
-                  </Card>
+        {/* Profile Setup Warning */}
+        {!profile && (
+          <Card className="mb-8 border-yellow-200 bg-yellow-50">
+            <CardHeader>
+              <CardTitle className="text-yellow-800">يرجى إكمال الملف الشخصي</CardTitle>
+              <CardDescription className="text-yellow-700">
+                قبل البدء في توثيق الشواهد، يجب إكمال معلوماتك الأساسية
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild>
+                <Link href="/profile-setup">
+                  <Settings className="h-4 w-4 ml-2" />
+                  إعداد الملف الشخصي الآن
                 </Link>
-              ))}
-            </div>
-          ) : (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 mb-4">لا توجد معايير بعد</p>
-                {user?.role === 'admin' && (
-                  <Link href="/admin">
-                    <Button>إضافة معيار جديد</Button>
-                  </Link>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      </section>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
-      {/* Footer */}
-      <footer className="border-t bg-white py-8 mt-16">
-        <div className="container mx-auto px-4 text-center text-gray-600">
-          <p>© 2025 نظام إدارة المعايير والشواهد. جميع الحقوق محفوظة.</p>
+        {/* Standards Grid */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {standards?.map((standard) => {
+            const evidenceForStandard = userEvidenceList?.filter(
+              (e) => e.standardId === standard.id
+            );
+            const isCompleted = evidenceForStandard?.some((e) => e.isCompleted);
+
+            return (
+              <Card
+                key={standard.id}
+                className="hover:shadow-lg transition-shadow cursor-pointer"
+              >
+                <Link href={`/standard/${standard.id}`}>
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600">
+                            {standard.orderIndex}
+                          </span>
+                          {isCompleted && (
+                            <CheckCircle2 className="h-5 w-5 text-green-600" />
+                          )}
+                        </div>
+                        <CardTitle className="text-lg">{standard.title}</CardTitle>
+                      </div>
+                      <span className="text-sm font-medium text-gray-500">
+                        {standard.weight}%
+                      </span>
+                    </div>
+                    <CardDescription className="line-clamp-2">
+                      {standard.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" className="w-full">
+                      عرض التفاصيل
+                    </Button>
+                  </CardContent>
+                </Link>
+              </Card>
+            );
+          })}
         </div>
-      </footer>
+      </main>
     </div>
   );
 }
