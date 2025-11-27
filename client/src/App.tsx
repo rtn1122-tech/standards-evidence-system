@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import ProfileSetup from "./pages/ProfileSetup";
 import StandardDetail from "./pages/StandardDetail";
+import EvidenceForm from "./pages/EvidenceForm";
 
 function Router() {
   return (
@@ -14,6 +15,8 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/profile-setup"} component={ProfileSetup} />
       <Route path="/standard/:id" component={StandardDetail} />
+      <Route path="/evidence/new" component={EvidenceForm} />
+      <Route path="/evidence/:id" component={EvidenceForm} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
