@@ -30,6 +30,22 @@ export const appRouter = router({
         return await db.getStandardById(input.id);
       }),
     
+    getProgress: protectedProcedure.query(async ({ ctx }) => {
+      const standards = await db.getAllStandards();
+      const allEvidence = await db.getUserEvidenceByUserId(ctx.user.id);
+      const completedEvidence = allEvidence.filter(e => e.isCompleted);
+      
+      const totalCount = standards.length;
+      const completedCount = completedEvidence.length;
+      const totalProgress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+      
+      return {
+        totalCount,
+        completedCount,
+        totalProgress,
+      };
+    }),
+    
     create: protectedProcedure
       .input(z.object({
         title: z.string().min(1),
@@ -111,6 +127,12 @@ export const appRouter = router({
     }),
     
     getByStandardId: publicProcedure
+      .input(z.object({ standardId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getEvidenceTemplatesByStandardId(input.standardId);
+      }),
+    
+    listByStandard: publicProcedure
       .input(z.object({ standardId: z.number() }))
       .query(async ({ input }) => {
         return await db.getEvidenceTemplatesByStandardId(input.standardId);
