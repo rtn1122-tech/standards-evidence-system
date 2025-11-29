@@ -65,6 +65,7 @@ export default function StandardDetail() {
               <ArrowRight className="h-4 w-4" />
             </Button>
             <div>
+              <p className="text-xs text-muted-foreground">وزارة التعليم</p>
               <h1 className="text-xl font-bold text-primary">المعيار {standard.orderIndex}</h1>
               <p className="text-sm text-muted-foreground">{standard.title}</p>
             </div>

@@ -169,6 +169,7 @@ export default function EvidenceForm() {
               <ArrowRight className="h-4 w-4" />
             </Button>
             <div>
+              <p className="text-xs text-muted-foreground">وزارة التعليم</p>
               <h1 className="text-xl font-bold text-primary">
                 {evidenceId ? "تعديل الشاهد" : "إضافة شاهد جديد"}
               </h1>

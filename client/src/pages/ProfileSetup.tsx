@@ -123,6 +123,9 @@ export default function ProfileSetup() {
 
         <Card>
           <CardHeader>
+            <div className="text-center mb-4">
+              <p className="text-sm text-muted-foreground">وزارة التعليم</p>
+            </div>
             <CardTitle>إعداد الملف الشخصي</CardTitle>
             <CardDescription>
               يرجى إدخال معلوماتك الأساسية. هذه المعلومات ستستخدم في جميع الشواهد.

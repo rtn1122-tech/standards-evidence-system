@@ -49,8 +49,8 @@ export default function Home() {
                 </svg>
               </div>
               <div>
+                <p className="text-xs text-muted-foreground">وزارة التعليم</p>
                 <h1 className="text-xl font-bold">نظام الأداء المهني للمعلمين</h1>
-                <p className="text-xs text-muted-foreground">مرحباً</p>
               </div>
             </div>
             <Button asChild>
@@ -106,17 +106,18 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
-              </svg>
+            <div className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">وزارة التعليم</p>
+                <h1 className="text-xl font-bold">نظام الأداء المهني للمعلمين</h1>
+                <p className="text-xs text-muted-foreground">مرحباً، {user?.name || "المستخدم"}</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold">نظام الأداء المهني للمعلمين</h1>
-              <p className="text-xs text-muted-foreground">مرحباً، {user?.name || "المستخدم"}</p>
-            </div>
-          </div>
         </div>
       </header>
 
