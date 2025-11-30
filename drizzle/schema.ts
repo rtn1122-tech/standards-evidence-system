@@ -83,6 +83,31 @@ export type EvidenceTemplate = typeof evidenceTemplates.$inferSelect;
 export type InsertEvidenceTemplate = typeof evidenceTemplates.$inferInsert;
 
 /**
+ * Evidence sub-templates - detailed sub-evidence linked to main evidence templates
+ */
+export const evidenceSubTemplates = mysqlTable("evidenceSubTemplates", {
+  id: int("id").autoincrement().primaryKey(),
+  evidenceTemplateId: int("evidenceTemplateId").notNull(), // الشاهد الرئيسي
+  standardId: int("standardId").notNull(), // المعيار
+  title: varchar("title", { length: 500 }).notNull(), // عنوان الشاهد الفرعي
+  description: text("description"), // وصف تفصيلي
+  
+  // Filtering criteria
+  applicableSubjects: text("applicableSubjects"), // JSON array - المواد المناسبة
+  applicableGrades: text("applicableGrades"), // JSON array - الصفوف المناسبة
+  applicableStages: text("applicableStages"), // JSON array - المراحل المناسبة
+  applicableSemesters: text("applicableSemesters"), // JSON array - الفصول الدراسية
+  applicableTracks: text("applicableTracks"), // JSON array - المسارات (عام، علمي، أدبي، إلخ)
+  
+  orderIndex: int("orderIndex").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EvidenceSubTemplate = typeof evidenceSubTemplates.$inferSelect;
+export type InsertEvidenceSubTemplate = typeof evidenceSubTemplates.$inferInsert;
+
+/**
  * User evidence - teacher's completed evidence with 2 pages
  */
 export const userEvidence = mysqlTable("userEvidence", {
