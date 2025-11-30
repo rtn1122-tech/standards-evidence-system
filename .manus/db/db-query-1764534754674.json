@@ -1,0 +1,29 @@
+{
+  "query": "SHOW CREATE TABLE evidenceSubTemplates",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SHOW CREATE TABLE evidenceSubTemplates",
+  "rows": [
+    {
+      "Table": "evidenceSubTemplates",
+      "Create Table": "CREATE TABLE `evidenceSubTemplates` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `parentTemplateId` int(11) NOT NULL,",
+    "  `code` varchar(50) NOT NULL,",
+    "  `title` varchar(500) NOT NULL,",
+    "  `subject` varchar(100) DEFAULT NULL,",
+    "  `grade` varchar(100) DEFAULT NULL,",
+    "  `semester` varchar(20) DEFAULT NULL,",
+    "  `stage` varchar(50) DEFAULT NULL,",
+    "  `track` varchar(50) DEFAULT NULL,",
+    "  `orderIndex` int(11) NOT NULL,",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin"
+  ],
+  "stdout": "Table\tCreate Table\nevidenceSubTemplates\tCREATE TABLE `evidenceSubTemplates` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `parentTemplateId` int(11) NOT NULL,\n  `code` varchar(50) NOT NULL,\n  `title` varchar(500) NOT NULL,\n  `subject` varchar(100) DEFAULT NULL,\n  `grade` varchar(100) DEFAULT NULL,\n  `semester` varchar(20) DEFAULT NULL,\n  `stage` varchar(50) DEFAULT NULL,\n  `track` varchar(50) DEFAULT NULL,\n  `orderIndex` int(11) NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin\n",
+  "stderr": "",
+  "execution_time_ms": 1601
+}

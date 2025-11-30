@@ -1,0 +1,45 @@
+{
+  "query": "SELECT id, evidenceTemplateId, title, applicableSubjects, applicableStages FROM evidenceSubTemplates LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SELECT id, evidenceTemplateId, title, applicableSubjects, applicableStages FROM evidenceSubTemplates LIMIT 5",
+  "rows": [
+    {
+      "id": "1",
+      "evidenceTemplateId": "30001",
+      "title": "الجمع بالعد التصاعدي",
+      "applicableSubjects": "[\"رياضيات\"]",
+      "applicableStages": "[\"ابتدائية\"]"
+    },
+    {
+      "id": "2",
+      "evidenceTemplateId": "30001",
+      "title": "المخلوقات الحية",
+      "applicableSubjects": "[\"علوم\"]",
+      "applicableStages": "[\"ابتدائية\"]"
+    },
+    {
+      "id": "3",
+      "evidenceTemplateId": "30001",
+      "title": "تنوين الفتح",
+      "applicableSubjects": "[\"لغة عربية\"]",
+      "applicableStages": "[\"ابتدائية\"]"
+    },
+    {
+      "id": "4",
+      "evidenceTemplateId": "30001",
+      "title": "الصلاة",
+      "applicableSubjects": "[\"تربية إسلامية\"]",
+      "applicableStages": "[\"ابتدائية\"]"
+    },
+    {
+      "id": "5",
+      "evidenceTemplateId": "30001",
+      "title": "أنا وطن",
+      "applicableSubjects": "[\"اجتماعيات\"]",
+      "applicableStages": "[\"ابتدائية\"]"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tevidenceTemplateId\ttitle\tapplicableSubjects\tapplicableStages\n1\t30001\tالجمع بالعد التصاعدي\t[\"رياضيات\"]\t[\"ابتدائية\"]\n2\t30001\tالمخلوقات الحية\t[\"علوم\"]\t[\"ابتدائية\"]\n3\t30001\tتنوين الفتح\t[\"لغة عربية\"]\t[\"ابتدائية\"]\n4\t30001\tالصلاة\t[\"تربية إسلامية\"]\t[\"ابتدائية\"]\n5\t30001\tأنا وطن\t[\"اجتماعيات\"]\t[\"ابتدائية\"]\n",
+  "stderr": "",
+  "execution_time_ms": 1571
+}
