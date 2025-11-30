@@ -164,8 +164,12 @@ export default function Dashboard() {
                       <div className="flex items-start gap-3">
                         <GraduationCap className="h-5 w-5 text-muted-foreground mt-0.5" />
                         <div>
-                          <p className="text-sm text-muted-foreground">المرحلة التعليمية</p>
-                          <Badge>{profile.stage}</Badge>
+                          <p className="text-sm text-muted-foreground">المراحل التعليمية</p>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {(profile.stage.startsWith('[') ? JSON.parse(profile.stage) : [profile.stage]).map((stage: string) => (
+                              <Badge key={stage} variant="outline">{stage}</Badge>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     )}

@@ -24,7 +24,7 @@ export default function ProfileSetup() {
     teacherName: "",
     principalName: "",
     gender: "male" as "male" | "female",
-    stage: "",
+    stages: [] as string[],
     subjects: [] as string[],
     email: "",
     phoneNumber: "",
@@ -43,7 +43,7 @@ export default function ProfileSetup() {
         teacherName: profile.teacherName || "",
         principalName: profile.principalName || "",
         gender: profile.gender,
-        stage: profile.stage || "",
+        stages: profile.stage ? (profile.stage.startsWith('[') ? JSON.parse(profile.stage) : [profile.stage]) : [],
         subjects: profile.subjects ? JSON.parse(profile.subjects) : [],
         email: profile.email || "",
         phoneNumber: profile.phoneNumber || "",
@@ -82,6 +82,7 @@ export default function ProfileSetup() {
 
     upsertMutation.mutate({
       ...formData,
+      stage: JSON.stringify(formData.stages),
       subjects: JSON.stringify(formData.subjects),
     });
   };
@@ -208,18 +209,32 @@ export default function ProfileSetup() {
 
               {/* المرحلة */}
               <div className="space-y-2">
-                <Label>المرحلة التعليمية</Label>
-                <RadioGroup
-                  value={formData.stage}
-                  onValueChange={(value) => setFormData({ ...formData, stage: value })}
-                >
+                <Label>المرحلة التعليمية (يمكن اختيار أكثر من مرحلة)</Label>
+                <div className="grid grid-cols-1 gap-2">
                   {STAGES.map((stage) => (
-                    <div key={stage} className="flex items-center space-x-2 space-x-reverse">
-                      <RadioGroupItem value={stage} id={`stage-${stage}`} />
-                      <Label htmlFor={`stage-${stage}`} className="cursor-pointer">{stage}</Label>
+                    <div
+                      key={stage}
+                      className={`p-3 rounded-lg border-2 cursor-pointer transition-colors ${
+                        formData.stages.includes(stage)
+                          ? "border-blue-600 bg-blue-50"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                      onClick={() => {
+                        setFormData({
+                          ...formData,
+                          stages: formData.stages.includes(stage)
+                            ? formData.stages.filter((s) => s !== stage)
+                            : [...formData.stages, stage],
+                        });
+                      }}
+                    >
+                      <span className="text-sm">{stage}</span>
                     </div>
                   ))}
-                </RadioGroup>
+                </div>
+                <p className="text-sm text-gray-500">
+                  المراحل المختارة: {formData.stages.length > 0 ? formData.stages.join("، ") : "لا يوجد"}
+                </p>
               </div>
 
               {/* المواد التدريسية */}
