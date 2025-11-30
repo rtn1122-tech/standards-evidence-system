@@ -5,14 +5,23 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, CheckCircle2, Plus } from "lucide-react";
+import { AlertCircle, CheckCircle2, Plus, Search, Filter } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { STAGES, SUBJECTS } from "@/../../shared/constants";
 
 export default function Home() {
   const { user, loading, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
+  
+  // حالة البحث والتصفية
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStage, setSelectedStage] = useState<string>("all");
+  const [selectedSubject, setSelectedSubject] = useState<string>("all");
 
   const { data: profile, isLoading: profileLoading } = trpc.teacherProfile.get.useQuery(
     undefined,
@@ -157,13 +166,101 @@ export default function Home() {
               <CardTitle>المعايير المهنية</CardTitle>
               <CardDescription>اضغط على أي معيار لعرض الشواهد المرتبطة به</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-6">
+              {/* واجهة البحث والتصفية */}
+              <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-2 mb-4">
+                  <Filter className="h-5 w-5 text-muted-foreground" />
+                  <h3 className="font-semibold">البحث والتصفية</h3>
+                </div>
+                
+                <div className="grid gap-4 md:grid-cols-3">
+                  {/* شريط البحث */}
+                  <div className="relative">
+                    <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="ابحث في الشواهد..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pr-10"
+                    />
+                  </div>
+
+                  {/* تصفية المرحلة */}
+                  <Select value={selectedStage} onValueChange={setSelectedStage}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="جميع المراحل" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">جميع المراحل</SelectItem>
+                      {STAGES.map((stage) => (
+                        <SelectItem key={stage} value={stage}>
+                          {stage}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* تصفية المادة */}
+                  <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="جميع المواد" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">جميع المواد</SelectItem>
+                      {SUBJECTS.map((subject) => (
+                        <SelectItem key={subject} value={subject}>
+                          {subject}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* عداد الفلاتر النشطة */}
+                {(searchQuery || selectedStage !== "all" || selectedSubject !== "all") && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">الفلاتر النشطة:</span>
+                    {searchQuery && (
+                      <Badge variant="secondary" className="gap-1">
+                        بحث: {searchQuery}
+                      </Badge>
+                    )}
+                    {selectedStage !== "all" && (
+                      <Badge variant="secondary" className="gap-1">
+                        مرحلة: {selectedStage}
+                      </Badge>
+                    )}
+                    {selectedSubject !== "all" && (
+                      <Badge variant="secondary" className="gap-1">
+                        مادة: {selectedSubject}
+                      </Badge>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSearchQuery("");
+                        setSelectedStage("all");
+                        setSelectedSubject("all");
+                      }}
+                      className="h-7 text-xs"
+                    >
+                      إعادة تعيين
+                    </Button>
+                  </div>
+                )}
+              </div>
+
               <Accordion type="single" collapsible className="w-full">
                 {standards.map((standard) => (
                   <StandardAccordionItem
                     key={standard.id}
                     standard={standard}
                     disabled={needsProfile}
+                    searchQuery={searchQuery}
+                    selectedStage={selectedStage}
+                    selectedSubject={selectedSubject}
                   />
                 ))}
               </Accordion>
@@ -178,9 +275,15 @@ export default function Home() {
 function StandardAccordionItem({
   standard,
   disabled,
+  searchQuery,
+  selectedStage,
+  selectedSubject,
 }: {
   standard: { id: number; title: string; description: string | null; weight: number };
   disabled: boolean;
+  searchQuery: string;
+  selectedStage: string;
+  selectedSubject: string;
 }) {
   const [, setLocation] = useLocation();
   
@@ -194,9 +297,45 @@ function StandardAccordionItem({
     { enabled: !disabled }
   );
 
+  // تطبيق التصفية على الشواهد
+  const filteredTemplates = evidenceTemplates.filter((template) => {
+    // تصفية البحث
+    if (searchQuery && !template.title.toLowerCase().includes(searchQuery.toLowerCase()) && 
+        !(template.description || "").toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+
+    // تصفية المرحلة
+    if (selectedStage !== "all") {
+      if (template.evidenceType === "stage" || template.evidenceType === "general") {
+        if (template.applicableStages) {
+          const stages = JSON.parse(template.applicableStages);
+          if (!stages.includes(selectedStage)) return false;
+        }
+      }
+    }
+
+    // تصفية المادة
+    if (selectedSubject !== "all") {
+      if (template.evidenceType === "subject" || template.evidenceType === "general") {
+        if (template.applicableSubjects) {
+          const subjects = JSON.parse(template.applicableSubjects);
+          if (!subjects.includes(selectedSubject)) return false;
+        }
+      }
+    }
+
+    return true;
+  });
+
   const completedCount = userEvidence.filter((e) => e.isCompleted).length;
-  const totalCount = evidenceTemplates.length;
+  const totalCount = filteredTemplates.length;
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+  
+  // إخفاء المعيار إذا لم تكن هناك شواهد بعد التصفية
+  if (filteredTemplates.length === 0 && (searchQuery || selectedStage !== "all" || selectedSubject !== "all")) {
+    return null;
+  }
 
   return (
     <AccordionItem value={`standard-${standard.id}`}>
@@ -240,13 +379,15 @@ function StandardAccordionItem({
               </Button>
             </div>
 
-            {evidenceTemplates.length === 0 ? (
+            {filteredTemplates.length === 0 ? (
               <p className="text-center text-sm text-muted-foreground py-4">
-                لا توجد شواهد مضافة لهذا المعيار
+                {(searchQuery || selectedStage !== "all" || selectedSubject !== "all") 
+                  ? "لا توجد شواهد مطابقة للفلاتر المختارة"
+                  : "لا توجد شواهد مضافة لهذا المعيار"}
               </p>
             ) : (
               <div className="grid gap-2">
-                {evidenceTemplates.map((template) => {
+                {filteredTemplates.map((template) => {
                   const userEv = userEvidence.find((e) => e.evidenceTemplateId === template.id);
                   const isCompleted = userEv?.isCompleted || false;
 
