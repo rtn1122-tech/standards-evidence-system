@@ -1,0 +1,30 @@
+{
+  "query": "SELECT id, title FROM evidenceTemplates ORDER BY id DESC LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SELECT id, title FROM evidenceTemplates ORDER BY id DESC LIMIT 5",
+  "rows": [
+    {
+      "id": "30002",
+      "title": "مجتمعات التعلّم المهنية"
+    },
+    {
+      "id": "30001",
+      "title": "تبادل الخبرات بين الزملاء"
+    },
+    {
+      "id": "81",
+      "title": "المساهمة في الأنشطة الوطنية"
+    },
+    {
+      "id": "80",
+      "title": "دعم برامج المدرسة الخارجية"
+    },
+    {
+      "id": "79",
+      "title": "الإشراف على برامج تطوعية"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\n30002\tمجتمعات التعلّم المهنية\n30001\tتبادل الخبرات بين الزملاء\n81\tالمساهمة في الأنشطة الوطنية\n80\tدعم برامج المدرسة الخارجية\n79\tالإشراف على برامج تطوعية\n",
+  "stderr": "",
+  "execution_time_ms": 1585
+}

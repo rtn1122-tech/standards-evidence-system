@@ -1,4 +1,4 @@
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, 
@@ -237,4 +237,44 @@ export async function createBackground(data: InsertBackground) {
   
   const result = await db.insert(backgrounds).values(data);
   return result;
+}
+
+// ========== Evidence Sub-Templates Functions ==========
+
+export async function getSubEvidenceByTemplateId(templateId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.execute<any>(
+    sql`SELECT * FROM evidenceSubTemplates WHERE evidenceTemplateId = ${templateId} ORDER BY orderIndex`
+  );
+  return result as any[];
+}
+
+export async function getFilteredSubEvidence(templateId: number, userStages: string[], userSubjects: string[]) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.execute<any>(
+    sql`SELECT * FROM evidenceSubTemplates WHERE evidenceTemplateId = ${templateId} ORDER BY orderIndex`
+  );
+  const allSubEvidence = result as any[];
+  
+  // Filter based on user profile
+  return allSubEvidence.filter((item) => {
+    // Parse JSON fields
+    const applicableStages = item.applicableStages ? JSON.parse(item.applicableStages) : null;
+    const applicableSubjects = item.applicableSubjects ? JSON.parse(item.applicableSubjects) : null;
+    
+    // If no restrictions, show to everyone
+    if (!applicableStages && !applicableSubjects) return true;
+    
+    // Check stage match
+    const stageMatch = !applicableStages || applicableStages.some((stage: string) => userStages.includes(stage));
+    
+    // Check subject match
+    const subjectMatch = !applicableSubjects || applicableSubjects.some((subject: string) => userSubjects.includes(subject));
+    
+    return stageMatch && subjectMatch;
+  });
 }

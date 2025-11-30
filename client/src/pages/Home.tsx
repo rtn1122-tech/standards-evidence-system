@@ -5,7 +5,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, CheckCircle2, Plus, Search, Filter } from "lucide-react";
+import { AlertCircle, CheckCircle2, Plus, Search, Filter, ChevronDown, ChevronUp } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
@@ -390,43 +391,135 @@ function StandardAccordionItem({
               </p>
             ) : (
               <div className="grid gap-2">
-                {filteredTemplates.map((template) => {
-                  const userEv = userEvidence.find((e) => e.evidenceTemplateId === template.id);
-                  const isCompleted = userEv?.isCompleted || false;
-
-                  return (
-                    <div
-                      key={template.id}
-                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
-                      onClick={() => {
-                        if (userEv) {
-                          setLocation(`/evidence/${userEv.id}`);
-                        } else {
-                          setLocation(`/evidence/new?standardId=${standard.id}&templateId=${template.id}`);
-                        }
-                      }}
-                    >
-                      <div className="flex items-center gap-3">
-                        {isCompleted ? (
-                          <CheckCircle2 className="h-5 w-5 text-green-600" />
-                        ) : (
-                          <div className="h-5 w-5 rounded-full border-2 border-muted-foreground/30" />
-                        )}
-                        <span className="font-medium">{template.title}</span>
-                      </div>
-                      {isCompleted && (
-                        <Badge variant="default" className="bg-green-600">
-                          مكتمل
-                        </Badge>
-                      )}
-                    </div>
-                  );
-                })}
+                {filteredTemplates.map((template) => (
+                  <EvidenceTemplateItem
+                    key={template.id}
+                    template={template}
+                    standardId={standard.id}
+                    userEvidence={userEvidence}
+                  />
+                ))}
               </div>
             )}
           </div>
         )}
       </AccordionContent>
     </AccordionItem>
+  );
+}
+
+
+function EvidenceTemplateItem({
+  template,
+  standardId,
+  userEvidence,
+}: {
+  template: any;
+  standardId: number;
+  userEvidence: any[];
+}) {
+  const [, setLocation] = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
+  
+  const { data: subEvidence = [], isLoading } = trpc.evidenceTemplates.getFilteredSubEvidence.useQuery(
+    { templateId: template.id },
+    { enabled: isOpen }
+  );
+  
+  const userEv = userEvidence.find((e) => e.evidenceTemplateId === template.id);
+  const isCompleted = userEv?.isCompleted || false;
+  const hasSubEvidence = template.id === 30001 || template.id === 30002; // IDs of parent templates
+
+  if (!hasSubEvidence) {
+    // Original behavior for templates without sub-evidence
+    return (
+      <div
+        key={template.id}
+        className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
+        onClick={() => {
+          if (userEv) {
+            setLocation(`/evidence/${userEv.id}`);
+          } else {
+            setLocation(`/evidence/new?standardId=${standardId}&templateId=${template.id}`);
+          }
+        }}
+      >
+        <div className="flex items-center gap-3">
+          {isCompleted ? (
+            <CheckCircle2 className="h-5 w-5 text-green-600" />
+          ) : (
+            <div className="h-5 w-5 rounded-full border-2 border-muted-foreground/30" />
+          )}
+          <span className="font-medium">{template.title}</span>
+        </div>
+        {isCompleted && (
+          <Badge variant="default" className="bg-green-600">
+            مكتمل
+          </Badge>
+        )}
+      </div>
+    );
+  }
+
+  // New behavior for templates with sub-evidence
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="border rounded-lg">
+      <div className="flex items-center justify-between p-3">
+        <div className="flex items-center gap-3 flex-1">
+          {isCompleted ? (
+            <CheckCircle2 className="h-5 w-5 text-green-600" />
+          ) : (
+            <div className="h-5 w-5 rounded-full border-2 border-muted-foreground/30" />
+          )}
+          <span className="font-medium">{template.title}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          {isCompleted && (
+            <Badge variant="default" className="bg-green-600">
+              مكتمل
+            </Badge>
+          )}
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          </CollapsibleTrigger>
+        </div>
+      </div>
+      
+      <CollapsibleContent>
+        <div className="border-t bg-muted/30 p-3">
+          {isLoading ? (
+            <div className="text-center py-4">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
+            </div>
+          ) : subEvidence.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-2">
+              لا توجد شواهد فرعية مطابقة لملفك الشخصي
+            </p>
+          ) : (
+            <div className="grid gap-1.5">
+              {subEvidence.map((subItem: any) => (
+                <div
+                  key={subItem.id}
+                  className="flex items-start gap-2 p-2 rounded hover:bg-background transition-colors cursor-pointer text-sm"
+                  onClick={() => {
+                    setLocation(`/evidence/new?standardId=${standardId}&templateId=${template.id}&subTemplateId=${subItem.id}`);
+                  }}
+                >
+                  <div className="h-4 w-4 rounded-full border border-muted-foreground/30 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="font-medium leading-tight">{subItem.title}</p>
+                    {subItem.description && (
+                      <p className="text-xs text-muted-foreground mt-0.5">{subItem.description}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }

@@ -1,0 +1,34 @@
+{
+  "query": "SELECT * FROM evidenceTemplates WHERE id >= 30000 LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SELECT * FROM evidenceTemplates WHERE id >= 30000 LIMIT 5",
+  "rows": [
+    {
+      "id": "30001",
+      "standardId": "2",
+      "title": "تبادل الخبرات بين الزملاء",
+      "description": "شواهد تبادل الخبرات بين الزملاء",
+      "evidenceType": "general",
+      "applicableSubjects": "NULL",
+      "applicableStages": "NULL",
+      "orderIndex": "8",
+      "createdAt": "2025-11-30 20:31:04",
+      "updatedAt": "2025-11-30 20:48:02"
+    },
+    {
+      "id": "30002",
+      "standardId": "2",
+      "title": "مجتمعات التعلّم المهنية",
+      "description": "شواهد مجتمعات التعلّم المهنية",
+      "evidenceType": "general",
+      "applicableSubjects": "NULL",
+      "applicableStages": "NULL",
+      "orderIndex": "9",
+      "createdAt": "2025-11-30 20:33:28",
+      "updatedAt": "2025-11-30 20:48:02"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstandardId\ttitle\tdescription\tevidenceType\tapplicableSubjects\tapplicableStages\torderIndex\tcreatedAt\tupdatedAt\n30001\t2\tتبادل الخبرات بين الزملاء\tشواهد تبادل الخبرات بين الزملاء\tgeneral\tNULL\tNULL\t8\t2025-11-30 20:31:04\t2025-11-30 20:48:02\n30002\t2\tمجتمعات التعلّم المهنية\tشواهد مجتمعات التعلّم المهنية\tgeneral\tNULL\tNULL\t9\t2025-11-30 20:33:28\t2025-11-30 20:48:02\n",
+  "stderr": "",
+  "execution_time_ms": 1530
+}

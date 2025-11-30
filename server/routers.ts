@@ -148,6 +148,29 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return await db.getEvidenceTemplatesByStandardId(input.standardId);
       }),
+    
+    getSubEvidence: publicProcedure
+      .input(z.object({ templateId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getSubEvidenceByTemplateId(input.templateId);
+      }),
+    
+    getFilteredSubEvidence: protectedProcedure
+      .input(z.object({ templateId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        // Get user profile
+        const profile = await db.getTeacherProfileByUserId(ctx.user.id);
+        if (!profile) {
+          // If no profile, return all sub-evidence
+          return await db.getSubEvidenceByTemplateId(input.templateId);
+        }
+        
+        // Parse stages and subjects
+        const userStages = profile.stage ? JSON.parse(profile.stage) : [];
+        const userSubjects = profile.subjects ? JSON.parse(profile.subjects) : [];
+        
+        return await db.getFilteredSubEvidence(input.templateId, userStages, userSubjects);
+      }),
   }),
 
   evidence: router({

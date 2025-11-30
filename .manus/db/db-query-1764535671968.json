@@ -1,0 +1,54 @@
+{
+  "query": "SELECT id, title FROM standards ORDER BY id",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SELECT id, title FROM standards ORDER BY id",
+  "rows": [
+    {
+      "id": "1",
+      "title": "أداء الواجبات الوظيفية"
+    },
+    {
+      "id": "2",
+      "title": "التفاعل مع المجتمع المهني"
+    },
+    {
+      "id": "3",
+      "title": "التفاعل مع أولياء الأمور"
+    },
+    {
+      "id": "4",
+      "title": "إدارة الصف"
+    },
+    {
+      "id": "5",
+      "title": "التخطيط للتدريس"
+    },
+    {
+      "id": "6",
+      "title": "تنفيذ التدريس"
+    },
+    {
+      "id": "7",
+      "title": "التقويم"
+    },
+    {
+      "id": "8",
+      "title": "التطوير المهني"
+    },
+    {
+      "id": "9",
+      "title": "القيم المهنية"
+    },
+    {
+      "id": "10",
+      "title": "استخدام التقنية التعليمية"
+    },
+    {
+      "id": "11",
+      "title": "المشاركة المجتمعية"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\n1\tأداء الواجبات الوظيفية\n2\tالتفاعل مع المجتمع المهني\n3\tالتفاعل مع أولياء الأمور\n4\tإدارة الصف\n5\tالتخطيط للتدريس\n6\tتنفيذ التدريس\n7\tالتقويم\n8\tالتطوير المهني\n9\tالقيم المهنية\n10\tاستخدام التقنية التعليمية\n11\tالمشاركة المجتمعية\n",
+  "stderr": "",
+  "execution_time_ms": 1624
+}
