@@ -8,11 +8,13 @@ import Home from "./pages/Home";
 import ProfileSetup from "./pages/ProfileSetup";
 import StandardDetail from "./pages/StandardDetail";
 import EvidenceForm from "./pages/EvidenceForm";
+import Dashboard from "./pages/Dashboard";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/profile-setup"} component={ProfileSetup} />
       <Route path="/standard/:id" component={StandardDetail} />
       <Route path="/evidence/new" component={EvidenceForm} />
