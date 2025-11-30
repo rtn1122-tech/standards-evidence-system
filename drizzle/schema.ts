@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, date } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -32,6 +32,14 @@ export const teacherProfiles = mysqlTable("teacherProfiles", {
   stage: varchar("stage", { length: 100 }), // المرحلة (ابتدائي، متوسط، ثانوي)
   subjects: text("subjects"), // المواد التدريسية (JSON array)
   selectedBackground: varchar("selectedBackground", { length: 100 }).default("default"), // الخلفية المختارة
+  // حقول جديدة (اختيارية)
+  email: varchar("email", { length: 255 }), // البريد الإلكتروني
+  phoneNumber: varchar("phoneNumber", { length: 20 }), // رقم الجوال
+  professionalLicenseNumber: varchar("professionalLicenseNumber", { length: 100 }), // رقم الرخصة المهنية
+  licenseStartDate: date("licenseStartDate"), // تاريخ بداية الرخصة
+  licenseEndDate: date("licenseEndDate"), // تاريخ نهاية الرخصة
+  employeeNumber: varchar("employeeNumber", { length: 100 }), // الرقم الوظيفي
+  jobTitle: varchar("jobTitle", { length: 255 }), // المسمى الوظيفي
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

@@ -110,11 +110,22 @@ export const appRouter = router({
         stage: z.string().optional(),
         subjects: z.string().optional(), // JSON string
         selectedBackground: z.string().optional(),
+        // حقول جديدة (اختيارية)
+        email: z.string().optional(),
+        phoneNumber: z.string().optional(),
+        professionalLicenseNumber: z.string().optional(),
+        licenseStartDate: z.string().optional(),
+        licenseEndDate: z.string().optional(),
+        employeeNumber: z.string().optional(),
+        jobTitle: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        const { licenseStartDate, licenseEndDate, ...rest } = input;
         await db.upsertTeacherProfile({
           userId: ctx.user.id,
-          ...input,
+          ...rest,
+          licenseStartDate: licenseStartDate ? new Date(licenseStartDate) : undefined,
+          licenseEndDate: licenseEndDate ? new Date(licenseEndDate) : undefined,
         });
         
         return { success: true };

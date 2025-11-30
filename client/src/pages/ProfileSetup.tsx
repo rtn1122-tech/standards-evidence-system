@@ -10,20 +10,7 @@ import { ArrowRight, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
-
-const STAGES = ["ابتدائي", "متوسط", "ثانوي"];
-const SUBJECTS = [
-  "لغة عربية",
-  "رياضيات",
-  "علوم",
-  "اجتماعيات",
-  "لغة إنجليزية",
-  "تربية إسلامية",
-  "تربية فنية",
-  "تربية بدنية",
-  "حاسب آلي",
-  "مهارات حياتية",
-];
+import { STAGES, SUBJECTS } from "@/../../shared/constants";
 
 export default function ProfileSetup() {
   const { user, isAuthenticated } = useAuth();
@@ -39,6 +26,13 @@ export default function ProfileSetup() {
     gender: "male" as "male" | "female",
     stage: "",
     subjects: [] as string[],
+    email: "",
+    phoneNumber: "",
+    professionalLicenseNumber: "",
+    licenseStartDate: "",
+    licenseEndDate: "",
+    employeeNumber: "",
+    jobTitle: "",
   });
 
   useEffect(() => {
@@ -51,6 +45,13 @@ export default function ProfileSetup() {
         gender: profile.gender,
         stage: profile.stage || "",
         subjects: profile.subjects ? JSON.parse(profile.subjects) : [],
+        email: profile.email || "",
+        phoneNumber: profile.phoneNumber || "",
+        professionalLicenseNumber: profile.professionalLicenseNumber || "",
+        licenseStartDate: profile.licenseStartDate ? (profile.licenseStartDate instanceof Date ? profile.licenseStartDate.toISOString().split('T')[0] : profile.licenseStartDate) : "",
+        licenseEndDate: profile.licenseEndDate ? (profile.licenseEndDate instanceof Date ? profile.licenseEndDate.toISOString().split('T')[0] : profile.licenseEndDate) : "",
+        employeeNumber: profile.employeeNumber || "",
+        jobTitle: profile.jobTitle || "",
       });
     } else if (user) {
       setFormData(prev => ({
@@ -224,7 +225,7 @@ export default function ProfileSetup() {
               {/* المواد التدريسية */}
               <div className="space-y-2">
                 <Label>المواد التدريسية</Label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
                   {SUBJECTS.map((subject) => (
                     <div
                       key={subject}
@@ -242,6 +243,89 @@ export default function ProfileSetup() {
                 <p className="text-sm text-gray-500">
                   المواد المختارة: {formData.subjects.length > 0 ? formData.subjects.join("، ") : "لا يوجد"}
                 </p>
+              </div>
+
+              {/* حقول إضافية اختيارية */}
+              <div className="border-t pt-6 space-y-6">
+                <h3 className="text-lg font-semibold">معلومات إضافية (اختيارية)</h3>
+                
+                {/* البريد الإلكتروني */}
+                <div className="space-y-2">
+                  <Label htmlFor="email">البريد الإلكتروني</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="example@email.com"
+                  />
+                </div>
+
+                {/* رقم الجوال */}
+                <div className="space-y-2">
+                  <Label htmlFor="phoneNumber">رقم الجوال</Label>
+                  <Input
+                    id="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                    placeholder="05xxxxxxxx"
+                  />
+                </div>
+
+                {/* رقم الرخصة المهنية */}
+                <div className="space-y-2">
+                  <Label htmlFor="professionalLicenseNumber">رقم الرخصة المهنية</Label>
+                  <Input
+                    id="professionalLicenseNumber"
+                    value={formData.professionalLicenseNumber}
+                    onChange={(e) => setFormData({ ...formData, professionalLicenseNumber: e.target.value })}
+                    placeholder="رقم الرخصة"
+                  />
+                </div>
+
+                {/* تاريخ الرخصة */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="licenseStartDate">تاريخ بداية الرخصة</Label>
+                    <Input
+                      id="licenseStartDate"
+                      type="date"
+                      value={formData.licenseStartDate}
+                      onChange={(e) => setFormData({ ...formData, licenseStartDate: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="licenseEndDate">تاريخ نهاية الرخصة</Label>
+                    <Input
+                      id="licenseEndDate"
+                      type="date"
+                      value={formData.licenseEndDate}
+                      onChange={(e) => setFormData({ ...formData, licenseEndDate: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                {/* الرقم الوظيفي */}
+                <div className="space-y-2">
+                  <Label htmlFor="employeeNumber">الرقم الوظيفي</Label>
+                  <Input
+                    id="employeeNumber"
+                    value={formData.employeeNumber}
+                    onChange={(e) => setFormData({ ...formData, employeeNumber: e.target.value })}
+                    placeholder="رقم الموظف"
+                  />
+                </div>
+
+                {/* المسمى الوظيفي */}
+                <div className="space-y-2">
+                  <Label htmlFor="jobTitle">المسمى الوظيفي</Label>
+                  <Input
+                    id="jobTitle"
+                    value={formData.jobTitle}
+                    onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
+                    placeholder="مثال: معلم لغة عربية"
+                  />
+                </div>
               </div>
 
               {/* Submit Button */}

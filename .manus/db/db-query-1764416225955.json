@@ -1,0 +1,54 @@
+{
+  "query": "SELECT standardId, COUNT(*) as count FROM evidenceTemplates GROUP BY standardId ORDER BY standardId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SELECT standardId, COUNT(*) as count FROM evidenceTemplates GROUP BY standardId ORDER BY standardId;",
+  "rows": [
+    {
+      "standardId": "1",
+      "count": "12"
+    },
+    {
+      "standardId": "2",
+      "count": "8"
+    },
+    {
+      "standardId": "3",
+      "count": "7"
+    },
+    {
+      "standardId": "4",
+      "count": "7"
+    },
+    {
+      "standardId": "5",
+      "count": "7"
+    },
+    {
+      "standardId": "6",
+      "count": "7"
+    },
+    {
+      "standardId": "7",
+      "count": "7"
+    },
+    {
+      "standardId": "8",
+      "count": "7"
+    },
+    {
+      "standardId": "9",
+      "count": "5"
+    },
+    {
+      "standardId": "10",
+      "count": "7"
+    },
+    {
+      "standardId": "11",
+      "count": "7"
+    }
+  ],
+  "messages": [],
+  "stdout": "standardId\tcount\n1\t12\n2\t8\n3\t7\n4\t7\n5\t7\n6\t7\n7\t7\n8\t7\n9\t5\n10\t7\n11\t7\n",
+  "stderr": "",
+  "execution_time_ms": 1568
+}
