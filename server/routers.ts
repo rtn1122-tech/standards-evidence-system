@@ -166,7 +166,8 @@ export const appRouter = router({
         }
         
         // Parse stages and subjects
-        const userStages = profile.stage ? JSON.parse(profile.stage) : [];
+        // stage is stored as plain text, not JSON array
+        const userStages = profile.stage ? [profile.stage] : [];
         const userSubjects = profile.subjects ? JSON.parse(profile.subjects) : [];
         
         return await db.getFilteredSubEvidence(input.templateId, userStages, userSubjects);

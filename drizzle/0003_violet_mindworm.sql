@@ -1,0 +1,1 @@
+ALTER TABLE `evidenceTemplates` ADD `hasSubEvidence` boolean DEFAULT false NOT NULL;

@@ -74,6 +74,7 @@ export const evidenceTemplates = mysqlTable("evidenceTemplates", {
   evidenceType: mysqlEnum("evidenceType", ["general", "subject", "stage"]).default("general").notNull(),
   applicableSubjects: text("applicableSubjects"), // JSON array - null means all
   applicableStages: text("applicableStages"), // JSON array - null means all
+  hasSubEvidence: boolean("hasSubEvidence").default(false).notNull(), // Whether this template has sub-evidence
   orderIndex: int("orderIndex").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

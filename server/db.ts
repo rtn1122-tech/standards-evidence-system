@@ -12,9 +12,9 @@ import {
   userEvidence,
   InsertUserEvidence,
   backgrounds,
-  InsertBackground,
-  evidenceDetails
+  InsertBackground
 } from "../drizzle/schema";
+import { evidenceDetails } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -257,9 +257,14 @@ export async function getFilteredSubEvidence(templateId: number, userStages: str
   if (!db) return [];
   
   const result = await db.execute<any>(
-    sql`SELECT * FROM evidenceSubTemplates WHERE evidenceTemplateId = ${templateId} ORDER BY orderIndex`
+    sql`SELECT * FROM evidenceSubTemplates WHERE evidenceTemplateId = ${templateId}`
   );
   const allSubEvidence = result as any[];
+  
+  // If user has no profile data (empty arrays), show all sub-evidence
+  if (userStages.length === 0 && userSubjects.length === 0) {
+    return allSubEvidence;
+  }
   
   // Filter based on user profile
   return allSubEvidence.filter((item) => {

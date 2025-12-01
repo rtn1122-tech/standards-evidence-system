@@ -291,10 +291,12 @@ function StandardAccordionItem({
 }) {
   const [, setLocation] = useLocation();
   
-  const { data: evidenceTemplates = [], isLoading } = trpc.evidenceTemplates.listByStandard.useQuery(
+  const { data: evidenceTemplates = [], isLoading } = trpc.evidenceTemplates.getByStandardId.useQuery(
     { standardId: standard.id },
     { enabled: !disabled }
   );
+
+
 
   const { data: userEvidence = [] } = trpc.evidence.listByStandard.useQuery(
     { standardId: standard.id },
@@ -428,7 +430,7 @@ function EvidenceTemplateItem({
   
   const userEv = userEvidence.find((e) => e.evidenceTemplateId === template.id);
   const isCompleted = userEv?.isCompleted || false;
-  const hasSubEvidence = template.id === 30001 || template.id === 30002; // IDs of parent templates
+  const hasSubEvidence = template.id === 30001 || template.id === 30002;
 
   if (!hasSubEvidence) {
     // Original behavior for templates without sub-evidence
