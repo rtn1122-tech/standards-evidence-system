@@ -12,9 +12,9 @@ import {
   userEvidence,
   InsertUserEvidence,
   backgrounds,
-  InsertBackground
+  InsertBackground,
+  evidenceDetails
 } from "../drizzle/schema";
-import { evidenceDetails } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -308,7 +308,6 @@ export async function createEvidenceDetail(data: {
   section4: string;
   section5: string;
   section6: string;
-  section7: string;
   image1: string | null;
   image2: string | null;
   theme: string;
@@ -338,7 +337,6 @@ export async function createEvidenceDetail(data: {
     section4Content: data.section4,
     section5Content: data.section5,
     section6Content: data.section6,
-    section7Content: data.section7,
     image1Url: data.image1,
     image2Url: data.image2,
     selectedTheme: data.theme,

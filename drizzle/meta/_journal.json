@@ -29,6 +29,13 @@
       "when": 1764570408227,
       "tag": "0003_violet_mindworm",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1764573242890,
+      "tag": "0004_nosy_bastion",
+      "breakpoints": true
     }
   ]
 }

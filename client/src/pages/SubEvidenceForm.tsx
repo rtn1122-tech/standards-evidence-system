@@ -39,7 +39,7 @@ export default function SubEvidenceForm() {
   const [section4, setSection4] = useState(""); // النتائج
   const [section5, setSection5] = useState(""); // التحليل والمناقشة
   const [section6, setSection6] = useState(""); // التوصيات
-  const [section7, setSection7] = useState(""); // الخاتمة
+  // Note: Only 6 sections in new schema
   
   // Images
   const [image1, setImage1] = useState<File | null>(null);
@@ -52,13 +52,13 @@ export default function SubEvidenceForm() {
   // Pre-fill sections when data loads
   useEffect(() => {
     if (subTemplate) {
-      setSection1(subTemplate.section1 || "");
-      setSection2(subTemplate.section2 || "");
-      setSection3(subTemplate.section3 || "");
-      setSection4(subTemplate.section4 || "");
-      setSection5(subTemplate.section5 || "");
-      setSection6(subTemplate.section6 || "");
-      setSection7(subTemplate.section7 || "");
+      setSection1(subTemplate.section1Content || "");
+      setSection2(subTemplate.section2Content || "");
+      setSection3(subTemplate.section3Content || "");
+      setSection4(subTemplate.section4Content || "");
+      setSection5(subTemplate.section5Content || "");
+      setSection6(subTemplate.section6Content || "");
+      // Note: Only 6 sections in new schema
     }
   }, [subTemplate]);
   
@@ -139,7 +139,6 @@ export default function SubEvidenceForm() {
       section4,
       section5,
       section6,
-      section7,
       image1: image1Url,
       image2: image2Url,
       theme: "default",
@@ -423,10 +422,10 @@ export default function SubEvidenceForm() {
         {/* Page 2 - Text Sections */}
         {currentPage === 2 && (
           <div className="space-y-6">
-            {/* Section 1 - المقدمة */}
+            {/* Section 1 */}
             <Card>
               <CardHeader>
-                <CardTitle>المقدمة</CardTitle>
+                <CardTitle>{subTemplate?.section1Title || "القسم الأول"}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Textarea
@@ -439,10 +438,10 @@ export default function SubEvidenceForm() {
               </CardContent>
             </Card>
             
-            {/* Section 2 - الأهداف */}
+            {/* Section 2 */}
             <Card>
               <CardHeader>
-                <CardTitle>الأهداف</CardTitle>
+                <CardTitle>{subTemplate?.section2Title || "القسم الثاني"}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Textarea
@@ -458,7 +457,7 @@ export default function SubEvidenceForm() {
             {/* Section 3 - الإجراءات */}
             <Card>
               <CardHeader>
-                <CardTitle>الإجراءات</CardTitle>
+                <CardTitle>{subTemplate?.section3Title || "القسم الثالث"}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Textarea
@@ -474,7 +473,7 @@ export default function SubEvidenceForm() {
             {/* Section 4 - النتائج */}
             <Card>
               <CardHeader>
-                <CardTitle>النتائج</CardTitle>
+                <CardTitle>{subTemplate?.section4Title || "القسم الرابع"}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Textarea
@@ -506,7 +505,7 @@ export default function SubEvidenceForm() {
             {/* Section 6 - التوصيات */}
             <Card>
               <CardHeader>
-                <CardTitle>التوصيات</CardTitle>
+                <CardTitle>{subTemplate?.section5Title || "القسم الخامس"}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Textarea
@@ -519,21 +518,7 @@ export default function SubEvidenceForm() {
               </CardContent>
             </Card>
             
-            {/* Section 7 - الخاتمة */}
-            <Card>
-              <CardHeader>
-                <CardTitle>الخاتمة</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  value={section7}
-                  onChange={(e) => setSection7(e.target.value)}
-                  rows={6}
-                  className="w-full"
-                  placeholder="أدخل الخاتمة..."
-                />
-              </CardContent>
-            </Card>
+
           </div>
         )}
         

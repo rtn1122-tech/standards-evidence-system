@@ -93,6 +93,24 @@ export const evidenceSubTemplates = mysqlTable("evidenceSubTemplates", {
   title: varchar("title", { length: 500 }).notNull(), // عنوان الشاهد الفرعي
   description: text("description"), // وصف تفصيلي
   
+  // Content sections (6 sections for page 2)
+  section1Title: varchar("section1Title", { length: 255 }),
+  section1Content: text("section1Content"),
+  section2Title: varchar("section2Title", { length: 255 }),
+  section2Content: text("section2Content"),
+  section3Title: varchar("section3Title", { length: 255 }),
+  section3Content: text("section3Content"),
+  section4Title: varchar("section4Title", { length: 255 }),
+  section4Content: text("section4Content"),
+  section5Title: varchar("section5Title", { length: 255 }),
+  section5Content: text("section5Content"),
+  section6Title: varchar("section6Title", { length: 255 }),
+  section6Content: text("section6Content"),
+  
+  // Default images (2 images)
+  defaultImage1Url: text("defaultImage1Url"),
+  defaultImage2Url: text("defaultImage2Url"),
+  
   // Filtering criteria
   applicableSubjects: text("applicableSubjects"), // JSON array - المواد المناسبة
   applicableGrades: text("applicableGrades"), // JSON array - الصفوف المناسبة

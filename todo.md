@@ -89,3 +89,9 @@
 - [x] حذف template 16 المكرر
 - [ ] مشكلة متقطعة: template 30002 أحياناً يظهر وأحياناً لا يظهر (يحتاج debugging عميق)
 - [ ] اختبار نموذج تعبئة شاهد آخر
+
+## إضافة بيانات شاهد "الحضور والانصراف"
+- [x] إيجاد evidenceTemplate ID لـ "الحضور والانصراف"
+- [x] إضافة حقول sections و images إلى schema
+- [x] إضافة evidenceSubTemplate بـ description و 6 sections
+- [ ] اختبار عرض البيانات في نموذج التعبئة
