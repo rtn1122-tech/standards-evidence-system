@@ -15,6 +15,13 @@
       "when": 1764534440940,
       "tag": "0001_nice_morlocks",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1764567456143,
+      "tag": "0002_red_captain_midlands",
+      "breakpoints": true
     }
   ]
 }

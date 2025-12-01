@@ -157,3 +157,57 @@ export const backgrounds = mysqlTable("backgrounds", {
 
 export type Background = typeof backgrounds.$inferSelect;
 export type InsertBackground = typeof backgrounds.$inferInsert;
+
+/**
+ * Evidence details with custom fields and PDF generation
+ */
+export const evidenceDetails = mysqlTable("evidenceDetails", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  userEvidenceId: int("userEvidenceId").notNull(), // ربط مع userEvidence
+  evidenceTemplateId: int("evidenceTemplateId").notNull(),
+  evidenceSubTemplateId: int("evidenceSubTemplateId"), // null if main evidence
+  
+  // Page 1: Dynamic fields (JSON)
+  customFields: text("customFields"), // {"المنفذ": "أحمد", "ساهم في التنفيذ": "محمد، سعيد", ...}
+  
+  // Page 2: Content sections (editable by teacher)
+  section1Title: varchar("section1Title", { length: 100 }), // e.g., "المقدمة"
+  section1Content: text("section1Content"),
+  
+  section2Title: varchar("section2Title", { length: 100 }), // e.g., "الأهداف"
+  section2Content: text("section2Content"),
+  
+  section3Title: varchar("section3Title", { length: 100 }), // e.g., "الإجراءات"
+  section3Content: text("section3Content"),
+  
+  section4Title: varchar("section4Title", { length: 100 }), // e.g., "النتائج"
+  section4Content: text("section4Content"),
+  
+  section5Title: varchar("section5Title", { length: 100 }), // e.g., "التحليل والمناقشة"
+  section5Content: text("section5Content"),
+  
+  section6Title: varchar("section6Title", { length: 100 }), // e.g., "التوصيات"
+  section6Content: text("section6Content"),
+  
+  section7Title: varchar("section7Title", { length: 100 }), // e.g., "الخاتمة" (optional)
+  section7Content: text("section7Content"),
+  
+  // Images (2-3 images)
+  image1Url: text("image1Url"),
+  image2Url: text("image2Url"),
+  image3Url: text("image3Url"),
+  
+  // Theme selection
+  selectedTheme: varchar("selectedTheme", { length: 50 }).default("moe").notNull(), // "moe" = Ministry of Education theme
+  
+  // Generated PDF
+  pdfUrl: text("pdfUrl"),
+  qrCodeData: text("qrCodeData"), // URL or data for QR code
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EvidenceDetail = typeof evidenceDetails.$inferSelect;
+export type InsertEvidenceDetail = typeof evidenceDetails.$inferInsert;
