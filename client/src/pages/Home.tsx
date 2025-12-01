@@ -504,7 +504,7 @@ function EvidenceTemplateItem({
                   key={subItem.id}
                   className="flex items-start gap-2 p-2 rounded hover:bg-background transition-colors cursor-pointer text-sm"
                   onClick={() => {
-                    setLocation(`/evidence/new?standardId=${standardId}&templateId=${template.id}&subTemplateId=${subItem.id}`);
+                    setLocation(`/evidence/sub/${subItem.id}`);
                   }}
                 >
                   <div className="h-4 w-4 rounded-full border border-muted-foreground/30 mt-0.5 flex-shrink-0" />

@@ -12,7 +12,8 @@ import {
   userEvidence,
   InsertUserEvidence,
   backgrounds,
-  InsertBackground
+  InsertBackground,
+  evidenceDetails
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -276,5 +277,65 @@ export async function getFilteredSubEvidence(templateId: number, userStages: str
     const subjectMatch = !applicableSubjects || applicableSubjects.some((subject: string) => userSubjects.includes(subject));
     
     return stageMatch && subjectMatch;
+  });
+}
+
+export async function getSubTemplateById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.execute<any>(
+    sql`SELECT * FROM evidenceSubTemplates WHERE id = ${id} LIMIT 1`
+  );
+  
+  const rows = result as any[];
+  return rows[0] || null;
+}
+
+export async function createEvidenceDetail(data: {
+  userId: number;
+  subTemplateId: number;
+  templateId: number;
+  dynamicFields: string;
+  section1: string;
+  section2: string;
+  section3: string;
+  section4: string;
+  section5: string;
+  section6: string;
+  section7: string;
+  image1: string | null;
+  image2: string | null;
+  theme: string;
+}) {
+  const db = await getDb();
+  if (!db) return;
+  
+  // Create a temporary userEvidence entry first (required by schema)
+  const userEvidenceResult = await db.insert(userEvidence).values({
+    userId: data.userId,
+    evidenceTemplateId: data.templateId,
+    standardId: 2, // Default to standard 2
+    isCompleted: false,
+  });
+  
+  const userEvidenceId = Number(userEvidenceResult[0].insertId);
+  
+  await db.insert(evidenceDetails).values({
+    userId: data.userId,
+    userEvidenceId,
+    evidenceTemplateId: data.templateId,
+    evidenceSubTemplateId: data.subTemplateId,
+    customFields: data.dynamicFields,
+    section1Content: data.section1,
+    section2Content: data.section2,
+    section3Content: data.section3,
+    section4Content: data.section4,
+    section5Content: data.section5,
+    section6Content: data.section6,
+    section7Content: data.section7,
+    image1Url: data.image1,
+    image2Url: data.image2,
+    selectedTheme: data.theme,
   });
 }

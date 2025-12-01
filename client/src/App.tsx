@@ -9,6 +9,7 @@ import ProfileSetup from "./pages/ProfileSetup";
 import StandardDetail from "./pages/StandardDetail";
 import EvidenceForm from "./pages/EvidenceForm";
 import Dashboard from "./pages/Dashboard";
+import SubEvidenceForm from "./pages/SubEvidenceForm";
 
 function Router() {
   return (
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/standard/:id" component={StandardDetail} />
       <Route path="/evidence/new" component={EvidenceForm} />
       <Route path="/evidence/:id" component={EvidenceForm} />
+      <Route path="/evidence/sub/:subTemplateId" component={SubEvidenceForm} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

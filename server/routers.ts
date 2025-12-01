@@ -171,6 +171,51 @@ export const appRouter = router({
         
         return await db.getFilteredSubEvidence(input.templateId, userStages, userSubjects);
       }),
+    
+    getSubTemplateById: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getSubTemplateById(input.id);
+      }),
+  }),
+
+  evidenceDetails: router({
+    save: protectedProcedure
+      .input(z.object({
+        subTemplateId: z.number(),
+        templateId: z.number(),
+        dynamicFields: z.any(),
+        section1: z.string(),
+        section2: z.string(),
+        section3: z.string(),
+        section4: z.string(),
+        section5: z.string(),
+        section6: z.string(),
+        section7: z.string(),
+        image1: z.string().nullable(),
+        image2: z.string().nullable(),
+        theme: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await db.createEvidenceDetail({
+          userId: ctx.user.id,
+          subTemplateId: input.subTemplateId,
+          templateId: input.templateId,
+          dynamicFields: JSON.stringify(input.dynamicFields),
+          section1: input.section1,
+          section2: input.section2,
+          section3: input.section3,
+          section4: input.section4,
+          section5: input.section5,
+          section6: input.section6,
+          section7: input.section7,
+          image1: input.image1,
+          image2: input.image2,
+          theme: input.theme,
+        });
+        
+        return { success: true };
+      }),
   }),
 
   evidence: router({
