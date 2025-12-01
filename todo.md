@@ -94,4 +94,10 @@
 - [x] إيجاد evidenceTemplate ID لـ "الحضور والانصراف"
 - [x] إضافة حقول sections و images إلى schema
 - [x] إضافة evidenceSubTemplate بـ description و 6 sections
-- [ ] اختبار عرض البيانات في نموذج التعبئة
+- [x] تحديث SubEvidenceForm لعرض عناوين الأقسام بشكل ديناميكي
+- [x] مشكلة: title و description لا يظهران في المربع الأبيض (تم الحل)
+  - [x] التحقق من وجود البيانات في قاعدة البيانات (ID 101) - البيانات موجودة
+  - [x] فحص API response من getSubTemplateById - يُرجع array بدلاً من object
+  - [x] إضافة console.log في SubEvidenceForm للتحقق من البيانات المستلمة
+  - [x] إصلاح data structure في getSubTemplateById (db.execute يُرجع [rows, fields])
+  - [x] اختبار العرض في المتصفح - يعمل بنجاح

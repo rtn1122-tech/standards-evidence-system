@@ -52,6 +52,9 @@ export default function SubEvidenceForm() {
   // Pre-fill sections when data loads
   useEffect(() => {
     if (subTemplate) {
+      console.log("🔍 SubTemplate Data:", subTemplate);
+      console.log("📝 Title:", subTemplate.title);
+      console.log("📄 Description:", subTemplate.description);
       setSection1(subTemplate.section1Content || "");
       setSection2(subTemplate.section2Content || "");
       setSection3(subTemplate.section3Content || "");

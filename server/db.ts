@@ -12,9 +12,9 @@ import {
   userEvidence,
   InsertUserEvidence,
   backgrounds,
-  InsertBackground,
-  evidenceDetails
+  InsertBackground
 } from "../drizzle/schema";
+import * as schema from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -289,12 +289,8 @@ export async function getSubTemplateById(id: number) {
   const db = await getDb();
   if (!db) return null;
   
-  const result = await db.execute<any>(
-    sql`SELECT * FROM evidenceSubTemplates WHERE id = ${id} LIMIT 1`
-  );
-  
-  const rows = result as any[];
-  return rows[0] || null;
+  const result = await db.select().from(schema.evidenceSubTemplates).where(eq(schema.evidenceSubTemplates.id, id)).limit(1);
+  return result[0] || null;
 }
 
 export async function createEvidenceDetail(data: {
@@ -325,7 +321,7 @@ export async function createEvidenceDetail(data: {
   
   const userEvidenceId = Number(userEvidenceResult[0].insertId);
   
-  await db.insert(evidenceDetails).values({
+  await db.insert(schema.evidenceDetails).values({
     userId: data.userId,
     userEvidenceId,
     evidenceTemplateId: data.templateId,
