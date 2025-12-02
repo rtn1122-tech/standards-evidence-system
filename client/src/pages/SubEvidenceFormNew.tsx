@@ -55,7 +55,7 @@ export default function SubEvidenceFormNew() {
   
   const [currentPage, setCurrentPage] = useState(1);
   
-  // Pre-fill sections when data loads
+  // Pre-fill sections and default images when data loads
   useEffect(() => {
     if (subTemplate) {
       setSection1(subTemplate.section1Content || "");
@@ -64,6 +64,16 @@ export default function SubEvidenceFormNew() {
       setSection4(subTemplate.section4Content || "");
       setSection5(subTemplate.section5Content || "");
       setSection6(subTemplate.section6Content || "");
+      
+      // Set default images if available
+      if (subTemplate.defaultImage1Url) {
+        setImage1Preview(subTemplate.defaultImage1Url);
+        setImage1Url(subTemplate.defaultImage1Url);
+      }
+      if (subTemplate.defaultImage2Url) {
+        setImage2Preview(subTemplate.defaultImage2Url);
+        setImage2Url(subTemplate.defaultImage2Url);
+      }
     }
   }, [subTemplate]);
   
