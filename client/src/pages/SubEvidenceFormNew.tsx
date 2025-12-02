@@ -154,9 +154,10 @@ export default function SubEvidenceFormNew() {
   
   // Save mutation
   const saveMutation = trpc.evidenceDetails.save.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("تم حفظ بيانات الشاهد بنجاح");
-      setLocation("/");
+      // Navigate to preview page with the returned evidenceDetailId
+      setLocation(`/evidence/sub-preview/${data.evidenceDetailId}`);
     },
     onError: (error) => {
       toast.error(error.message || "حدث خطأ أثناء الحفظ");
@@ -169,11 +170,8 @@ export default function SubEvidenceFormNew() {
       return;
     }
     
-    // Validation
-    if (!title.trim() || !beneficiaries.trim()) {
-      toast.error("يرجى ملء جميع الحقول المطلوبة");
-      return;
-    }
+    // Validation - allow saving even with empty fields
+    // Teacher can fill them later
     
     // Images are already uploaded to S3 (image1Url, image2Url)
     

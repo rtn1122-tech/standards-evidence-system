@@ -190,3 +190,12 @@
 - [x] إضافة tRPC procedure (evidenceDetails.generatePDF)
 - [x] اختبار توليد PDF - نجح! (9 صفحات، 329.90 KB)
 - [ ] إنشاء صفحة معاينة للمستخدم النهائي مع زر تحميل PDF
+
+## صفحة معاينة الشاهد المكتمل مع تحميل PDF
+- [x] إنشاء صفحة SubEvidencePreview.tsx
+- [x] إضافة زر "تحميل PDF" مع ربطه بـ trpc.evidenceDetails.generatePDF
+- [x] إضافة route في App.tsx (/evidence/sub-preview/:id)
+- [x] ربط النموذج بصفحة المعاينة (saveMutation يُرجع evidenceDetailId)
+- [x] إزالة validation الصارم للسماح بالحفظ
+- [x] اختبار الحفظ والتوجيه - نجح! تم التوجيه إلى صفحة المعاينة
+- [ ] إصلاح مشكلة تحميل PDF (لا يعمل في المتصفح - يحتاج debugging)

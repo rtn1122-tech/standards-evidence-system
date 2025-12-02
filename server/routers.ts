@@ -198,7 +198,7 @@ export const appRouter = router({
         theme: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
-        await db.createEvidenceDetail({
+        const evidenceDetailId = await db.createEvidenceDetail({
           userId: ctx.user.id,
           subTemplateId: input.subTemplateId,
           templateId: input.templateId,
@@ -214,7 +214,7 @@ export const appRouter = router({
           theme: input.theme,
         });
         
-        return { success: true };
+        return { success: true, evidenceDetailId };
       }),
     
     uploadImage: protectedProcedure

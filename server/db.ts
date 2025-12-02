@@ -12,7 +12,9 @@ import {
   userEvidence,
   InsertUserEvidence,
   backgrounds,
-  InsertBackground
+  InsertBackground,
+  evidenceSubTemplates,
+  evidenceDetails
 } from "../drizzle/schema";
 import * as schema from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -288,8 +290,7 @@ export async function getFilteredSubEvidence(templateId: number, userStages: str
 export async function getSubTemplateById(id: number) {
   const db = await getDb();
   if (!db) return null;
-  
-  const result = await db.select().from(schema.evidenceSubTemplates).where(eq(schema.evidenceSubTemplates.id, id)).limit(1);
+  const result = await db.select().from(evidenceSubTemplates).where(eq(evidenceSubTemplates.id, id)).limit(1);
   return result[0] || null;
 }
 
@@ -321,7 +322,7 @@ export async function createEvidenceDetail(data: {
   
   const userEvidenceId = Number(userEvidenceResult[0].insertId);
   
-  await db.insert(schema.evidenceDetails).values({
+  const evidenceDetailResult = await db.insert(evidenceDetails).values({
     userId: data.userId,
     userEvidenceId,
     evidenceTemplateId: data.templateId,
@@ -337,4 +338,6 @@ export async function createEvidenceDetail(data: {
     image2Url: data.image2,
     selectedTheme: data.theme,
   });
+  
+  return Number(evidenceDetailResult[0].insertId);
 }
