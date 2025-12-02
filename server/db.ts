@@ -360,3 +360,67 @@ export async function getEvidenceDetailById(id: number) {
   
   return result[0];
 }
+
+/**
+ * Get all evidence details for a user with related data
+ */
+export async function getUserEvidenceDetails(userId: number) {
+  const db = await getDb();
+  
+  const result = await db
+    .select({
+      id: evidenceDetails.id,
+      userId: evidenceDetails.userId,
+      evidenceSubTemplateId: evidenceDetails.evidenceSubTemplateId,
+      customFields: evidenceDetails.customFields,
+      section1Content: evidenceDetails.section1Content,
+      section2Content: evidenceDetails.section2Content,
+      section3Content: evidenceDetails.section3Content,
+      section4Content: evidenceDetails.section4Content,
+      section5Content: evidenceDetails.section5Content,
+      section6Content: evidenceDetails.section6Content,
+      image1Url: evidenceDetails.image1Url,
+      image2Url: evidenceDetails.image2Url,
+      createdAt: evidenceDetails.createdAt,
+      updatedAt: evidenceDetails.updatedAt,
+      // Sub-template data
+      subTemplateTitle: evidenceSubTemplates.title,
+      subTemplateDescription: evidenceSubTemplates.description,
+      // Standard data
+      standardId: evidenceSubTemplates.standardId,
+    })
+    .from(evidenceDetails)
+    .leftJoin(
+      evidenceSubTemplates,
+      eq(evidenceDetails.evidenceSubTemplateId, evidenceSubTemplates.id)
+    )
+    .where(eq(evidenceDetails.userId, userId))
+    .orderBy(desc(evidenceDetails.createdAt));
+  
+  return result;
+}
+
+/**
+ * Delete evidence detail by ID (with user ownership check)
+ */
+export async function deleteEvidenceDetail(id: number, userId: number) {
+  const db = await getDb();
+  
+  // First check if the evidence belongs to the user
+  const existing = await db
+    .select()
+    .from(evidenceDetails)
+    .where(eq(evidenceDetails.id, id))
+    .limit(1);
+  
+  if (existing.length === 0 || existing[0].userId !== userId) {
+    return false;
+  }
+  
+  // Delete the evidence
+  await db
+    .delete(evidenceDetails)
+    .where(eq(evidenceDetails.id, id));
+  
+  return true;
+}

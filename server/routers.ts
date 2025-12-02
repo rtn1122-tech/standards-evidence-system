@@ -243,6 +243,40 @@ export const appRouter = router({
         return { url };
       }),
     
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getUserEvidenceDetails(ctx.user.id);
+    }),
+    
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input, ctx }) => {
+        const evidenceDetail = await db.getEvidenceDetailById(input.id);
+        
+        if (!evidenceDetail || evidenceDetail.userId !== ctx.user.id) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Evidence detail not found',
+          });
+        }
+        
+        return evidenceDetail;
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const success = await db.deleteEvidenceDetail(input.id, ctx.user.id);
+        
+        if (!success) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Evidence detail not found or you do not have permission to delete it',
+          });
+        }
+        
+        return { success: true };
+      }),
+    
     generatePDF: protectedProcedure
       .input(z.object({
         evidenceDetailId: z.number(),

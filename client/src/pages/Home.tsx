@@ -128,9 +128,14 @@ export default function Home() {
                 <p className="text-xs text-muted-foreground">مرحباً، {user?.name || "المستخدم"}</p>
               </div>
             </div>
-            <Button variant="outline" onClick={() => setLocation("/dashboard")}>
-              لوحة البيانات
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setLocation("/my-evidence")}>
+                شواهدي
+              </Button>
+              <Button variant="outline" onClick={() => setLocation("/dashboard")}>
+                لوحة البيانات
+              </Button>
+            </div>
         </div>
       </header>
 

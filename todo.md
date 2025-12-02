@@ -225,3 +225,29 @@
   * صفحة التفاصيل: 6 أقسام محتوى + صورتين + QR Code + التوقيعات
   * ثيم الألوان الأخضر الفيروزي (#00A896)
 - [x] حفظ checkpoint نهائي
+
+## إضافة قائمة الشواهد المحفوظة
+- [ ] إضافة tRPC procedures:
+  * getUserEvidenceDetails: جلب جميع الشواهد المحفوظة للمعلم
+  * deleteEvidenceDetail: حذف شاهد محفوظ
+- [ ] إضافة database functions:
+  * getUserEvidenceDetails(userId): جلب الشواهد مع بيانات المعيار والشاهد الفرعي
+  * deleteEvidenceDetail(id, userId): حذف شاهد مع التحقق من الصلاحية
+- [ ] إنشاء صفحة MyEvidence.tsx:
+  * عرض جميع الشواهد المحفوظة في جدول أو cards
+  * زر "تحميل PDF" لكل شاهد
+  * زر "تعديل" للانتقال إلى SubEvidenceFormNew
+  * زر "حذف" مع تأكيد
+  * عداد الشواهد المكتملة
+- [ ] إضافة route في App.tsx (/my-evidence)
+- [ ] إضافة زر "شواهدي" في الصفحة الرئيسية
+- [ ] اختبار جميع الوظائف
+- [ ] حفظ checkpoint
+
+## ✅ التحقق من دعم الاختيار المتعدد (مكتمل)
+- [x] فحص ProfileSetup.tsx - يدعم الاختيار المتعدد بشكل كامل
+- [x] فحص حفظ البيانات - يتم حفظ stage و subjects كـ JSON string
+- [x] فحص Dashboard.tsx - يعرض جميع المراحل والمواد في Badges
+- [x] فحص schema - stage: varchar(100), subjects: text
+- [x] اختبار في المتصفح - نجح! تم اختيار مرحلتين ومادتين
+- [x] حفظ checkpoint
