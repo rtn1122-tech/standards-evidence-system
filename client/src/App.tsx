@@ -10,6 +10,8 @@ import StandardDetail from "./pages/StandardDetail";
 import EvidenceForm from "./pages/EvidenceForm";
 import Dashboard from "./pages/Dashboard";
 import SubEvidenceForm from "./pages/SubEvidenceForm";
+import EvidencePreview from "./pages/EvidencePreview";
+import SubEvidenceFormNew from "./pages/SubEvidenceFormNew";
 
 function Router() {
   return (
@@ -21,6 +23,8 @@ function Router() {
       <Route path="/evidence/new" component={EvidenceForm} />
       <Route path="/evidence/:id" component={EvidenceForm} />
       <Route path="/evidence/sub/:subTemplateId" component={SubEvidenceForm} />
+      <Route path="/evidence/preview/:id" component={EvidencePreview} />
+      <Route path="/evidence/sub-new/:subTemplateId" component={SubEvidenceFormNew} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
