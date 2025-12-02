@@ -248,34 +248,59 @@ export const appRouter = router({
         evidenceDetailId: z.number(),
       }))
       .mutation(async ({ input, ctx }) => {
-        // TODO: Fetch evidence detail data from database
-        // For now, return mock data
         const { generateEvidencePDF } = await import('./generatePDF');
         
-        // Mock data - replace with actual database query
+        // Fetch evidence detail from database
+        const evidenceDetail = await db.getEvidenceDetailById(input.evidenceDetailId);
+        
+        if (!evidenceDetail) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Evidence detail not found',
+          });
+        }
+        
+        // Fetch teacher profile for additional data
+        const profile = await db.getTeacherProfileByUserId(ctx.user.id);
+        
+        // Fetch sub-template for title and description
+        const subTemplate = evidenceDetail.evidenceSubTemplateId 
+          ? await db.getSubTemplateById(evidenceDetail.evidenceSubTemplateId)
+          : null;
+        
+        // Parse customFields JSON
+        const customFields = evidenceDetail.customFields 
+          ? JSON.parse(evidenceDetail.customFields)
+          : {};
+        
+        // Build evidence data for PDF generation
         const evidenceData = {
-          id: input.evidenceDetailId,
-          title: "الحضور والانصراف",
-          standardName: "أداء الواجبات الوظيفية",
-          description: "يُعدّّ الالتزام بالدوام المدرسي حضورًا وانصرافًا أحد أهم ركائز أداء الواجبات الوظيفية للمعلم، فهو يعكس مستوى الانضباط المهني والمسؤولية تجاه المدرسة والطلاب وزملاء العمل.",
-          elementTitle: "استخدام التقنية الحديثة",
-          grade: "جميع الفصول",
-          beneficiaries: "الطلاب",
-          duration: "طوال العام",
-          executionLocation: "الفصل - مصادر التعلم",
-          studentsCount: "جميع الطلاب",
-          lessonTitle: "جميع المناهج المستندة",
-          section1: "انتظام الحضور يسهم في استقرار البيئة الدراسية.",
-          section2: "تفعيل حالات الغياب الطارئ.",
-          section3: "تسهيل مهام الإدارة.",
-          section4: "الحضور المبكر يعكس الاستعداد.",
-          section5: "حفظ سجلات الدوام.",
-          section6: "تقليل حالات العجز.",
-          image1Url: "https://storage.example.com/image1.jpg",
-          image2Url: "https://storage.example.com/image2.jpg",
-          teacherName: ctx.user.name || "المعلم",
-          schoolName: "مدرسة الاختبار",
-          principalName: "",
+          id: evidenceDetail.id,
+          title: subTemplate?.title || "شاهد",
+          standardName: "أداء الواجبات الوظيفية", // TODO: fetch from standard
+          description: subTemplate?.description || "",
+          // Page 1 fields from customFields
+          elementTitle: customFields.elementTitle || "",
+          grade: customFields.grade || "",
+          beneficiaries: customFields.beneficiaries || "",
+          duration: customFields.duration || "",
+          executionLocation: customFields.executionLocation || "",
+          studentsCount: customFields.studentsCount || "",
+          lessonTitle: customFields.lessonTitle || "",
+          // Page 2 sections
+          section1: evidenceDetail.section1Content || "",
+          section2: evidenceDetail.section2Content || "",
+          section3: evidenceDetail.section3Content || "",
+          section4: evidenceDetail.section4Content || "",
+          section5: evidenceDetail.section5Content || "",
+          section6: evidenceDetail.section6Content || "",
+          // Images
+          image1Url: evidenceDetail.image1Url || null,
+          image2Url: evidenceDetail.image2Url || null,
+          // Teacher info
+          teacherName: profile?.teacherName || ctx.user.name || "المعلم",
+          schoolName: profile?.schoolName || "المدرسة",
+          principalName: profile?.principalName || "",
         };
         
         const pdfBuffer = await generateEvidencePDF(evidenceData);

@@ -341,3 +341,22 @@ export async function createEvidenceDetail(data: {
   
   return Number(evidenceDetailResult[0].insertId);
 }
+
+/**
+ * Get evidence detail by ID with all related data
+ */
+export async function getEvidenceDetailById(id: number) {
+  const db = await getDb();
+  
+  const result = await db
+    .select()
+    .from(evidenceDetails)
+    .where(eq(evidenceDetails.id, id))
+    .limit(1);
+  
+  if (result.length === 0) {
+    return null;
+  }
+  
+  return result[0];
+}
