@@ -48,6 +48,10 @@ export default function SubEvidenceFormNew() {
   const [image2, setImage2] = useState<File | null>(null);
   const [image1Preview, setImage1Preview] = useState<string>("");
   const [image2Preview, setImage2Preview] = useState<string>("");
+  const [image1Url, setImage1Url] = useState<string | null>(null);
+  const [image2Url, setImage2Url] = useState<string | null>(null);
+  const [uploadingImage1, setUploadingImage1] = useState(false);
+  const [uploadingImage2, setUploadingImage2] = useState(false);
   
   const [currentPage, setCurrentPage] = useState(1);
   
@@ -63,21 +67,61 @@ export default function SubEvidenceFormNew() {
     }
   }, [subTemplate]);
   
+  // Upload image mutation
+  const uploadImageMutation = trpc.evidenceDetails.uploadImage.useMutation();
+  
   // Handle image upload
-  const handleImageUpload = (file: File, imageNumber: 1 | 2) => {
+  const handleImageUpload = async (file: File, imageNumber: 1 | 2) => {
     if (!file.type.startsWith("image/")) {
       toast.error("يرجى اختيار ملف صورة");
       return;
     }
     
+    // Set uploading state
+    if (imageNumber === 1) {
+      setUploadingImage1(true);
+    } else {
+      setUploadingImage2(true);
+    }
+    
+    // Read file as base64
     const reader = new FileReader();
-    reader.onloadend = () => {
+    reader.onloadend = async () => {
+      const base64String = reader.result as string;
+      
+      // Set preview immediately
       if (imageNumber === 1) {
         setImage1(file);
-        setImage1Preview(reader.result as string);
+        setImage1Preview(base64String);
       } else {
         setImage2(file);
-        setImage2Preview(reader.result as string);
+        setImage2Preview(base64String);
+      }
+      
+      try {
+        // Upload to S3
+        const result = await uploadImageMutation.mutateAsync({
+          file: base64String,
+          fileName: file.name,
+        });
+        
+        // Save URL
+        if (imageNumber === 1) {
+          setImage1Url(result.url);
+          toast.success("تم رفع الصورة الأولى بنجاح");
+        } else {
+          setImage2Url(result.url);
+          toast.success("تم رفع الصورة الثانية بنجاح");
+        }
+      } catch (error) {
+        toast.error("فشل رفع الصورة");
+        console.error("Upload error:", error);
+      } finally {
+        if (imageNumber === 1) {
+          setUploadingImage1(false);
+        } else {
+          setUploadingImage2(false);
+        }
       }
     };
     reader.readAsDataURL(file);
@@ -121,9 +165,7 @@ export default function SubEvidenceFormNew() {
       return;
     }
     
-    // TODO: Upload images to S3
-    let image1Url = null;
-    let image2Url = null;
+    // Images are already uploaded to S3 (image1Url, image2Url)
     
     const dynamicFields = {
       title,

@@ -5,6 +5,7 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
 import { TRPCError } from "@trpc/server";
+import { storagePut } from "./storage";
 
 export const appRouter = router({
   system: systemRouter,
@@ -214,6 +215,32 @@ export const appRouter = router({
         });
         
         return { success: true };
+      }),
+    
+    uploadImage: protectedProcedure
+      .input(z.object({
+        file: z.string(), // base64 encoded image
+        fileName: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Convert base64 to buffer
+        const base64Data = input.file.replace(/^data:image\/\w+;base64,/, "");
+        const buffer = Buffer.from(base64Data, 'base64');
+        
+        // Generate unique file name
+        const timestamp = Date.now();
+        const randomSuffix = Math.random().toString(36).substring(2, 8);
+        const fileExtension = input.fileName.split('.').pop() || 'jpg';
+        const fileKey = `evidence-images/${ctx.user.id}/${timestamp}-${randomSuffix}.${fileExtension}`;
+        
+        // Upload to S3
+        const { url } = await storagePut(
+          fileKey,
+          buffer,
+          `image/${fileExtension}`
+        );
+        
+        return { url };
       }),
   }),
 
