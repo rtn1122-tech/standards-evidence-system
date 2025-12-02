@@ -242,6 +242,50 @@ export const appRouter = router({
         
         return { url };
       }),
+    
+    generatePDF: protectedProcedure
+      .input(z.object({
+        evidenceDetailId: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // TODO: Fetch evidence detail data from database
+        // For now, return mock data
+        const { generateEvidencePDF } = await import('./generatePDF');
+        
+        // Mock data - replace with actual database query
+        const evidenceData = {
+          id: input.evidenceDetailId,
+          title: "الحضور والانصراف",
+          standardName: "أداء الواجبات الوظيفية",
+          description: "يُعدّّ الالتزام بالدوام المدرسي حضورًا وانصرافًا أحد أهم ركائز أداء الواجبات الوظيفية للمعلم، فهو يعكس مستوى الانضباط المهني والمسؤولية تجاه المدرسة والطلاب وزملاء العمل.",
+          elementTitle: "استخدام التقنية الحديثة",
+          grade: "جميع الفصول",
+          beneficiaries: "الطلاب",
+          duration: "طوال العام",
+          executionLocation: "الفصل - مصادر التعلم",
+          studentsCount: "جميع الطلاب",
+          lessonTitle: "جميع المناهج المستندة",
+          section1: "انتظام الحضور يسهم في استقرار البيئة الدراسية.",
+          section2: "تفعيل حالات الغياب الطارئ.",
+          section3: "تسهيل مهام الإدارة.",
+          section4: "الحضور المبكر يعكس الاستعداد.",
+          section5: "حفظ سجلات الدوام.",
+          section6: "تقليل حالات العجز.",
+          image1Url: "https://storage.example.com/image1.jpg",
+          image2Url: "https://storage.example.com/image2.jpg",
+          teacherName: ctx.user.name || "المعلم",
+          schoolName: "مدرسة الاختبار",
+          principalName: "",
+        };
+        
+        const pdfBuffer = await generateEvidencePDF(evidenceData);
+        
+        // Return as base64 for download
+        return {
+          pdf: pdfBuffer.toString('base64'),
+          filename: `evidence-${input.evidenceDetailId}.pdf`,
+        };
+      }),
   }),
 
   evidence: router({

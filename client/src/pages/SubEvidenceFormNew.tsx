@@ -422,8 +422,7 @@ export default function SubEvidenceFormNew() {
             <div className="flex justify-between items-start mb-4">
               <div className="text-right">
                 <div className="font-bold text-lg">وزارة التعليم</div>
-                <div className="text-sm">الإدارة العامة للتعليم بالباحة</div>
-                <div className="text-sm">مدرسة متوسطة القموص</div>
+                <div className="text-sm">{profile?.schoolName || "الإدارة العامة للتعليم"}</div>
               </div>
               <div className="w-16 h-16 border-2 border-black flex items-center justify-center">
                 <span className="text-xs">QR</span>
