@@ -70,12 +70,7 @@ export default function StandardDetail() {
               <p className="text-sm text-muted-foreground">{standard.title}</p>
             </div>
           </div>
-          {user && (
-            <Button onClick={() => setLocation(`/evidence/new?standardId=${standardId}`)}>
-              <Plus className="ml-2 h-4 w-4" />
-              إضافة شاهد جديد
-            </Button>
-          )}
+
         </div>
       </header>
 
@@ -142,12 +137,8 @@ export default function StandardDetail() {
           <Card>
             <CardContent className="py-12 text-center">
               <FileText className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-semibold mb-2">لا توجد شواهد بعد</h3>
-              <p className="text-muted-foreground mb-4">ابدأ بإضافة أول شاهد لهذا المعيار</p>
-              <Button onClick={() => setLocation(`/evidence/new?standardId=${standardId}`)}>
-                <Plus className="ml-2 h-4 w-4" />
-                إضافة شاهد
-              </Button>
+              <h3 className="text-lg font-semibold mb-2">لا توجد شواهد فرعية بعد</h3>
+              <p className="text-muted-foreground mb-4">اختر شاهد فرعي من القائمة أدناه لإضافته</p>
             </CardContent>
           </Card>
         ) : (

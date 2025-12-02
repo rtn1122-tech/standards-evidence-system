@@ -251,3 +251,23 @@
 - [x] فحص schema - stage: varchar(100), subjects: text
 - [x] اختبار في المتصفح - نجح! تم اختيار مرحلتين ومادتين
 - [x] حفظ checkpoint
+
+## إصلاح خطأ "حدث خطأ أثناء إضافة الشاهد"
+- [ ] فحص server logs لمعرفة الخطأ
+- [ ] فحص createEvidenceDetail procedure في routers.ts
+- [ ] فحص createEvidenceDetail function في db.ts
+- [ ] إصلاح الخطأ (schema mismatch أو missing fields)
+- [ ] اختبار الحفظ في المتصفح
+- [ ] حفظ checkpoint
+
+## ✅ حذف نظام الشواهد القديم (مكتمل)
+- [x] حذف routes القديمة من App.tsx
+- [x] حذف ملفات EvidenceForm.tsx و EvidencePreview.tsx
+- [x] حذف userEvidence router من routers.ts
+- [x] حذف evidence router من routers.ts
+- [x] حذف database functions القديمة
+- [x] تحديث getProgress لاستخدام evidenceDetails
+- [x] إزالة زر "إضافة شاهد" من StandardDetail.tsx
+- [x] إعادة كتابة App.tsx لإصلاح أخطاء compilation
+- [x] اختبار النظام - يعمل بنجاح!
+- [x] حفظ checkpoint

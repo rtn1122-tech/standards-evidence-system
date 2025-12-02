@@ -188,43 +188,6 @@ export async function createEvidenceTemplate(data: InsertEvidenceTemplate) {
 
 // ========== User Evidence Functions ==========
 
-export async function getUserEvidenceByUserId(userId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  
-  return await db.select().from(userEvidence).where(eq(userEvidence.userId, userId)).orderBy(desc(userEvidence.updatedAt));
-}
-
-export async function getUserEvidenceById(id: number) {
-  const db = await getDb();
-  if (!db) return undefined;
-  
-  const result = await db.select().from(userEvidence).where(eq(userEvidence.id, id)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
-}
-
-export async function createUserEvidence(data: InsertUserEvidence) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  const result = await db.insert(userEvidence).values(data);
-  return result;
-}
-
-export async function updateUserEvidence(id: number, data: Partial<InsertUserEvidence>) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  await db.update(userEvidence).set(data).where(eq(userEvidence.id, id));
-}
-
-export async function deleteUserEvidence(id: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  await db.delete(userEvidence).where(eq(userEvidence.id, id));
-}
-
 // ========== Background Functions ==========
 
 export async function getAllBackgrounds() {
@@ -312,11 +275,24 @@ export async function createEvidenceDetail(data: {
   const db = await getDb();
   if (!db) return;
   
+  // Get standardId from evidenceSubTemplate
+  const subTemplate = await db
+    .select({ standardId: evidenceSubTemplates.standardId })
+    .from(evidenceSubTemplates)
+    .where(eq(evidenceSubTemplates.id, data.subTemplateId))
+    .limit(1);
+  
+  if (subTemplate.length === 0) {
+    throw new Error(`Evidence sub-template ${data.subTemplateId} not found`);
+  }
+  
+  const standardId = subTemplate[0].standardId;
+  
   // Create a temporary userEvidence entry first (required by schema)
   const userEvidenceResult = await db.insert(userEvidence).values({
     userId: data.userId,
     evidenceTemplateId: data.templateId,
-    standardId: 2, // Default to standard 2
+    standardId,
     isCompleted: false,
   });
   
