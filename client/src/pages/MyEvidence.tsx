@@ -2,7 +2,7 @@ import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Download, Edit, Trash2, Loader2, FileText } from "lucide-react";
+import { Download, Edit, Trash2, Loader2, FileText, Eye } from "lucide-react";
 import { useState } from "react";
 
 export default function MyEvidence() {
@@ -65,6 +65,31 @@ export default function MyEvidence() {
   const handleDownloadPDF = (id: number) => {
     setDownloadingId(id);
     generatePDF.mutate({ evidenceDetailId: id });
+  };
+
+  const handlePreviewPDF = (id: number) => {
+    setDownloadingId(id);
+    generatePDF.mutate(
+      { evidenceDetailId: id },
+      {
+        onSuccess: (data) => {
+          // Convert base64 to blob and open in new tab
+          const byteCharacters = atob(data.pdf);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: 'application/pdf' });
+          
+          // Open PDF in new tab
+          const url = window.URL.createObjectURL(blob);
+          window.open(url, '_blank');
+          
+          setDownloadingId(null);
+        },
+      }
+    );
   };
 
   const handleEdit = (id: number) => {
@@ -210,24 +235,44 @@ export default function MyEvidence() {
 
                   {/* Action Buttons */}
                   <div className="flex flex-col gap-2">
-                    <Button
-                      onClick={() => handleDownloadPDF(evidence.id)}
-                      disabled={downloadingId === evidence.id}
-                      size="sm"
-                      className="bg-teal-600 hover:bg-teal-700 text-white"
-                    >
-                      {downloadingId === evidence.id ? (
-                        <>
-                          <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                          جاري التحميل...
-                        </>
-                      ) : (
-                        <>
-                          <Download className="ml-2 h-4 w-4" />
-                          تحميل PDF
-                        </>
-                      )}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handlePreviewPDF(evidence.id)}
+                        disabled={downloadingId === evidence.id}
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white flex-1"
+                      >
+                        {downloadingId === evidence.id ? (
+                          <>
+                            <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                            جاري التحميل...
+                          </>
+                        ) : (
+                          <>
+                            <Eye className="ml-2 h-4 w-4" />
+                            معاينة
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        onClick={() => handleDownloadPDF(evidence.id)}
+                        disabled={downloadingId === evidence.id}
+                        size="sm"
+                        className="bg-teal-600 hover:bg-teal-700 text-white flex-1"
+                      >
+                        {downloadingId === evidence.id ? (
+                          <>
+                            <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                            جاري التحميل...
+                          </>
+                        ) : (
+                          <>
+                            <Download className="ml-2 h-4 w-4" />
+                            تحميل
+                          </>
+                        )}
+                      </Button>
+                    </div>
 
                     <Button
                       onClick={() => handleEdit(evidence.id)}

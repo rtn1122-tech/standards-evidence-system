@@ -12,9 +12,7 @@ import {
   userEvidence,
   InsertUserEvidence,
   backgrounds,
-  InsertBackground,
-  evidenceSubTemplates,
-  evidenceDetails
+  InsertBackground
 } from "../drizzle/schema";
 import * as schema from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -212,7 +210,7 @@ export async function getSubEvidenceByTemplateId(templateId: number) {
   if (!db) return [];
   
   const result = await db.execute<any>(
-    sql`SELECT * FROM evidenceSubTemplates WHERE evidenceTemplateId = ${templateId} ORDER BY orderIndex`
+    sql`SELECT * FROM schema.evidenceSubTemplates WHERE evidenceTemplateId = ${templateId} ORDER BY orderIndex`
   );
   return result as any[];
 }
@@ -222,7 +220,7 @@ export async function getFilteredSubEvidence(templateId: number, userStages: str
   if (!db) return [];
   
   const result = await db.execute<any>(
-    sql`SELECT * FROM evidenceSubTemplates WHERE evidenceTemplateId = ${templateId}`
+    sql`SELECT * FROM schema.evidenceSubTemplates WHERE evidenceTemplateId = ${templateId}`
   );
   const allSubEvidence = result as any[];
   
@@ -253,7 +251,7 @@ export async function getFilteredSubEvidence(templateId: number, userStages: str
 export async function getSubTemplateById(id: number) {
   const db = await getDb();
   if (!db) return null;
-  const result = await db.select().from(evidenceSubTemplates).where(eq(evidenceSubTemplates.id, id)).limit(1);
+  const result = await db.select().from(schema.evidenceSubTemplates).where(eq(schema.evidenceSubTemplates.id, id)).limit(1);
   return result[0] || null;
 }
 
@@ -277,9 +275,9 @@ export async function createEvidenceDetail(data: {
   
   // Get standardId from evidenceSubTemplate
   const subTemplate = await db
-    .select({ standardId: evidenceSubTemplates.standardId })
-    .from(evidenceSubTemplates)
-    .where(eq(evidenceSubTemplates.id, data.subTemplateId))
+    .select({ standardId: schema.evidenceSubTemplates.standardId })
+    .from(schema.evidenceSubTemplates)
+    .where(eq(schema.evidenceSubTemplates.id, data.subTemplateId))
     .limit(1);
   
   if (subTemplate.length === 0) {
@@ -298,7 +296,7 @@ export async function createEvidenceDetail(data: {
   
   const userEvidenceId = Number(userEvidenceResult[0].insertId);
   
-  const evidenceDetailResult = await db.insert(evidenceDetails).values({
+  const evidenceDetailResult = await db.insert(schema.evidenceDetails).values({
     userId: data.userId,
     userEvidenceId,
     evidenceTemplateId: data.templateId,
@@ -326,8 +324,8 @@ export async function getEvidenceDetailById(id: number) {
   
   const result = await db
     .select()
-    .from(evidenceDetails)
-    .where(eq(evidenceDetails.id, id))
+    .from(schema.evidenceDetails)
+    .where(eq(schema.evidenceDetails.id, id))
     .limit(1);
   
   if (result.length === 0) {
@@ -346,33 +344,33 @@ export async function getUserEvidenceDetails(userId: number) {
   
   const result = await db
     .select({
-      id: evidenceDetails.id,
-      userId: evidenceDetails.userId,
-      evidenceSubTemplateId: evidenceDetails.evidenceSubTemplateId,
-      customFields: evidenceDetails.customFields,
-      section1Content: evidenceDetails.section1Content,
-      section2Content: evidenceDetails.section2Content,
-      section3Content: evidenceDetails.section3Content,
-      section4Content: evidenceDetails.section4Content,
-      section5Content: evidenceDetails.section5Content,
-      section6Content: evidenceDetails.section6Content,
-      image1Url: evidenceDetails.image1Url,
-      image2Url: evidenceDetails.image2Url,
-      createdAt: evidenceDetails.createdAt,
-      updatedAt: evidenceDetails.updatedAt,
+      id: schema.evidenceDetails.id,
+      userId: schema.evidenceDetails.userId,
+      evidenceSubTemplateId: schema.evidenceDetails.evidenceSubTemplateId,
+      customFields: schema.evidenceDetails.customFields,
+      section1Content: schema.evidenceDetails.section1Content,
+      section2Content: schema.evidenceDetails.section2Content,
+      section3Content: schema.evidenceDetails.section3Content,
+      section4Content: schema.evidenceDetails.section4Content,
+      section5Content: schema.evidenceDetails.section5Content,
+      section6Content: schema.evidenceDetails.section6Content,
+      image1Url: schema.evidenceDetails.image1Url,
+      image2Url: schema.evidenceDetails.image2Url,
+      createdAt: schema.evidenceDetails.createdAt,
+      updatedAt: schema.evidenceDetails.updatedAt,
       // Sub-template data
-      subTemplateTitle: evidenceSubTemplates.title,
-      subTemplateDescription: evidenceSubTemplates.description,
+      subTemplateTitle: schema.evidenceSubTemplates.title,
+      subTemplateDescription: schema.evidenceSubTemplates.description,
       // Standard data
-      standardId: evidenceSubTemplates.standardId,
+      standardId: schema.evidenceSubTemplates.standardId,
     })
-    .from(evidenceDetails)
+    .from(schema.evidenceDetails)
     .leftJoin(
-      evidenceSubTemplates,
-      eq(evidenceDetails.evidenceSubTemplateId, evidenceSubTemplates.id)
+      schema.evidenceSubTemplates,
+      eq(schema.evidenceDetails.evidenceSubTemplateId, schema.evidenceSubTemplates.id)
     )
-    .where(eq(evidenceDetails.userId, userId))
-    .orderBy(desc(evidenceDetails.createdAt));
+    .where(eq(schema.evidenceDetails.userId, userId))
+    .orderBy(desc(schema.evidenceDetails.createdAt));
   
   return result;
 }
@@ -387,8 +385,8 @@ export async function deleteEvidenceDetail(id: number, userId: number) {
   // First check if the evidence belongs to the user
   const existing = await db
     .select()
-    .from(evidenceDetails)
-    .where(eq(evidenceDetails.id, id))
+    .from(schema.evidenceDetails)
+    .where(eq(schema.evidenceDetails.id, id))
     .limit(1);
   
   if (existing.length === 0 || existing[0].userId !== userId) {
@@ -397,8 +395,8 @@ export async function deleteEvidenceDetail(id: number, userId: number) {
   
   // Delete the evidence
   await db!
-    .delete(evidenceDetails)
-    .where(eq(evidenceDetails.id, id));
+    .delete(schema.evidenceDetails)
+    .where(eq(schema.evidenceDetails.id, id));
   
   return true;
 }
@@ -412,9 +410,9 @@ export async function getEvidenceSubTemplatesByStandard(standardId: number) {
   
   const result = await db
     .select()
-    .from(evidenceSubTemplates)
-    .where(eq(evidenceSubTemplates.standardId, standardId))
-    .orderBy(evidenceSubTemplates.orderIndex);
+    .from(schema.evidenceSubTemplates)
+    .where(eq(schema.evidenceSubTemplates.standardId, standardId))
+    .orderBy(schema.evidenceSubTemplates.orderIndex);
   
   return result;
 }
