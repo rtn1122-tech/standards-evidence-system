@@ -28,6 +28,7 @@ interface EvidenceData {
   executionLocation: string;
   studentsCount: string;
   lessonTitle: string;
+  date: string;
   // Page 2 sections
   section1: string;
   section2: string;

@@ -335,6 +335,7 @@ export const appRouter = router({
           executionLocation: customFields.executionLocation || "",
           studentsCount: customFields.studentsCount || "",
           lessonTitle: customFields.lessonTitle || "",
+          date: customFields.date || new Date().toISOString().split('T')[0],
           // Page 2 sections
           section1: evidenceDetail.section1Content || "",
           section2: evidenceDetail.section2Content || "",
@@ -362,7 +363,8 @@ export const appRouter = router({
     
     generateAllPDF: protectedProcedure
       .mutation(async ({ ctx }) => {
-        const { generateEvidencePDF } = await import('./generatePDF');
+        const { generateCoverAndEmptyPages } = await import('./generateCoverPages');
+        const { generateEvidencePages } = await import('./generateEvidencePages');
         const PDFDocument = (await import('pdf-lib')).PDFDocument;
         
         // Fetch all evidence details for the user
@@ -378,8 +380,14 @@ export const appRouter = router({
         // Fetch teacher profile once
         const profile = await db.getTeacherProfileByUserId(ctx.user.id);
         
-        // Generate individual PDFs for each evidence
-        const pdfBuffers: Buffer[] = [];
+        // Generate cover + empty pages ONCE
+        const coverPdfBuffer = await generateCoverAndEmptyPages({
+          teacherName: profile?.teacherName || ctx.user.name || 'المعلم',
+          schoolName: profile?.schoolName || 'المدرسة',
+        });
+        
+        // Generate individual evidence pages (without cover/empty pages)
+        const evidencePdfBuffers: Buffer[] = [];
         
         for (const evidence of evidenceList) {
           // Fetch sub-template
@@ -405,6 +413,7 @@ export const appRouter = router({
             executionLocation: customFields.executionLocation || "",
             studentsCount: customFields.studentsCount || "",
             lessonTitle: customFields.lessonTitle || "",
+            date: customFields.date || new Date().toISOString().split('T')[0],
             section1: evidence.section1Content || "",
             section2: evidence.section2Content || "",
             section3: evidence.section3Content || "",
@@ -418,17 +427,23 @@ export const appRouter = router({
             principalName: profile?.principalName || "",
           };
           
-          const pdfBuffer = await generateEvidencePDF(evidenceData);
-          pdfBuffers.push(pdfBuffer);
+          const pdfBuffer = await generateEvidencePages(evidenceData);
+          evidencePdfBuffers.push(pdfBuffer);
         }
         
-        // Merge all PDFs into one
+        // Merge: Cover + Empty Pages + All Evidence Pages
         const mergedPdf = await PDFDocument.create();
         
-        for (const pdfBuffer of pdfBuffers) {
-          const pdf = await PDFDocument.load(pdfBuffer);
-          const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-          copiedPages.forEach((page) => mergedPdf.addPage(page));
+        // 1. Add cover + empty pages (7 pages total)
+        const coverPdf = await PDFDocument.load(coverPdfBuffer);
+        const coverPages = await mergedPdf.copyPages(coverPdf, coverPdf.getPageIndices());
+        coverPages.forEach((page) => mergedPdf.addPage(page));
+        
+        // 2. Add all evidence pages sequentially
+        for (const evidencePdfBuffer of evidencePdfBuffers) {
+          const evidencePdf = await PDFDocument.load(evidencePdfBuffer);
+          const evidencePages = await mergedPdf.copyPages(evidencePdf, evidencePdf.getPageIndices());
+          evidencePages.forEach((page) => mergedPdf.addPage(page));
         }
         
         const mergedPdfBytes = await mergedPdf.save();
