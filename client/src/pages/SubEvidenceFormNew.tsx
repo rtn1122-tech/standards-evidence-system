@@ -25,7 +25,7 @@ export default function SubEvidenceFormNew() {
     enabled: !!user
   });
   
-  // Page 1 - Dynamic fields (8 fields)
+  // Page 1 - Dynamic fields (8 fields + date)
   const [title, setTitle] = useState("");
   const [grade, setGrade] = useState("");
   const [beneficiaries, setBeneficiaries] = useState("");
@@ -34,6 +34,11 @@ export default function SubEvidenceFormNew() {
   const [studentsCount, setStudentsCount] = useState("");
   const [lessonTitle, setLessonTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [date, setDate] = useState(() => {
+    // Default to today's date in YYYY-MM-DD format
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  });
   
   // Page 2 - 6 sections (pre-filled from database)
   const [section1, setSection1] = useState(""); // المقدمة
@@ -82,8 +87,9 @@ export default function SubEvidenceFormNew() {
   
   // Handle image upload
   const handleImageUpload = async (file: File, imageNumber: 1 | 2) => {
-    if (!file.type.startsWith("image/")) {
-      toast.error("يرجى اختيار ملف صورة");
+    // Accept images and PDFs
+    if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
+      toast.error("يرجى اختيار ملف صورة أو PDF");
       return;
     }
     
@@ -141,10 +147,11 @@ export default function SubEvidenceFormNew() {
   const handleDrop = (e: React.DragEvent, imageNumber: 1 | 2) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith("image/")) {
+    // Accept images and PDFs
+    if (file && (file.type.startsWith("image/") || file.type === "application/pdf")) {
       handleImageUpload(file, imageNumber);
     } else {
-      toast.error("يرجى سحب ملف صورة");
+      toast.error("يرجى سحب ملف صورة أو PDF");
     }
   };
   
@@ -184,7 +191,7 @@ export default function SubEvidenceFormNew() {
       studentsCount,
       lessonTitle,
       teacherName: profile.teacherName,
-      date: new Date().toISOString(),
+      date: date, // Use the editable date field
       standardName: subTemplate?.standardId ? `المعيار ${subTemplate.standardId}` : "",
       evidenceName: subTemplate?.title || "",
     };
@@ -383,7 +390,13 @@ export default function SubEvidenceFormNew() {
                 />
               </div>
               <div className="border border-black p-2">
-                {/* فارغ */}
+                <label className="text-xs text-gray-600 block mb-1">التاريخ</label>
+                <Input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="border-0 p-0 h-auto text-sm"
+                />
               </div>
             </div>
 
@@ -542,7 +555,7 @@ export default function SubEvidenceFormNew() {
                 <input
                   id="image1-input"
                   type="file"
-                  accept="image/*"
+                  accept="image/*,application/pdf"
                   className="hidden"
                   onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0], 1)}
                 />
@@ -567,7 +580,7 @@ export default function SubEvidenceFormNew() {
                 <input
                   id="image2-input"
                   type="file"
-                  accept="image/*"
+                  accept="image/*,application/pdf"
                   className="hidden"
                   onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0], 2)}
                 />

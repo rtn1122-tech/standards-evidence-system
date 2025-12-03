@@ -9,6 +9,7 @@ export default function MyEvidence() {
   const [, navigate] = useLocation();
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [downloadingId, setDownloadingId] = useState<number | null>(null);
+  const [downloadingAll, setDownloadingAll] = useState(false);
 
   const { data: evidenceList, isLoading, refetch } = trpc.evidenceDetails.list.useQuery();
 
@@ -70,6 +71,45 @@ export default function MyEvidence() {
     navigate(`/evidence/sub-new/${id}`);
   };
 
+  const generateAllPDF = trpc.evidenceDetails.generateAllPDF.useMutation({
+    onSuccess: (data) => {
+      // Convert base64 to blob and download
+      const byteCharacters = atob(data.pdf);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = data.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      setDownloadingAll(false);
+      alert(`✅ تم تحميل الملف بنجاح: ${data.filename}`);
+    },
+    onError: (error) => {
+      setDownloadingAll(false);
+      alert(`❌ خطأ في توليد PDF: ${error.message}`);
+    },
+  });
+
+  const handleDownloadAllPDF = () => {
+    if (!evidenceList || evidenceList.length === 0) {
+      alert('لا توجد شواهد لتحميلها');
+      return;
+    }
+    setDownloadingAll(true);
+    generateAllPDF.mutate();
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-teal-50 to-cyan-50 py-8">
@@ -96,13 +136,32 @@ export default function MyEvidence() {
                 جميع الشواهد التي قمت بإكمالها ({evidenceList?.length || 0} شاهد)
               </p>
             </div>
-            <Button
-              onClick={() => navigate("/")}
-              variant="outline"
-              className="border-teal-300 text-teal-700 hover:bg-teal-50"
-            >
-              العودة للصفحة الرئيسية
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleDownloadAllPDF}
+                disabled={downloadingAll || !evidenceList || evidenceList.length === 0}
+                className="bg-teal-600 hover:bg-teal-700"
+              >
+                {downloadingAll ? (
+                  <>
+                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                    جاري التحميل...
+                  </>
+                ) : (
+                  <>
+                    <Download className="h-4 w-4 ml-2" />
+                    تحميل جميع الشواهد PDF
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={() => navigate("/")}
+                variant="outline"
+                className="border-teal-300 text-teal-700 hover:bg-teal-50"
+              >
+                العودة للصفحة الرئيسية
+              </Button>
+            </div>
           </div>
         </div>
 

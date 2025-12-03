@@ -1,5 +1,19 @@
 import puppeteer from "puppeteer";
 import QRCode from "qrcode";
+import axios from "axios";
+
+// Helper function to convert image URL to base64
+async function imageUrlToBase64(url: string): Promise<string> {
+  try {
+    const response = await axios.get(url, { responseType: 'arraybuffer' });
+    const base64 = Buffer.from(response.data, 'binary').toString('base64');
+    const mimeType = response.headers['content-type'] || 'image/jpeg';
+    return `data:${mimeType};base64,${base64}`;
+  } catch (error) {
+    console.error('Error converting image to base64:', error);
+    return ''; // Return empty string if image fails to load
+  }
+}
 
 interface EvidenceData {
   id: number;
@@ -37,6 +51,10 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
     width: 150,
     margin: 1,
   });
+
+  // Convert images to base64
+  const image1Base64 = data.image1Url ? await imageUrlToBase64(data.image1Url) : '';
+  const image2Base64 = data.image2Url ? await imageUrlToBase64(data.image2Url) : '';
 
   const html = `
 <!DOCTYPE html>
@@ -535,17 +553,17 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       </div>
     </div>
     
-    ${data.image1Url || data.image2Url ? `
+    ${image1Base64 || image2Base64 ? `
     <div class="images-row">
-      ${data.image1Url ? `
+      ${image1Base64 ? `
       <div class="image-box">
-        <img src="${data.image1Url}" alt="صورة 1" />
+        <img src="${image1Base64}" alt="صورة 1" />
         <div class="image-label">صورة توضيحية 1</div>
       </div>
       ` : ''}
-      ${data.image2Url ? `
+      ${image2Base64 ? `
       <div class="image-box">
-        <img src="${data.image2Url}" alt="صورة 2" />
+        <img src="${image2Base64}" alt="صورة 2" />
         <div class="image-label">صورة توضيحية 2</div>
       </div>
       ` : ''}

@@ -359,6 +359,87 @@ export const appRouter = router({
           filename: `evidence-${input.evidenceDetailId}.pdf`,
         };
       }),
+    
+    generateAllPDF: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { generateEvidencePDF } = await import('./generatePDF');
+        const PDFDocument = (await import('pdf-lib')).PDFDocument;
+        
+        // Fetch all evidence details for the user
+        const evidenceList = await db.getUserEvidenceDetails(ctx.user.id);
+        
+        if (!evidenceList || evidenceList.length === 0) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'لا توجد شواهد لتحميلها',
+          });
+        }
+        
+        // Fetch teacher profile once
+        const profile = await db.getTeacherProfileByUserId(ctx.user.id);
+        
+        // Generate individual PDFs for each evidence
+        const pdfBuffers: Buffer[] = [];
+        
+        for (const evidence of evidenceList) {
+          // Fetch sub-template
+          const subTemplate = evidence.evidenceSubTemplateId 
+            ? await db.getSubTemplateById(evidence.evidenceSubTemplateId)
+            : null;
+          
+          // Parse customFields
+          const customFields = evidence.customFields 
+            ? JSON.parse(evidence.customFields)
+            : {};
+          
+          // Build evidence data
+          const evidenceData = {
+            id: evidence.id,
+            title: subTemplate?.title || "شاهد",
+            standardName: "أداء الواجبات الوظيفية",
+            description: subTemplate?.description || "",
+            elementTitle: customFields.elementTitle || "",
+            grade: customFields.grade || "",
+            beneficiaries: customFields.beneficiaries || "",
+            duration: customFields.duration || "",
+            executionLocation: customFields.executionLocation || "",
+            studentsCount: customFields.studentsCount || "",
+            lessonTitle: customFields.lessonTitle || "",
+            section1: evidence.section1Content || "",
+            section2: evidence.section2Content || "",
+            section3: evidence.section3Content || "",
+            section4: evidence.section4Content || "",
+            section5: evidence.section5Content || "",
+            section6: evidence.section6Content || "",
+            image1Url: evidence.image1Url || null,
+            image2Url: evidence.image2Url || null,
+            teacherName: profile?.teacherName || ctx.user.name || "المعلم",
+            schoolName: profile?.schoolName || "المدرسة",
+            principalName: profile?.principalName || "",
+          };
+          
+          const pdfBuffer = await generateEvidencePDF(evidenceData);
+          pdfBuffers.push(pdfBuffer);
+        }
+        
+        // Merge all PDFs into one
+        const mergedPdf = await PDFDocument.create();
+        
+        for (const pdfBuffer of pdfBuffers) {
+          const pdf = await PDFDocument.load(pdfBuffer);
+          const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+          copiedPages.forEach((page) => mergedPdf.addPage(page));
+        }
+        
+        const mergedPdfBytes = await mergedPdf.save();
+        const mergedBuffer = Buffer.from(mergedPdfBytes);
+        
+        // Return as base64 for download
+        return {
+          pdf: mergedBuffer.toString('base64'),
+          filename: `all-evidence-${ctx.user.id}-${Date.now()}.pdf`,
+        };
+      }),
   }),
 
   backgrounds: router({
