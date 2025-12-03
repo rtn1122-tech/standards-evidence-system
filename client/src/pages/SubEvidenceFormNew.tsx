@@ -39,6 +39,7 @@ export default function SubEvidenceFormNew() {
     const today = new Date();
     return today.toISOString().split('T')[0];
   });
+
   
   // Page 2 - 6 sections (pre-filled from database)
   const [section1, setSection1] = useState(""); // المقدمة
@@ -191,6 +192,7 @@ export default function SubEvidenceFormNew() {
       studentsCount,
       lessonTitle,
       teacherName: profile.teacherName,
+      principalName: profile.principalName || "", // Principal name from profile
       date: date, // Use the editable date field
       standardName: subTemplate?.standardId ? `المعيار ${subTemplate.standardId}` : "",
       evidenceName: subTemplate?.title || "",
@@ -590,7 +592,7 @@ export default function SubEvidenceFormNew() {
             {/* التوقيع */}
             <div className="grid grid-cols-2 gap-4">
               <div className="border border-black p-3 text-center">
-                <span className="font-medium">مدير المدرسة</span>
+                <span className="font-medium">مدير المدرسة: {profile?.principalName || ""}</span>
               </div>
               <div className="border border-black p-3 text-center">
                 <span className="font-medium">اسم المعلم: {profile?.teacherName || ""}</span>

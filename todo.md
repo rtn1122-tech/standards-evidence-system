@@ -359,4 +359,9 @@
   - [x] حقل التاريخ قابل للتعديل (input type=date)
   - [x] الصور الافتراضية تظهر (Unsplash)
   - [x] زر معاينة PDF موجود
-- [ ] حفظ checkpoint نهائي
+- [x] حفظ checkpoint نهائي
+
+## مشكلة عاجلة - اسم المدير
+- [x] إصلاح اسم المدير - يؤخذ من profile ويكون غير قابل للتعديل
+- [x] principalName موجود في teacherProfile schema
+- [x] تحديث SubEvidenceFormNew - عرض principalName من profile
