@@ -200,7 +200,7 @@ export default function SubEvidenceFormNew() {
     
     saveMutation.mutate({
       subTemplateId,
-      templateId: subTemplate.evidenceTemplateId || 30002,
+      templateId: subTemplate?.evidenceTemplateId || 30002,
       dynamicFields,
       section1,
       section2,
@@ -314,7 +314,7 @@ export default function SubEvidenceFormNew() {
             {/* عنوان المعيار */}
             <div className="border-2 border-black p-4 text-center mb-6">
               <h3 className="text-xl font-bold">
-                معيار: {subTemplate.standardName || "توظيف تقنيات ووسائل تعليم مناسبة"}
+                معيار: {subTemplate?.standardId || "توظيف تقنيات ووسائل تعليم مناسبة"}
               </h3>
             </div>
 
@@ -447,7 +447,7 @@ export default function SubEvidenceFormNew() {
             {/* عنوان المعيار */}
             <div className="border-2 border-black p-4 text-center mb-4">
               <h3 className="text-xl font-bold">
-                معيار: {subTemplate.standardName || "توظيف تقنيات ووسائل تعليم مناسبة"}
+                معيار: {subTemplate?.standardId || "توظيف تقنيات ووسائل تعليم مناسبة"}
               </h3>
             </div>
 

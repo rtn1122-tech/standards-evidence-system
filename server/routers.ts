@@ -110,6 +110,7 @@ export const appRouter = router({
         stage: z.string().optional(),
         subjects: z.string().optional(), // JSON string
         selectedBackground: z.string().optional(),
+        selectedTheme: z.string().optional(),
         // حقول جديدة (اختيارية)
         email: z.string().optional(),
         phoneNumber: z.string().optional(),

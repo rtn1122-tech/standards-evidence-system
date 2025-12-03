@@ -321,6 +321,7 @@ export async function createEvidenceDetail(data: {
  */
 export async function getEvidenceDetailById(id: number) {
   const db = await getDb();
+  if (!db) return null;
   
   const result = await db
     .select()
@@ -394,7 +395,7 @@ export async function deleteEvidenceDetail(id: number, userId: number) {
   }
   
   // Delete the evidence
-  await db!
+  await db
     .delete(schema.evidenceDetails)
     .where(eq(schema.evidenceDetails.id, id));
   

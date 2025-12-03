@@ -380,5 +380,12 @@
 - [x] إضافة حقل selectedTheme إلى teacherProfile schema
 - [x] تحديث صفحة البيانات - إضافة dropdown لاختيار الثيم (4 خيارات)
 - [ ] تحديث generatePDF - استخدام الثيم المختار (بعد استلام الثيمات الثلاثة المتبقية)
-- [ ] اختبار تغيير الثيم
+- [ ] اختبار تغيير الثيم (بعد استلام الثيمات الثلاثة)
+- [x] حفظ checkpoint
+
+## تنظيف الكود - إصلاح 41 خطأ TypeScript
+- [ ] إصلاح أخطاء imports في server/db.ts (evidenceDetails, evidenceSubTemplates)
+- [ ] حذف الملفات القديمة غير المستخدمة
+- [ ] إزالة Dead Code
+- [ ] التأكد من عدم وجود أخطاء TypeScript
 - [ ] حفظ checkpoint
