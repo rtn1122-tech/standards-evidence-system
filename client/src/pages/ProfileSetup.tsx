@@ -26,6 +26,7 @@ export default function ProfileSetup() {
     gender: "male" as "male" | "female",
     stages: [] as string[],
     subjects: [] as string[],
+    selectedTheme: "theme1",
     email: "",
     phoneNumber: "",
     professionalLicenseNumber: "",
@@ -45,6 +46,7 @@ export default function ProfileSetup() {
         gender: profile.gender,
         stages: profile.stage ? (profile.stage.startsWith('[') ? JSON.parse(profile.stage) : [profile.stage]) : [],
         subjects: profile.subjects ? JSON.parse(profile.subjects) : [],
+        selectedTheme: profile.selectedTheme || "theme1",
         email: profile.email || "",
         phoneNumber: profile.phoneNumber || "",
         professionalLicenseNumber: profile.professionalLicenseNumber || "",
@@ -84,6 +86,7 @@ export default function ProfileSetup() {
       ...formData,
       stage: JSON.stringify(formData.stages),
       subjects: JSON.stringify(formData.subjects),
+      selectedTheme: formData.selectedTheme,
     });
   };
 
@@ -340,6 +343,26 @@ export default function ProfileSetup() {
                     onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
                     placeholder="مثال: معلم لغة عربية"
                   />
+                </div>
+                  </div>
+
+              {/* اختيار الثيم للطباعة */}
+              <div className="border-t pt-6 space-y-4">
+                <h3 className="text-lg font-semibold">إعدادات الطباعة</h3>
+                <div className="space-y-2">
+                  <Label htmlFor="selectedTheme">الثيم المستخدم عند طباعة الشواهد</Label>
+                  <select
+                    id="selectedTheme"
+                    value={formData.selectedTheme}
+                    onChange={(e) => setFormData({ ...formData, selectedTheme: e.target.value })}
+                    className="w-full p-2 border rounded-lg"
+                  >
+                    <option value="theme1">الثيم الرسمي 1 (الافتراضي)</option>
+                    <option value="theme2">الثيم الرسمي 2</option>
+                    <option value="theme3">الثيم الرسمي 3</option>
+                    <option value="theme4">الثيم الرسمي 4</option>
+                  </select>
+                  <p className="text-sm text-gray-500">سيتم تطبيق الثيم المختار عند تحميل PDF فقط</p>
                 </div>
               </div>
 

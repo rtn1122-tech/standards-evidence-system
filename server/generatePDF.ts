@@ -404,10 +404,20 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
     }
     
     .signature-box {
-      border: 1px solid #000;
+      border: 1px solid #00A896;
       padding: 12px;
       text-align: center;
-      min-height: 50px;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+    }
+    
+    .signature-box.green-accent {
+      background: #00A896;
+      color: white;
+      font-weight: bold;
     }
     
     @media print {
@@ -446,9 +456,13 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
   <!-- Page 8: Basic Information -->
   <div class="page content-page">
     <div class="header">
+      <div class="qr-code" style="width: 100px; height: 100px;">
+        <img src="${qrCodeDataUrl}" alt="QR Code" style="width: 100%; height: 100%;" />
+      </div>
       <div class="header-text">
         <div class="logo-text">المملكة العربية السعودية</div>
         <div class="sub-text">وزارة التعليم</div>
+        <div class="sub-text">${data.schoolName}</div>
       </div>
     </div>
     
@@ -573,11 +587,12 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
     
     <div class="signature-row">
       <div class="signature-box">
-        <div class="field-label">مدير المدرسة</div>
-        <div class="field-value">${data.principalName || ''}</div>
+        <div style="width: 70%;">${data.principalName || ''}</div>
+        <div class="signature-box green-accent" style="width: 30%;">مدير المدرسة</div>
       </div>
       <div class="signature-box">
-        <div class="field-label">اسم المعلم: ${data.teacherName}</div>
+        <div style="width: 70%;">${data.teacherName}</div>
+        <div class="signature-box green-accent" style="width: 30%;">اسم المعلم</div>
       </div>
     </div>
   </div>

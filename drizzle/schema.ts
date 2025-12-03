@@ -32,6 +32,7 @@ export const teacherProfiles = mysqlTable("teacherProfiles", {
   stage: varchar("stage", { length: 100 }), // المرحلة (ابتدائي، متوسط، ثانوي)
   subjects: text("subjects"), // المواد التدريسية (JSON array)
   selectedBackground: varchar("selectedBackground", { length: 100 }).default("default"), // الخلفية المختارة
+  selectedTheme: varchar("selectedTheme", { length: 100 }).default("theme1"), // الثيم المختار للطباعة
   // حقول جديدة (اختيارية)
   email: varchar("email", { length: 255 }), // البريد الإلكتروني
   phoneNumber: varchar("phoneNumber", { length: 20 }), // رقم الجوال
