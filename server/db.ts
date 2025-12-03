@@ -342,6 +342,7 @@ export async function getEvidenceDetailById(id: number) {
  */
 export async function getUserEvidenceDetails(userId: number) {
   const db = await getDb();
+  if (!db) throw new Error('Database connection failed');
   
   const result = await db
     .select({
@@ -381,6 +382,7 @@ export async function getUserEvidenceDetails(userId: number) {
  */
 export async function deleteEvidenceDetail(id: number, userId: number) {
   const db = await getDb();
+  if (!db) throw new Error('Database connection failed');
   
   // First check if the evidence belongs to the user
   const existing = await db
@@ -394,7 +396,7 @@ export async function deleteEvidenceDetail(id: number, userId: number) {
   }
   
   // Delete the evidence
-  await db
+  await db!
     .delete(evidenceDetails)
     .where(eq(evidenceDetails.id, id));
   
@@ -406,6 +408,7 @@ export async function deleteEvidenceDetail(id: number, userId: number) {
  */
 export async function getEvidenceSubTemplatesByStandard(standardId: number) {
   const db = await getDb();
+  if (!db) throw new Error('Database connection failed');
   
   const result = await db
     .select()
