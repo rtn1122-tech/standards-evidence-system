@@ -389,7 +389,7 @@ function StandardAccordionItem({
                         if (userEvidence) {
                           setLocation(`/evidence/sub-preview/${userEvidence.id}`);
                         } else {
-                          setLocation(`/evidence/sub/${subTemplate.id}`);
+                          setLocation(`/evidence/sub-new/${subTemplate.id}`);
                         }
                       }}
                     >
