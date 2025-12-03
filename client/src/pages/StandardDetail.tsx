@@ -21,7 +21,7 @@ export default function StandardDetail() {
     { enabled: standardId > 0 }
   );
 
-  const { data: userEvidences = [] } = trpc.evidenceDetails.getUserEvidenceDetails.useQuery(
+  const { data: userEvidences = [] } = trpc.evidenceDetails.list.useQuery(
     undefined,
     { enabled: !!user }
   );

@@ -301,7 +301,7 @@ function StandardAccordionItem({
     { enabled: !disabled }
   );
 
-  const { data: userEvidences = [] } = trpc.evidenceDetails.getUserEvidenceDetails.useQuery(
+  const { data: userEvidences = [] } = trpc.evidenceDetails.list.useQuery(
     undefined,
     { enabled: !disabled }
   );

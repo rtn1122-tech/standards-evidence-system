@@ -299,3 +299,16 @@
 - [x] إضافة route في App.tsx
 - [x] اختبار الصفحة - تعمل بنجاح!
 - [x] حفظ checkpoint
+
+## إزالة القيم الافتراضية من حقول البيانات
+- [ ] فحص SubEvidenceForm.tsx - البحث عن القيم الافتراضية
+- [ ] إزالة القيم الافتراضية من dynamicFields
+- [ ] اختبار الحقول - يجب أن تكون فارغة
+- [ ] حفظ checkpoint
+
+## ✅ إصلاح خطأ evidenceDetails.getUserEvidenceDetails (مكتمل)
+- [x] البحث عن استخدامات getUserEvidenceDetails - وجدت 3 ملفات
+- [x] إصلاح Home.tsx - استبدال بـ list
+- [x] إصلاح StandardDetail.tsx - استبدال بـ list
+- [x] إصلاح Dashboard.tsx - استبدال بـ list
+- [x] حفظ checkpoint

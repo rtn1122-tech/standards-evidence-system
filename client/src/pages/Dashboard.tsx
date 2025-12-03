@@ -23,7 +23,7 @@ export default function Dashboard() {
     { enabled: isAuthenticated }
   );
 
-  const { data: myEvidences = [] } = trpc.evidenceDetails.getUserEvidenceDetails.useQuery(
+  const { data: myEvidences = [] } = trpc.evidenceDetails.list.useQuery(
     undefined,
     { enabled: isAuthenticated }
   );
