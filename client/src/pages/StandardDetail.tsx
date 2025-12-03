@@ -16,9 +16,14 @@ export default function StandardDetail() {
     { enabled: standardId > 0 }
   );
 
-  const { data: evidences = [], isLoading: evidencesLoading } = trpc.evidence.listByStandard.useQuery(
+  const { data: subTemplates = [], isLoading: subTemplatesLoading } = trpc.evidenceSubTemplates.listByStandard.useQuery(
     { standardId },
-    { enabled: standardId > 0 && !!user }
+    { enabled: standardId > 0 }
+  );
+
+  const { data: userEvidences = [] } = trpc.evidenceDetails.getUserEvidenceDetails.useQuery(
+    undefined,
+    { enabled: !!user }
   );
 
   if (authLoading || standardLoading) {
@@ -51,8 +56,16 @@ export default function StandardDetail() {
     );
   }
 
-  const completedCount = evidences.filter((e: any) => e.isCompleted).length;
-  const totalCount = evidences.length;
+  // حساب التقدم بناءً على الشواهد المكتملة
+  const completedSubTemplateIds = new Set(
+    userEvidences
+      .filter((e: any) => e.evidenceSubTemplateId)
+      .map((e: any) => e.evidenceSubTemplateId)
+  );
+  const completedCount = subTemplates.filter((st: any) => 
+    completedSubTemplateIds.has(st.id)
+  ).length;
+  const totalCount = subTemplates.length;
   const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   return (
@@ -128,12 +141,12 @@ export default function StandardDetail() {
               <Button onClick={() => (window.location.href = "/api/oauth/login")}>تسجيل الدخول</Button>
             </CardContent>
           </Card>
-        ) : evidencesLoading ? (
+        ) : subTemplatesLoading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
             <p className="text-muted-foreground">جاري تحميل الشواهد...</p>
           </div>
-        ) : evidences.length === 0 ? (
+        ) : subTemplates.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
               <FileText className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
@@ -143,39 +156,49 @@ export default function StandardDetail() {
           </Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {evidences.map((evidence: any) => (
-              <Card
-                key={evidence.id}
-                className={`cursor-pointer hover:shadow-lg transition-all ${
-                  evidence.isCompleted ? "border-teal-500 bg-teal-50/50" : ""
-                }`}
-                onClick={() => setLocation(`/evidence/${evidence.id}`)}
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg">{evidence.title}</CardTitle>
-                    {evidence.isCompleted && (
-                      <div className="bg-teal-500 text-white text-xs px-2 py-1 rounded-full">مكتمل</div>
+            {subTemplates.map((subTemplate: any) => {
+              const isCompleted = completedSubTemplateIds.has(subTemplate.id);
+              const userEvidence = userEvidences.find(
+                (e: any) => e.evidenceSubTemplateId === subTemplate.id
+              );
+              
+              return (
+                <Card
+                  key={subTemplate.id}
+                  className={`cursor-pointer hover:shadow-lg transition-all ${
+                    isCompleted ? "border-teal-500 bg-teal-50/50" : ""
+                  }`}
+                  onClick={() => {
+                    if (userEvidence) {
+                      setLocation(`/evidence/sub-preview/${userEvidence.id}`);
+                    } else {
+                      setLocation(`/evidence/sub-form/${subTemplate.id}`);
+                    }
+                  }}
+                >
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <CardTitle className="text-lg">{subTemplate.title}</CardTitle>
+                      {isCompleted && (
+                        <div className="bg-teal-500 text-white text-xs px-2 py-1 rounded-full">مكتمل</div>
+                      )}
+                    </div>
+                    {subTemplate.description && (
+                      <CardDescription className="line-clamp-2">{subTemplate.description}</CardDescription>
                     )}
-                  </div>
-                  {evidence.description && (
-                    <CardDescription className="line-clamp-2">{evidence.description}</CardDescription>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                    {evidence.lessonName && (
-                      <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded">{evidence.lessonName}</span>
-                    )}
-                    {evidence.eventDate && (
-                      <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded">
-                        {new Date(evidence.eventDate).toLocaleDateString('ar-SA')}
-                      </span>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-xs text-muted-foreground">
+                      {isCompleted ? (
+                        <span className="text-teal-600 font-medium">✓ تم إكمال الشاهد</span>
+                      ) : (
+                        <span>اضغط لإضافة الشاهد</span>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </main>

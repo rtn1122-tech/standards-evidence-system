@@ -400,3 +400,18 @@ export async function deleteEvidenceDetail(id: number, userId: number) {
   
   return true;
 }
+
+/**
+ * Get evidence sub-templates by standard ID
+ */
+export async function getEvidenceSubTemplatesByStandard(standardId: number) {
+  const db = await getDb();
+  
+  const result = await db
+    .select()
+    .from(evidenceSubTemplates)
+    .where(eq(evidenceSubTemplates.standardId, standardId))
+    .orderBy(evidenceSubTemplates.orderIndex);
+  
+  return result;
+}

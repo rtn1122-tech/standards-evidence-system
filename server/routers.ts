@@ -351,6 +351,14 @@ export const appRouter = router({
       return await db.getAllBackgrounds();
     }),
   }),
+
+  evidenceSubTemplates: router({
+    listByStandard: publicProcedure
+      .input(z.object({ standardId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getEvidenceSubTemplatesByStandard(input.standardId);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

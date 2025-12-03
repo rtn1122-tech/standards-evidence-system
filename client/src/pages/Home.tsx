@@ -296,55 +296,40 @@ function StandardAccordionItem({
 }) {
   const [, setLocation] = useLocation();
   
-  const { data: evidenceTemplates = [], isLoading } = trpc.evidenceTemplates.getByStandardId.useQuery(
+  const { data: evidenceSubTemplates = [], isLoading } = trpc.evidenceSubTemplates.listByStandard.useQuery(
     { standardId: standard.id },
     { enabled: !disabled }
   );
 
-
-
-  const { data: userEvidence = [] } = trpc.evidence.listByStandard.useQuery(
-    { standardId: standard.id },
+  const { data: userEvidences = [] } = trpc.evidenceDetails.getUserEvidenceDetails.useQuery(
+    undefined,
     { enabled: !disabled }
   );
 
-  // تطبيق التصفية على الشواهد
-  const filteredTemplates = evidenceTemplates.filter((template) => {
+  // تطبيق التصفية على الشواهد (فقط البحث حالياً)
+  const filteredSubTemplates = evidenceSubTemplates.filter((template) => {
     // تصفية البحث
     if (searchQuery && !template.title.toLowerCase().includes(searchQuery.toLowerCase()) && 
         !(template.description || "").toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
-
-    // تصفية المرحلة
-    if (selectedStage !== "all") {
-      if (template.evidenceType === "stage" || template.evidenceType === "general") {
-        if (template.applicableStages) {
-          const stages = JSON.parse(template.applicableStages);
-          if (!stages.includes(selectedStage)) return false;
-        }
-      }
-    }
-
-    // تصفية المادة
-    if (selectedSubject !== "all") {
-      if (template.evidenceType === "subject" || template.evidenceType === "general") {
-        if (template.applicableSubjects) {
-          const subjects = JSON.parse(template.applicableSubjects);
-          if (!subjects.includes(selectedSubject)) return false;
-        }
-      }
-    }
-
     return true;
   });
 
-  const completedCount = userEvidence.filter((e) => e.isCompleted).length;
-  const totalCount = filteredTemplates.length;
+  // حساب التقدم بناءً على الشواهد المكتملة
+  const completedSubTemplateIds = new Set(
+    userEvidences
+      .filter((e: any) => e.evidenceSubTemplateId)
+      .map((e: any) => e.evidenceSubTemplateId)
+  );
+  const completedCount = filteredSubTemplates.filter((st: any) => 
+    completedSubTemplateIds.has(st.id)
+  ).length;
+  const totalCount = filteredSubTemplates.length;
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
   
   // إخفاء المعيار إذا لم تكن هناك شواهد بعد التصفية
-  if (filteredTemplates.length === 0 && (searchQuery || selectedStage !== "all" || selectedSubject !== "all")) {
+  if (filteredSubTemplates.length === 0 && (searchQuery || selectedStage !== "all" || selectedSubject !== "all")) {
     return null;
   }
 
@@ -378,34 +363,52 @@ function StandardAccordionItem({
           </div>
         ) : (
           <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between px-4">
+            <div className="px-4">
               <p className="text-sm font-medium">الشواهد ({totalCount})</p>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setLocation(`/evidence/new?standardId=${standard.id}`)}
-              >
-                <Plus className="h-4 w-4 ml-1" />
-                إضافة شاهد
-              </Button>
             </div>
 
-            {filteredTemplates.length === 0 ? (
+            {filteredSubTemplates.length === 0 ? (
               <p className="text-center text-sm text-muted-foreground py-4">
                 {(searchQuery || selectedStage !== "all" || selectedSubject !== "all") 
                   ? "لا توجد شواهد مطابقة للفلاتر المختارة"
                   : "لا توجد شواهد مضافة لهذا المعيار"}
               </p>
             ) : (
-              <div className="grid gap-2">
-                {filteredTemplates.map((template) => (
-                  <EvidenceTemplateItem
-                    key={template.id}
-                    template={template}
-                    standardId={standard.id}
-                    userEvidence={userEvidence}
-                  />
-                ))}
+              <div className="grid gap-2 px-4">
+                {filteredSubTemplates.map((subTemplate: any) => {
+                  const isCompleted = completedSubTemplateIds.has(subTemplate.id);
+                  const userEvidence = userEvidences.find(
+                    (e: any) => e.evidenceSubTemplateId === subTemplate.id
+                  );
+                  
+                  return (
+                    <div
+                      key={subTemplate.id}
+                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
+                      onClick={() => {
+                        if (userEvidence) {
+                          setLocation(`/evidence/sub-preview/${userEvidence.id}`);
+                        } else {
+                          setLocation(`/evidence/sub/${subTemplate.id}`);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        {isCompleted ? (
+                          <CheckCircle2 className="h-5 w-5 text-green-600" />
+                        ) : (
+                          <div className="h-5 w-5 rounded-full border-2 border-muted-foreground/30" />
+                        )}
+                        <span className="font-medium">{subTemplate.title}</span>
+                      </div>
+                      {isCompleted && (
+                        <Badge variant="default" className="bg-green-600">
+                          مكتمل
+                        </Badge>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -415,118 +418,3 @@ function StandardAccordionItem({
   );
 }
 
-
-function EvidenceTemplateItem({
-  template,
-  standardId,
-  userEvidence,
-}: {
-  template: any;
-  standardId: number;
-  userEvidence: any[];
-}) {
-  const [, setLocation] = useLocation();
-  const [isOpen, setIsOpen] = useState(false);
-  
-  const { data: subEvidence = [], isLoading } = trpc.evidenceTemplates.getFilteredSubEvidence.useQuery(
-    { templateId: template.id },
-    { enabled: isOpen }
-  );
-  
-  const userEv = userEvidence.find((e) => e.evidenceTemplateId === template.id);
-  const isCompleted = userEv?.isCompleted || false;
-  const hasSubEvidence = template.id === 30001 || template.id === 30002;
-
-  if (!hasSubEvidence) {
-    // Original behavior for templates without sub-evidence
-    return (
-      <div
-        key={template.id}
-        className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
-        onClick={() => {
-          if (userEv) {
-            setLocation(`/evidence/${userEv.id}`);
-          } else {
-            setLocation(`/evidence/new?standardId=${standardId}&templateId=${template.id}`);
-          }
-        }}
-      >
-        <div className="flex items-center gap-3">
-          {isCompleted ? (
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
-          ) : (
-            <div className="h-5 w-5 rounded-full border-2 border-muted-foreground/30" />
-          )}
-          <span className="font-medium">{template.title}</span>
-        </div>
-        {isCompleted && (
-          <Badge variant="default" className="bg-green-600">
-            مكتمل
-          </Badge>
-        )}
-      </div>
-    );
-  }
-
-  // New behavior for templates with sub-evidence
-  return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="border rounded-lg">
-      <div className="flex items-center justify-between p-3">
-        <div className="flex items-center gap-3 flex-1">
-          {isCompleted ? (
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
-          ) : (
-            <div className="h-5 w-5 rounded-full border-2 border-muted-foreground/30" />
-          )}
-          <span className="font-medium">{template.title}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          {isCompleted && (
-            <Badge variant="default" className="bg-green-600">
-              مكتمل
-            </Badge>
-          )}
-          <CollapsibleTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            </Button>
-          </CollapsibleTrigger>
-        </div>
-      </div>
-      
-      <CollapsibleContent>
-        <div className="border-t bg-muted/30 p-3">
-          {isLoading ? (
-            <div className="text-center py-4">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
-            </div>
-          ) : subEvidence.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-2">
-              لا توجد شواهد فرعية مطابقة لملفك الشخصي
-            </p>
-          ) : (
-            <div className="grid gap-1.5">
-              {subEvidence.map((subItem: any) => (
-                <div
-                  key={subItem.id}
-                  className="flex items-start gap-2 p-2 rounded hover:bg-background transition-colors cursor-pointer text-sm"
-                  onClick={() => {
-                    setLocation(`/evidence/sub/${subItem.id}`);
-                  }}
-                >
-                  <div className="h-4 w-4 rounded-full border border-muted-foreground/30 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1">
-                    <p className="font-medium leading-tight">{subItem.title}</p>
-                    {subItem.description && (
-                      <p className="text-xs text-muted-foreground mt-0.5">{subItem.description}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
-  );
-}
