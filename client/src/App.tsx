@@ -14,13 +14,15 @@ import SubEvidencePreview from "./pages/SubEvidencePreview";
 import MyEvidence from "./pages/MyEvidence";
 import LandingPage from "./pages/LandingPage";
 import About from "./pages/About";
+import VerifyEvidence from "./pages/VerifyEvidence";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/landing"} component={LandingPage} />
-      <Route path={"/about"} component={About} />
+      <Route path="/about" component={About} />
+      <Route path="/verify/:id" component={VerifyEvidence} />
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/profile-setup"} component={ProfileSetup} />
       <Route path="/standard/:id" component={StandardDetail} />

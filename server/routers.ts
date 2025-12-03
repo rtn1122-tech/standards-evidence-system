@@ -276,6 +276,21 @@ export const appRouter = router({
         return { success: true };
       }),
     
+    getForVerification: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const evidenceDetail = await db.getEvidenceDetailById(input.id);
+        
+        if (!evidenceDetail) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Evidence detail not found',
+          });
+        }
+        
+        return evidenceDetail;
+      }),
+    
     generatePDF: protectedProcedure
       .input(z.object({
         evidenceDetailId: z.number(),
