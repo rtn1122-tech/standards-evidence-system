@@ -12,11 +12,15 @@ import SubEvidenceForm from "./pages/SubEvidenceForm";
 import SubEvidenceFormNew from "./pages/SubEvidenceFormNew";
 import SubEvidencePreview from "./pages/SubEvidencePreview";
 import MyEvidence from "./pages/MyEvidence";
+import LandingPage from "./pages/LandingPage";
+import About from "./pages/About";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/landing"} component={LandingPage} />
+      <Route path={"/about"} component={About} />
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/profile-setup"} component={ProfileSetup} />
       <Route path="/standard/:id" component={StandardDetail} />

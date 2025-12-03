@@ -23,6 +23,11 @@ export default function Dashboard() {
     { enabled: isAuthenticated }
   );
 
+  const { data: myEvidences = [] } = trpc.evidenceDetails.getUserEvidenceDetails.useQuery(
+    undefined,
+    { enabled: isAuthenticated }
+  );
+
   if (!isAuthenticated) {
     setLocation("/");
     return null;
@@ -271,6 +276,75 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
+          {/* إحصائيات سريعة */}
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">إجمالي الشواهد</CardTitle>
+                <BookOpen className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{myEvidences.length}</div>
+                <p className="text-xs text-muted-foreground">
+                  من 11 شاهد متاح
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">نسبة الإنجاز</CardTitle>
+                <GraduationCap className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{((myEvidences.length / 11) * 100).toFixed(0)}%</div>
+                <Progress value={(myEvidences.length / 11) * 100} className="h-2 mt-2" />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">المعايير المكتملة</CardTitle>
+                <Briefcase className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{completedCount}</div>
+                <p className="text-xs text-muted-foreground">
+                  من {totalCount} معيار
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* آخر الشواهد المضافة */}
+          {myEvidences.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>آخر الشواهد المضافة</CardTitle>
+                <CardDescription>آخر 5 شواهد تم حفظها</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {myEvidences.slice(0, 5).map((evidence: any) => (
+                    <div key={evidence.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors">
+                      <div className="flex-1">
+                        <p className="font-medium">{evidence.evidenceSubTemplate?.title || 'شاهد'}</p>
+                        <p className="text-sm text-muted-foreground">
+                          المعيار {evidence.evidenceSubTemplate?.standardId}
+                        </p>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setLocation(`/evidence/sub-preview/${evidence.id}`)}
+                      >
+                        عرض
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* ملخص المعايير */}
           <Card>
             <CardHeader>
@@ -279,25 +353,38 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {standards.map((standard) => (
-                  <div key={standard.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-bold">
-                        {standard.id}
+                {standards.map((standard) => {
+                  const standardEvidences = myEvidences.filter(
+                    (e: any) => e.evidenceSubTemplate?.standardId === standard.id
+                  );
+                  const standardProgress = standardEvidences.length > 0 ? 100 : 0;
+                  
+                  return (
+                    <div key={standard.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-bold">
+                          {standard.id}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-semibold">{standard.title}</p>
+                          <p className="text-sm text-muted-foreground">{standard.description}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <Progress value={standardProgress} className="h-2 flex-1" />
+                            <span className="text-xs text-muted-foreground">
+                              {standardEvidences.length}/1
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-semibold">{standard.title}</p>
-                        <p className="text-sm text-muted-foreground">{standard.description}</p>
+                      <div className="flex items-center gap-4">
+                        <Badge variant="outline">{standard.weight}%</Badge>
+                        <Button variant="ghost" size="sm" onClick={() => setLocation("/")}>
+                          عرض الشواهد
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <Badge variant="outline">{standard.weight}%</Badge>
-                      <Button variant="ghost" size="sm" onClick={() => setLocation("/")}>
-                        عرض الشواهد
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
