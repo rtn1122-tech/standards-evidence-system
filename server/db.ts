@@ -269,7 +269,6 @@ export async function createEvidenceDetail(data: {
   image1: string | null;
   image2: string | null;
   theme: string;
-  status?: "draft" | "completed";
 }) {
   const db = await getDb();
   if (!db) return;
@@ -312,7 +311,6 @@ export async function createEvidenceDetail(data: {
     image1Url: data.image1,
     image2Url: data.image2,
     selectedTheme: data.theme,
-    status: data.status || "completed",
   });
   
   return Number(evidenceDetailResult[0].insertId);

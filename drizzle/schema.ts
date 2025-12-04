@@ -232,10 +232,6 @@ export const evidenceDetails = mysqlTable("evidenceDetails", {
   pdfUrl: text("pdfUrl"),
   qrCodeData: text("qrCodeData"), // URL or data for QR code
   
-  // Draft and auto-save support
-  status: mysqlEnum("status", ["draft", "completed"]).default("draft").notNull(),
-  lastAutoSaved: timestamp("lastAutoSaved"),
-  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

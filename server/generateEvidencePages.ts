@@ -125,7 +125,7 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
     
     .info-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 15px;
       margin-bottom: 20px;
     }
@@ -133,7 +133,7 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
     .info-item {
       border: 2px solid #00A896;
       padding: 15px;
-      border-radius: 20px;
+      border-radius: 8px;
       background: #f9fffe;
     }
     
@@ -152,7 +152,7 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
     .description-box {
       border: 2px solid #00A896;
       padding: 20px;
-      border-radius: 20px;
+      border-radius: 8px;
       background: #f9fffe;
       min-height: 200px;
     }
@@ -217,7 +217,7 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
     .section-box {
       border: 2px solid #00A896;
       padding: 15px;
-      border-radius: 20px;
+      border-radius: 8px;
       background: #f9fffe;
       min-height: 150px;
     }
@@ -304,14 +304,6 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
     </div>
     
     <div class="info-grid">
-      <div class="info-item">
-        <div class="info-label">اسم العنصر</div>
-        <div class="info-value">${data.elementTitle || data.title}</div>
-      </div>
-      <div class="info-item">
-        <div class="info-label">الجدول (معيار)</div>
-        <div class="info-value">${data.standardName}</div>
-      </div>
       <div class="info-item">
         <div class="info-label">اسم المعلم</div>
         <div class="info-value">${data.teacherName}</div>

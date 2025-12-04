@@ -1,9 +1,0 @@
-{
-  "query": "ALTER TABLE evidenceDetails \nADD COLUMN status ENUM('draft', 'completed') NOT NULL DEFAULT 'draft',\nADD COLUMN lastAutoSaved TIMESTAMP NULL",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute ALTER TABLE evidenceDetails \nADD COLUMN status ENUM('draft', 'completed') NOT NULL DEFAULT 'draft',\nADD COLUMN lastAutoSaved TIMESTAMP NULL",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 2645
-}
