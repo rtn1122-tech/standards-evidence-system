@@ -359,7 +359,7 @@ export default function SubEvidenceFormNew() {
               <Input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="استخدام التقنية الحديثة"
+                placeholder={subTemplateId === 102 ? "التواصل مع أولياء الأمور" : "استخدام التقنية الحديثة"}
                 className="text-center font-semibold border-black"
               />
               <div className="border border-black p-3 text-right flex items-center justify-end">
@@ -367,87 +367,134 @@ export default function SubEvidenceFormNew() {
               </div>
             </div>
 
-            {/* جدول البيانات - 4 حقول */}
-            <div className="grid grid-cols-4 gap-4 mb-4">
-              <div className="border border-black p-2">
-                <label className="text-xs text-gray-600 block mb-1">مدة البرنامج</label>
-                <Input
-                  value={duration}
-                  onChange={(e) => setDuration(e.target.value)}
-                  placeholder="طوال العام"
-                  className="border-0 p-0 h-auto text-sm"
-                />
-              </div>
-              <div className="border border-black p-2">
-                <label className="text-xs text-gray-600 block mb-1">المستفيدون</label>
-                <Input
-                  value={beneficiaries}
-                  onChange={(e) => setBeneficiaries(e.target.value)}
-                  placeholder="الطلاب"
-                  className="border-0 p-0 h-auto text-sm"
-                />
-              </div>
-              <div className="border border-black p-2">
-                <label className="text-xs text-gray-600 block mb-1">الصف</label>
-                <Input
-                  value={grade}
-                  onChange={(e) => setGrade(e.target.value)}
-                  placeholder="جميع الفصول"
-                  className="border-0 p-0 h-auto text-sm"
-                />
-              </div>
-              <div className="border border-black p-2">
-                <label className="text-xs text-gray-600 block mb-1">العنوان</label>
-                <Input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="التقنية في التعليم"
-                  className="border-0 p-0 h-auto text-sm"
-                />
-              </div>
-            </div>
+            {/* جدول البيانات - 4 حقول للشاهد 102، 8 حقول للباقي */}
+            {subTemplateId === 102 ? (
+              // 4 حقول فقط للشاهد 102
+              <>
+                <div className="grid grid-cols-4 gap-4 mb-4">
+                  <div className="border border-black p-2">
+                    <label className="text-xs text-gray-600 block mb-1">المستفيدون</label>
+                    <Input
+                      value={beneficiaries}
+                      onChange={(e) => setBeneficiaries(e.target.value)}
+                      placeholder="أولياء الأمور"
+                      className="border-0 p-0 h-auto text-sm"
+                    />
+                  </div>
+                  <div className="border border-black p-2">
+                    <label className="text-xs text-gray-600 block mb-1">الوسائل المستخدمة</label>
+                    <Input
+                      value={executionLocation}
+                      onChange={(e) => setExecutionLocation(e.target.value)}
+                      placeholder="منصة مدرستي - قروب الواتس - الرسائل النصية"
+                      className="border-0 p-0 h-auto text-sm"
+                    />
+                  </div>
+                  <div className="border border-black p-2">
+                    <label className="text-xs text-gray-600 block mb-1">مدة البرنامج</label>
+                    <Input
+                      value={duration}
+                      onChange={(e) => setDuration(e.target.value)}
+                      placeholder="طوال العام"
+                      className="border-0 p-0 h-auto text-sm"
+                    />
+                  </div>
+                  <div className="border border-black p-2">
+                    <label className="text-xs text-gray-600 block mb-1">التاريخ</label>
+                    <Input
+                      type="date"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      className="border-0 p-0 h-auto text-sm"
+                    />
+                  </div>
+                </div>
+              </>
+            ) : (
+              // 8 حقول للشواهد الأخرى
+              <>
+                <div className="grid grid-cols-4 gap-4 mb-4">
+                  <div className="border border-black p-2">
+                    <label className="text-xs text-gray-600 block mb-1">مدة البرنامج</label>
+                    <Input
+                      value={duration}
+                      onChange={(e) => setDuration(e.target.value)}
+                      placeholder="طوال العام"
+                      className="border-0 p-0 h-auto text-sm"
+                    />
+                  </div>
+                  <div className="border border-black p-2">
+                    <label className="text-xs text-gray-600 block mb-1">المستفيدون</label>
+                    <Input
+                      value={beneficiaries}
+                      onChange={(e) => setBeneficiaries(e.target.value)}
+                      placeholder="الطلاب"
+                      className="border-0 p-0 h-auto text-sm"
+                    />
+                  </div>
+                  <div className="border border-black p-2">
+                    <label className="text-xs text-gray-600 block mb-1">الصف</label>
+                    <Input
+                      value={grade}
+                      onChange={(e) => setGrade(e.target.value)}
+                      placeholder="جميع الفصول"
+                      className="border-0 p-0 h-auto text-sm"
+                    />
+                  </div>
+                  <div className="border border-black p-2">
+                    <label className="text-xs text-gray-600 block mb-1">العنوان</label>
+                    <Input
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder="التقنية في التعليم"
+                      className="border-0 p-0 h-auto text-sm"
+                    />
+                  </div>
+                </div>
 
-            {/* 3 حقول */}
-            <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="border border-black p-2">
-                <label className="text-xs text-gray-600 block mb-1">عدد الطلاب</label>
-                <Input
-                  value={studentsCount}
-                  onChange={(e) => setStudentsCount(e.target.value)}
-                  placeholder="جميع الطلاب"
-                  className="border-0 p-0 h-auto text-sm"
-                />
-              </div>
-              <div className="border border-black p-2">
-                <label className="text-xs text-gray-600 block mb-1">مكان التنفيذ</label>
-                <Input
-                value={executionLocation}
-                onChange={(e) => setExecutionLocation(e.target.value)}
-                  placeholder="الفصل - مصادر التعلم"
-                  className="border-0 p-0 h-auto text-sm"
-                />
-              </div>
-              <div className="border border-black p-2">
-                <label className="text-xs text-gray-600 block mb-1">التاريخ</label>
-                <Input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="border-0 p-0 h-auto text-sm"
-                />
-              </div>
-            </div>
+                {/* 3 حقول */}
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  <div className="border border-black p-2">
+                    <label className="text-xs text-gray-600 block mb-1">عدد الطلاب</label>
+                    <Input
+                      value={studentsCount}
+                      onChange={(e) => setStudentsCount(e.target.value)}
+                      placeholder="جميع الطلاب"
+                      className="border-0 p-0 h-auto text-sm"
+                    />
+                  </div>
+                  <div className="border border-black p-2">
+                    <label className="text-xs text-gray-600 block mb-1">مكان التنفيذ</label>
+                    <Input
+                    value={executionLocation}
+                    onChange={(e) => setExecutionLocation(e.target.value)}
+                      placeholder="الفصل - مصادر التعلم"
+                      className="border-0 p-0 h-auto text-sm"
+                    />
+                  </div>
+                  <div className="border border-black p-2">
+                    <label className="text-xs text-gray-600 block mb-1">التاريخ</label>
+                    <Input
+                      type="date"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      className="border-0 p-0 h-auto text-sm"
+                    />
+                  </div>
+                </div>
 
-            {/* عنوان الدرس */}
-            <div className="border border-black p-2 mb-6">
-              <label className="text-xs text-gray-600 block mb-1">عنوان الدرس</label>
-              <Input
-                value={lessonTitle}
-                onChange={(e) => setLessonTitle(e.target.value)}
-                placeholder="جميع المناهج المستندة"
-                className="border-0 p-0 h-auto text-sm"
-              />
-            </div>
+                {/* عنوان الدرس */}
+                <div className="border border-black p-2 mb-6">
+                  <label className="text-xs text-gray-600 block mb-1">عنوان الدرس</label>
+                  <Input
+                    value={lessonTitle}
+                    onChange={(e) => setLessonTitle(e.target.value)}
+                    placeholder="جميع المناهج المستندة"
+                    className="border-0 p-0 h-auto text-sm"
+                  />
+                </div>
+              </>
+            )}
 
             {/* مربع الوصف */}
             <div className="border-2 border-black rounded-lg p-6 relative" style={{ minHeight: '300px' }}>

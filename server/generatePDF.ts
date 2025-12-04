@@ -31,6 +31,7 @@ function getThemeBackgroundBase64(): string {
 
 interface EvidenceData {
   id: number;
+  subTemplateId?: number;
   title: string;
   standardName: string;
   description: string;
@@ -383,38 +384,59 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       </div>
       
       <div class="fields-grid">
-        <div class="field-item">
-          <div class="field-label">التاريخ</div>
-          <div class="field-value">${data.date}</div>
-        </div>
-        <div class="field-item">
-          <div class="field-label">عنوان الدرس</div>
-          <div class="field-value">${data.lessonTitle}</div>
-        </div>
-        <div class="field-item">
-          <div class="field-label">عدد الطلاب</div>
-          <div class="field-value">${data.studentsCount}</div>
-        </div>
-        <div class="field-item">
-          <div class="field-label">مكان التنفيذ</div>
-          <div class="field-value">${data.executionLocation}</div>
-        </div>
-        <div class="field-item">
-          <div class="field-label">المدة الزمنية</div>
-          <div class="field-value">${data.duration}</div>
-        </div>
-        <div class="field-item">
-          <div class="field-label">المستفيدون</div>
-          <div class="field-value">${data.beneficiaries}</div>
-        </div>
-        <div class="field-item">
-          <div class="field-label">الصف</div>
-          <div class="field-value">${data.grade}</div>
-        </div>
-        <div class="field-item">
-          <div class="field-label">المنفذ</div>
-          <div class="field-value">${data.teacherName}</div>
-        </div>
+        ${data.subTemplateId === 102 ? `
+          <!-- 4 حقول فقط للشاهد 102 -->
+          <div class="field-item">
+            <div class="field-label">التاريخ</div>
+            <div class="field-value">${data.date}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">مدة البرنامج</div>
+            <div class="field-value">${data.duration}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">الوسائل المستخدمة</div>
+            <div class="field-value">${data.executionLocation}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">المستفيدون</div>
+            <div class="field-value">${data.beneficiaries}</div>
+          </div>
+        ` : `
+          <!-- 8 حقول للشواهد الأخرى -->
+          <div class="field-item">
+            <div class="field-label">التاريخ</div>
+            <div class="field-value">${data.date}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">عنوان الدرس</div>
+            <div class="field-value">${data.lessonTitle}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">عدد الطلاب</div>
+            <div class="field-value">${data.studentsCount}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">مكان التنفيذ</div>
+            <div class="field-value">${data.executionLocation}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">المدة الزمنية</div>
+            <div class="field-value">${data.duration}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">المستفيدون</div>
+            <div class="field-value">${data.beneficiaries}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">الصف</div>
+            <div class="field-value">${data.grade}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">المنفذ</div>
+            <div class="field-value">${data.teacherName}</div>
+          </div>
+        `}
       </div>
       
       <div class="description-box">

@@ -354,6 +354,7 @@ export const appRouter = router({
         // Build evidence data for PDF generation
         const evidenceData = {
           id: evidenceDetail.id,
+          subTemplateId: evidenceDetail.evidenceSubTemplateId || undefined,
           title: subTemplate?.title || "شاهد",
           standardName: "أداء الواجبات الوظيفية", // TODO: fetch from standard
           description: subTemplate?.description || "",
