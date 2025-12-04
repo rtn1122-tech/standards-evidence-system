@@ -152,7 +152,7 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
     .description-box {
       border: 2px solid #00A896;
       padding: 20px;
-      border-radius: 8px;
+      border-radius: 20px;
       background: #f9fffe;
       min-height: 200px;
     }
