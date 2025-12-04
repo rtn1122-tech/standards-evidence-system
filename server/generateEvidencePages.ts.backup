@@ -72,7 +72,7 @@ interface EvidenceData {
   educationDepartment: string;
 }
 
-export async function generateEvidencePages(data: EvidenceData): Promise<Buffer> {
+export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
   // Generate QR Code
   const qrCodeUrl = `https://standards-evidence-system.manus.space/verify/${data.id}`;
   const qrCodeDataUrl = await QRCode.toDataURL(qrCodeUrl, {

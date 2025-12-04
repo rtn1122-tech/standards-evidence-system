@@ -481,6 +481,7 @@ export const appRouter = router({
             teacherName: profile?.teacherName || ctx.user.name || "المعلم",
             schoolName: profile?.schoolName || "المدرسة",
             principalName: profile?.principalName || "",
+            educationDepartment: profile?.educationDepartment || "",
           };
           
           const pdfBuffer = await generateEvidencePages(evidenceData);
