@@ -155,7 +155,7 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
     /* Content area - white space in the middle */
     .content-area {
       position: absolute;
-      top: 60mm;
+      top: 35mm;
       left: 15mm;
       right: 15mm;
       bottom: 60mm;
