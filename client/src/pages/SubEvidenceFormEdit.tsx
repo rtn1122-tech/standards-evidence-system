@@ -53,6 +53,12 @@ export default function SubEvidenceFormEdit() {
   
   // Dynamic fields (additional fields beyond the 8 default ones)
   const [dynamicFields, setDynamicFields] = useState<Array<{ label: string; value: string }>>([]);
+  
+  // Visibility settings (for admin/collaborator only)
+  const [showVisibilitySettings] = useState(true); // Enabled for testing
+  const [applicableStages, setApplicableStages] = useState<string[]>([]);
+  const [applicableSubjects, setApplicableSubjects] = useState<string[]>([]);
+  const [applicableGrades, setApplicableGrades] = useState<string[]>([]);
 
   // Page 1 - Dynamic fields (8 fields + date)
   const [title, setTitle] = useState("");
