@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ArrowRight, Save, Upload, Loader2, Pencil, Plus, X, Eye } from "lucide-react";
+import { ArrowRight, Save, Upload, Loader2, Pencil, Plus, X, Eye, Settings, GraduationCap, BookOpen, Hash } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 
@@ -188,8 +188,34 @@ export default function SubEvidenceFormEdit() {
         setImage2Preview(evidenceDetail.image2Url);
         setImage2Url(evidenceDetail.image2Url);
       }
+      
+      // Load visibility settings from subTemplate
+      if (subTemplate) {
+        try {
+          if (subTemplate.applicableStages) {
+            const stages = typeof subTemplate.applicableStages === 'string' 
+              ? JSON.parse(subTemplate.applicableStages) 
+              : subTemplate.applicableStages;
+            setApplicableStages(Array.isArray(stages) ? stages : []);
+          }
+          if (subTemplate.applicableSubjects) {
+            const subjects = typeof subTemplate.applicableSubjects === 'string' 
+              ? JSON.parse(subTemplate.applicableSubjects) 
+              : subTemplate.applicableSubjects;
+            setApplicableSubjects(Array.isArray(subjects) ? subjects : []);
+          }
+          if (subTemplate.applicableGrades) {
+            const grades = typeof subTemplate.applicableGrades === 'string' 
+              ? JSON.parse(subTemplate.applicableGrades) 
+              : subTemplate.applicableGrades;
+            setApplicableGrades(Array.isArray(grades) ? grades : []);
+          }
+        } catch (e) {
+          console.error("Failed to parse visibility settings:", e);
+        }
+      }
     }
-  }, [evidenceDetail]);
+  }, [evidenceDetail, subTemplate]);
   
   // Upload image mutation
   const uploadImageMutation = trpc.evidenceDetails.uploadImage.useMutation();
@@ -390,6 +416,10 @@ export default function SubEvidenceFormEdit() {
       section6,
       image1: image1Url,
       image2: image2Url,
+      // Visibility settings
+      applicableStages: applicableStages.length > 0 ? JSON.stringify(applicableStages) : null,
+      applicableSubjects: applicableSubjects.length > 0 ? JSON.stringify(applicableSubjects) : null,
+      applicableGrades: applicableGrades.length > 0 ? JSON.stringify(applicableGrades) : null,
     });
   };
   
@@ -487,6 +517,108 @@ export default function SubEvidenceFormEdit() {
             <p className="text-sm text-muted-foreground text-right">{subTemplate.description}</p>
           )}
         </div>
+        
+        {/* Visibility Settings */}
+        {showVisibilitySettings && (
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h3 className="text-lg font-bold text-right mb-4 flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              إعدادات الظهور
+            </h3>
+            <p className="text-sm text-muted-foreground text-right mb-4">
+              حدد المراحل والمواد والصفوف التي سيظهر لها هذا الشاهد. اترك الكل فارغاً لجعله عاماً للجميع.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Stages */}
+              <div>
+                <h4 className="font-semibold text-right mb-3 flex items-center gap-2">
+                  <GraduationCap className="h-4 w-4" />
+                  المراحل الدراسية
+                </h4>
+                <div className="space-y-2">
+                  {['ابتدائي', 'متوسط', 'ثانوي'].map((stage) => (
+                    <label key={stage} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={applicableStages.includes(stage)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setApplicableStages([...applicableStages, stage]);
+                          } else {
+                            setApplicableStages(applicableStages.filter(s => s !== stage));
+                          }
+                        }}
+                        className="rounded border-gray-300"
+                      />
+                      <span className="text-sm">{stage}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Subjects */}
+              <div>
+                <h4 className="font-semibold text-right mb-3 flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  المواد الدراسية
+                </h4>
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {['رياضيات', 'علوم', 'لغة عربية', 'لغة إنجليزية', 'اجتماعيات', 'قرآن كريم', 'حاسب آلي', 'تربية فنية', 'تربية بدنية', 'أخرى'].map((subject) => (
+                    <label key={subject} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={applicableSubjects.includes(subject)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setApplicableSubjects([...applicableSubjects, subject]);
+                          } else {
+                            setApplicableSubjects(applicableSubjects.filter(s => s !== subject));
+                          }
+                        }}
+                        className="rounded border-gray-300"
+                      />
+                      <span className="text-sm">{subject}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Grades */}
+              <div>
+                <h4 className="font-semibold text-right mb-3 flex items-center gap-2">
+                  <Hash className="h-4 w-4" />
+                  الصفوف الدراسية
+                </h4>
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {Array.from({ length: 12 }, (_, i) => `الصف ${i + 1}`).map((grade) => (
+                    <label key={grade} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={applicableGrades.includes(grade)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setApplicableGrades([...applicableGrades, grade]);
+                          } else {
+                            setApplicableGrades(applicableGrades.filter(g => g !== grade));
+                          }
+                        }}
+                        className="rounded border-gray-300"
+                      />
+                      <span className="text-sm">{grade}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-800 text-right">
+                💡 <strong>ملاحظة:</strong> إذا لم تحدد أي خيار، سيظهر الشاهد لجميع المعلمين (عام).
+              </p>
+            </div>
+          </div>
+        )}
         
         {/* Page Navigation */}
         <div className="flex gap-2 mb-6">

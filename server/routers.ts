@@ -229,8 +229,17 @@ export const appRouter = router({
         section6: z.string(),
         image1: z.string().nullable(),
         image2: z.string().nullable(),
+        applicableStages: z.string().nullable().optional(),
+        applicableSubjects: z.string().nullable().optional(),
+        applicableGrades: z.string().nullable().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        const evidenceDetail = await db.getEvidenceDetailById(input.id);
+        if (!evidenceDetail) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+        
+        // Update evidence detail
         await db.updateEvidenceDetail(input.id, {
           customFields: JSON.stringify(input.dynamicFields),
           section1Content: input.section1,
@@ -242,6 +251,15 @@ export const appRouter = router({
           image1Url: input.image1,
           image2Url: input.image2,
         });
+        
+        // Update visibility settings in subTemplate if provided
+        if (input.applicableStages !== undefined || input.applicableSubjects !== undefined || input.applicableGrades !== undefined) {
+          await db.updateEvidenceSubTemplate(evidenceDetail.subTemplateId, {
+            applicableStages: input.applicableStages,
+            applicableSubjects: input.applicableSubjects,
+            applicableGrades: input.applicableGrades,
+          });
+        }
         
         return { success: true };
       }),

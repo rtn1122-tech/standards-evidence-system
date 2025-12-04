@@ -453,3 +453,23 @@ export async function getEvidenceSubTemplatesByStandard(standardId: number) {
 }
 
 
+
+/**
+ * Update evidence sub template visibility settings
+ */
+export async function updateEvidenceSubTemplate(
+  id: number,
+  data: {
+    applicableStages?: string | null;
+    applicableSubjects?: string | null;
+    applicableGrades?: string | null;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error('Database connection failed');
+  
+  await db
+    .update(schema.evidenceSubTemplates)
+    .set(data)
+    .where(eq(schema.evidenceSubTemplates.id, id));
+}
