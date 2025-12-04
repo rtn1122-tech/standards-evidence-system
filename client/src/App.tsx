@@ -16,6 +16,7 @@ import LandingPage from "./pages/LandingPage";
 import About from "./pages/About";
 import VerifyEvidence from "./pages/VerifyEvidence";
 
+
 function Router() {
   return (
     <Switch>
@@ -31,6 +32,7 @@ function Router() {
       <Route path="/evidence/edit/:evidenceId" component={SubEvidenceFormEdit} />
       <Route path="/evidence/sub-preview/:id" component={SubEvidencePreview} />
       <Route path="/my-evidence" component={MyEvidence} />
+
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
@@ -40,12 +42,14 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light">
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
+
+        <ThemeProvider defaultTheme="light">
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </ThemeProvider>
+
     </ErrorBoundary>
   );
 }

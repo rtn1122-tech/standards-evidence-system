@@ -451,3 +451,5 @@ export async function getEvidenceSubTemplatesByStandard(standardId: number) {
   
   return result;
 }
+
+

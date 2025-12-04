@@ -120,6 +120,11 @@ export const evidenceSubTemplates = mysqlTable("evidenceSubTemplates", {
   applicableTracks: text("applicableTracks"), // JSON array - المسارات (عام، علمي، أدبي، إلخ)
   
   orderIndex: int("orderIndex").notNull(),
+  
+  // Tracking who created this template
+  createdByCollaboratorId: int("createdByCollaboratorId"), // null if created by admin
+  createdByCollaboratorEmail: varchar("createdByCollaboratorEmail", { length: 320 }), // for display
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -231,3 +236,5 @@ export const evidenceDetails = mysqlTable("evidenceDetails", {
 
 export type EvidenceDetail = typeof evidenceDetails.$inferSelect;
 export type InsertEvidenceDetail = typeof evidenceDetails.$inferInsert;
+
+

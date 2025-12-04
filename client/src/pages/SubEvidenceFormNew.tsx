@@ -62,6 +62,12 @@ export default function SubEvidenceFormNew() {
   
   // Dynamic fields (additional fields beyond the 8 default ones)
   const [dynamicFields, setDynamicFields] = useState<Array<{ label: string; value: string }>>([]);
+  
+  // Visibility settings (for admin/collaborator only)
+  const [showVisibilitySettings] = useState(false); // Will be enabled for admin later
+  const [applicableStages, setApplicableStages] = useState<string[]>([]);
+  const [applicableSubjects, setApplicableSubjects] = useState<string[]>([]);
+  const [applicableGrades, setApplicableGrades] = useState<string[]>([]);
 
   
   // Page 2 - 6 sections (pre-filled from database)
