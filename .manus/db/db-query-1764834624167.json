@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, title, standardId, orderIndex FROM evidenceSubTemplates WHERE id = 102;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SELECT id, title, standardId, orderIndex FROM evidenceSubTemplates WHERE id = 102;",
+  "rows": [
+    {
+      "id": "102",
+      "title": "التفاعل مع أولياء الأمور - التواصل مع أولياء الأمور",
+      "standardId": "2",
+      "orderIndex": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tstandardId\torderIndex\n102\tالتفاعل مع أولياء الأمور - التواصل مع أولياء الأمور\t2\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1646
+}
