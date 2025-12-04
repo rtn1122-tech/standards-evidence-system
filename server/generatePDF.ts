@@ -49,6 +49,8 @@ interface EvidenceData {
   field2Label?: string;
   field3Label?: string;
   field4Label?: string;
+  // Additional dynamic fields
+  additionalFields?: string;
   // Page 2 sections
   section1: string;
   section2: string;
@@ -453,6 +455,22 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
             <div class="field-label">المنفذ</div>
             <div class="field-value">${data.teacherName}</div>
           </div>` : ''}
+          
+          <!-- الحقول الديناميكية الإضافية -->
+          ${data.additionalFields ? (() => {
+            try {
+              const additionalFields = JSON.parse(data.additionalFields);
+              return additionalFields.map((field: { label: string; value: string }) => 
+                field.value && field.value.trim() ? `
+                <div class="field-item">
+                  <div class="field-label">${field.label}</div>
+                  <div class="field-value">${field.value}</div>
+                </div>` : ''
+              ).join('');
+            } catch (e) {
+              return '';
+            }
+          })() : ''}
         `}
       </div>
       

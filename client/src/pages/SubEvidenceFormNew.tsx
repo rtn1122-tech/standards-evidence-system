@@ -4,7 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, Save, Upload, Loader2, Pencil } from "lucide-react";
+import { ArrowRight, Save, Upload, Loader2, Pencil, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 
@@ -45,6 +45,9 @@ export default function SubEvidenceFormNew() {
   const [field2Label, setField2Label] = useState("الوسائل المستخدمة");
   const [field3Label, setField3Label] = useState("المستفيدون");
   const [field4Label, setField4Label] = useState("التاريخ");
+  
+  // Dynamic fields (additional fields beyond the 8 default ones)
+  const [dynamicFields, setDynamicFields] = useState<Array<{ label: string; value: string }>>([]);
 
   
   // Page 2 - 6 sections (pre-filled from database)
@@ -225,7 +228,7 @@ export default function SubEvidenceFormNew() {
     
     // Images are already uploaded to S3 (image1Url, image2Url)
     
-    const dynamicFields = {
+    const dynamicFieldsData = {
       title,
       grade,
       beneficiaries,
@@ -243,12 +246,14 @@ export default function SubEvidenceFormNew() {
       field2Label,
       field3Label,
       field4Label,
+      // Additional dynamic fields
+      additionalFields: JSON.stringify(dynamicFields),
     };
     
     saveMutation.mutate({
       subTemplateId,
       templateId: subTemplate?.evidenceTemplateId || 30002,
-      dynamicFields,
+      dynamicFields: dynamicFieldsData,
       section1,
       section2,
       section3,
@@ -458,39 +463,39 @@ export default function SubEvidenceFormNew() {
               <>
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1">مدة البرنامج</label>
+                    <label className="text-xs text-gray-600 block mb-1 text-center">مدة البرنامج</label>
                     <Input
                       value={duration}
                       onChange={(e) => setDuration(e.target.value)}
                       placeholder="طوال العام"
-                      className="border-0 p-0 h-auto text-sm"
+                      className="border-0 p-0 h-auto text-sm text-center"
                     />
                   </div>
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1">المستفيدون</label>
+                    <label className="text-xs text-gray-600 block mb-1 text-center">المستفيدون</label>
                     <Input
                       value={beneficiaries}
                       onChange={(e) => setBeneficiaries(e.target.value)}
                       placeholder="الطلاب"
-                      className="border-0 p-0 h-auto text-sm"
+                      className="border-0 p-0 h-auto text-sm text-center"
                     />
                   </div>
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1">الصف</label>
+                    <label className="text-xs text-gray-600 block mb-1 text-center">الصف</label>
                     <Input
                       value={grade}
                       onChange={(e) => setGrade(e.target.value)}
                       placeholder="جميع الفصول"
-                      className="border-0 p-0 h-auto text-sm"
+                      className="border-0 p-0 h-auto text-sm text-center"
                     />
                   </div>
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1">العنوان</label>
+                    <label className="text-xs text-gray-600 block mb-1 text-center">العنوان</label>
                     <Input
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder="التقنية في التعليم"
-                      className="border-0 p-0 h-auto text-sm"
+                      className="border-0 p-0 h-auto text-sm text-center"
                     />
                   </div>
                 </div>
@@ -498,44 +503,94 @@ export default function SubEvidenceFormNew() {
                 {/* 3 حقول */}
                 <div className="grid grid-cols-3 gap-4 mb-4">
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1">عدد الطلاب</label>
+                    <label className="text-xs text-gray-600 block mb-1 text-center">عدد الطلاب</label>
                     <Input
                       value={studentsCount}
                       onChange={(e) => setStudentsCount(e.target.value)}
                       placeholder="جميع الطلاب"
-                      className="border-0 p-0 h-auto text-sm"
+                      className="border-0 p-0 h-auto text-sm text-center"
                     />
                   </div>
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1">مكان التنفيذ</label>
+                    <label className="text-xs text-gray-600 block mb-1 text-center">مكان التنفيذ</label>
                     <Input
                     value={executionLocation}
                     onChange={(e) => setExecutionLocation(e.target.value)}
                       placeholder="الفصل - مصادر التعلم"
-                      className="border-0 p-0 h-auto text-sm"
+                      className="border-0 p-0 h-auto text-sm text-center"
                     />
                   </div>
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1">التاريخ</label>
+                    <label className="text-xs text-gray-600 block mb-1 text-center">التاريخ</label>
                     <Input
                       type="date"
                       value={date}
                       onChange={(e) => setDate(e.target.value)}
-                      className="border-0 p-0 h-auto text-sm"
+                      className="border-0 p-0 h-auto text-sm text-center"
                     />
                   </div>
                 </div>
 
                 {/* عنوان الدرس */}
                 <div className="border border-black p-2 mb-6">
-                  <label className="text-xs text-gray-600 block mb-1">عنوان الدرس</label>
+                  <label className="text-xs text-gray-600 block mb-1 text-center">عنوان الدرس</label>
                   <Input
                     value={lessonTitle}
                     onChange={(e) => setLessonTitle(e.target.value)}
                     placeholder="جميع المناهج المستندة"
-                    className="border-0 p-0 h-auto text-sm"
+                    className="border-0 p-0 h-auto text-sm text-center"
                   />
                 </div>
+                
+                {/* الحقول الديناميكية */}
+                {dynamicFields.map((field, index) => (
+                  <div key={index} className="border border-black p-2 mb-4 relative">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newFields = [...dynamicFields];
+                        newFields.splice(index, 1);
+                        setDynamicFields(newFields);
+                      }}
+                      className="absolute top-1 left-1 text-red-500 hover:text-red-700"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                    <Input
+                      value={field.label}
+                      onChange={(e) => {
+                        const newFields = [...dynamicFields];
+                        newFields[index].label = e.target.value;
+                        setDynamicFields(newFields);
+                      }}
+                      placeholder="اسم الحقل"
+                      className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold text-center"
+                    />
+                    <Input
+                      value={field.value}
+                      onChange={(e) => {
+                        const newFields = [...dynamicFields];
+                        newFields[index].value = e.target.value;
+                        setDynamicFields(newFields);
+                      }}
+                      placeholder="القيمة"
+                      className="border-0 p-0 h-auto text-sm text-center"
+                    />
+                  </div>
+                ))}
+                
+                {/* زر إضافة حقل */}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setDynamicFields([...dynamicFields, { label: "", value: "" }]);
+                  }}
+                  className="w-full mb-6 border-2 border-dashed border-gray-400 hover:border-blue-500 hover:bg-blue-50"
+                >
+                  <Plus className="w-4 h-4 ml-2" />
+                  إضافة حقل جديد
+                </Button>
               </>
             )}
 
