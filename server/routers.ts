@@ -197,6 +197,7 @@ export const appRouter = router({
         image1: z.string().nullable(),
         image2: z.string().nullable(),
         theme: z.string(),
+        status: z.enum(["draft", "completed"]).optional().default("completed"),
       }))
       .mutation(async ({ input, ctx }) => {
         const evidenceDetailId = await db.createEvidenceDetail({
@@ -213,6 +214,7 @@ export const appRouter = router({
           image1: input.image1,
           image2: input.image2,
           theme: input.theme,
+          status: input.status,
         });
         
         return { success: true, evidenceDetailId };
