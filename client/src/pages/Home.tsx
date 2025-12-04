@@ -23,12 +23,13 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStage, setSelectedStage] = useState<string>("all");
   const [selectedSubject, setSelectedSubject] = useState<string>("all");
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'priority'>('newest');
 
   const { data: profile, isLoading: profileLoading } = trpc.teacherProfile.get.useQuery(
     undefined,
     { enabled: isAuthenticated }
   );
+  
+
 
   const { data: standards = [], isLoading: standardsLoading } = trpc.standards.list.useQuery();
 
@@ -226,17 +227,7 @@ export default function Home() {
                     </SelectContent>
                   </Select>
 
-                  {/* فرز الشواهد */}
-                  <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="الترتيب" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="newest">الأحدث أولاً</SelectItem>
-                      <SelectItem value="oldest">الأقدم أولاً</SelectItem>
-                      <SelectItem value="priority">الأهم أولاً</SelectItem>
-                    </SelectContent>
-                  </Select>
+
                 </div>
 
                 {/* عداد الفلاتر النشطة */}
@@ -283,7 +274,6 @@ export default function Home() {
                   searchQuery={searchQuery}
                   selectedStage={selectedStage}
                   selectedSubject={selectedSubject}
-                  sortBy={sortBy}
                 />
                 ))}
               </Accordion>
@@ -301,19 +291,17 @@ function StandardAccordionItem({
   searchQuery,
   selectedStage,
   selectedSubject,
-  sortBy,
 }: {
   standard: { id: number; title: string; description: string | null; weight: number };
   disabled: boolean;
-  searchQuery: string;
+  progress: number;
   selectedStage: string;
   selectedSubject: string;
-  sortBy: 'newest' | 'oldest' | 'priority';
 }) {
   const [, setLocation] = useLocation();
   
   const { data: evidenceSubTemplates = [], isLoading } = trpc.evidenceSubTemplates.listByStandard.useQuery(
-    { standardId: standard.id, sortBy },
+    { standardId: standard.id },
     { enabled: !disabled }
   );
 

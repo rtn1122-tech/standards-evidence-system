@@ -1,0 +1,30 @@
+{
+  "query": "SELECT userId, preferredSortBy FROM teacherProfiles LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SELECT userId, preferredSortBy FROM teacherProfiles LIMIT 5",
+  "rows": [
+    {
+      "userId": "1851582",
+      "preferredSortBy": "newest"
+    },
+    {
+      "userId": "2",
+      "preferredSortBy": "newest"
+    },
+    {
+      "userId": "1",
+      "preferredSortBy": "newest"
+    },
+    {
+      "userId": "1573057",
+      "preferredSortBy": "newest"
+    },
+    {
+      "userId": "1375188",
+      "preferredSortBy": "newest"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tpreferredSortBy\n1851582\tnewest\n2\tnewest\n1\tnewest\n1573057\tnewest\n1375188\tnewest\n",
+  "stderr": "",
+  "execution_time_ms": 1718
+}

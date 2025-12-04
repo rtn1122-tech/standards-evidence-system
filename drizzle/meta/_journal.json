@@ -64,6 +64,13 @@
       "when": 1764860702356,
       "tag": "0008_reflective_shadowcat",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1764861778961,
+      "tag": "0009_illegal_quicksilver",
+      "breakpoints": true
     }
   ]
 }
