@@ -390,57 +390,69 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       
       <div class="fields-grid">
         ${data.subTemplateId === 102 ? `
-          <!-- 4 حقول فقط للشاهد 102 -->
+          <!-- 4 حقول فقط للشاهد 102 - إخفاء الحقول الفارغة -->
+          ${data.date && data.date.trim() ? `
           <div class="field-item">
             <div class="field-label">${data.field4Label || 'التاريخ'}</div>
             <div class="field-value">${data.date}</div>
-          </div>
+          </div>` : ''}
+          ${data.duration && data.duration.trim() ? `
           <div class="field-item">
             <div class="field-label">${data.field1Label || 'مدة البرنامج'}</div>
             <div class="field-value">${data.duration}</div>
-          </div>
+          </div>` : ''}
+          ${data.executionLocation && data.executionLocation.trim() ? `
           <div class="field-item">
             <div class="field-label">${data.field2Label || 'الوسائل المستخدمة'}</div>
             <div class="field-value">${data.executionLocation}</div>
-          </div>
+          </div>` : ''}
+          ${data.beneficiaries && data.beneficiaries.trim() ? `
           <div class="field-item">
             <div class="field-label">${data.field3Label || 'المستفيدون'}</div>
             <div class="field-value">${data.beneficiaries}</div>
-          </div>
+          </div>` : ''}
         ` : `
-          <!-- 8 حقول للشواهد الأخرى -->
+          <!-- 8 حقول للشواهد الأخرى - إخفاء الحقول الفارغة -->
+          ${data.date && data.date.trim() ? `
           <div class="field-item">
             <div class="field-label">التاريخ</div>
             <div class="field-value">${data.date}</div>
-          </div>
+          </div>` : ''}
+          ${data.lessonTitle && data.lessonTitle.trim() ? `
           <div class="field-item">
             <div class="field-label">عنوان الدرس</div>
             <div class="field-value">${data.lessonTitle}</div>
-          </div>
+          </div>` : ''}
+          ${data.studentsCount && data.studentsCount.trim() ? `
           <div class="field-item">
             <div class="field-label">عدد الطلاب</div>
             <div class="field-value">${data.studentsCount}</div>
-          </div>
+          </div>` : ''}
+          ${data.executionLocation && data.executionLocation.trim() ? `
           <div class="field-item">
             <div class="field-label">مكان التنفيذ</div>
             <div class="field-value">${data.executionLocation}</div>
-          </div>
+          </div>` : ''}
+          ${data.duration && data.duration.trim() ? `
           <div class="field-item">
             <div class="field-label">المدة الزمنية</div>
             <div class="field-value">${data.duration}</div>
-          </div>
+          </div>` : ''}
+          ${data.beneficiaries && data.beneficiaries.trim() ? `
           <div class="field-item">
             <div class="field-label">المستفيدون</div>
             <div class="field-value">${data.beneficiaries}</div>
-          </div>
+          </div>` : ''}
+          ${data.grade && data.grade.trim() ? `
           <div class="field-item">
             <div class="field-label">الصف</div>
             <div class="field-value">${data.grade}</div>
-          </div>
+          </div>` : ''}
+          ${data.teacherName && data.teacherName.trim() ? `
           <div class="field-item">
             <div class="field-label">المنفذ</div>
             <div class="field-value">${data.teacherName}</div>
-          </div>
+          </div>` : ''}
         `}
       </div>
       
