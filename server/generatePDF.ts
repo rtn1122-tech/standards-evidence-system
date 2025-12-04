@@ -222,10 +222,11 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
     /* Description box */
     .description-box {
       border: 1px solid #000;
-      padding: 10px;
-      min-height: 80px;
+      padding: 15px;
+      min-height: 120px;
       text-align: right;
       background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
     }
     
     .description-label {

@@ -208,3 +208,13 @@
 - [x] تطبيق التعديل في generatePDF.ts
 - [x] تطبيق التعديل في generateEvidencePages.ts
 - [x] اختبار التعديل - نجح! النصوص أقرب ومرفوعة 3mm
+
+## تعديل مربع الوصف
+
+### تكبير وتحسين description-box
+- [x] زيادة min-height من 80px إلى 120px
+- [x] إضافة border-radius: 20px للحواف الدائرية
+- [x] زيادة padding من 10px إلى 15px
+- [x] تطبيق التعديل في generatePDF.ts
+- [x] تطبيق التعديل في generateEvidencePages.ts
+- [x] اختبار التعديل - نجح! مربع الوصف أكبر مع حواف دائرية
