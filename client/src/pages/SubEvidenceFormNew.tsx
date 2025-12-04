@@ -291,6 +291,7 @@ export default function SubEvidenceFormNew() {
     
     previewMutation.mutate({
       subTemplateId,
+      description,
       dynamicFields: dynamicFieldsData,
       section1,
       section2,

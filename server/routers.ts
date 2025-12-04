@@ -376,9 +376,9 @@ export const appRouter = router({
           subTemplateId: evidenceDetail.evidenceSubTemplateId || undefined,
           title: subTemplate?.title || "شاهد",
           standardName: "أداء الواجبات الوظيفية", // TODO: fetch from standard
-          description: subTemplate?.description || "",
+          description: evidenceDetail.description || subTemplate?.description || "",
           // Page 1 fields from customFields
-          elementTitle: customFields.elementTitle || "",
+          elementTitle: subTemplate?.title || "شاهد",
           grade: customFields.grade || "",
           beneficiaries: customFields.beneficiaries || "",
           duration: customFields.duration || "",
@@ -461,8 +461,8 @@ export const appRouter = router({
             id: evidence.id,
             title: subTemplate?.title || "شاهد",
             standardName: "أداء الواجبات الوظيفية",
-            description: subTemplate?.description || "",
-            elementTitle: customFields.elementTitle || "",
+            description: evidence.description || subTemplate?.description || "",
+            elementTitle: subTemplate?.title || "شاهد",
             grade: customFields.grade || "",
             beneficiaries: customFields.beneficiaries || "",
             duration: customFields.duration || "",
@@ -515,6 +515,7 @@ export const appRouter = router({
     generatePreviewPDF: protectedProcedure
       .input(z.object({
         subTemplateId: z.number(),
+        description: z.string().optional(),
         dynamicFields: z.any(),
         section1: z.string(),
         section2: z.string(),
@@ -540,7 +541,7 @@ export const appRouter = router({
           subTemplateId: input.subTemplateId,
           title: subTemplate?.title || "شاهد",
           standardName: "أداء الواجبات الوظيفية",
-          description: subTemplate?.description || "",
+          description: input.description || subTemplate?.description || "",
           // Page 1 fields from dynamicFields
           elementTitle: input.dynamicFields.title || "",
           grade: input.dynamicFields.grade || "",

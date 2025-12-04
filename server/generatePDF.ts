@@ -158,7 +158,7 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       top: 60mm;
       left: 15mm;
       right: 15mm;
-      bottom: 60mm;
+      bottom: 35mm;
       padding: 10mm;
     }
     
