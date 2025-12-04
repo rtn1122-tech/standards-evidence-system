@@ -576,41 +576,45 @@ export default function SubEvidenceFormEdit() {
                 </div>
                 
                 {/* الحقول الديناميكية */}
-                {dynamicFields.map((field, index) => (
-                  <div key={index} className="border border-black p-2 mb-4 relative">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const newFields = [...dynamicFields];
-                        newFields.splice(index, 1);
-                        setDynamicFields(newFields);
-                      }}
-                      className="absolute top-1 left-1 text-red-500 hover:text-red-700"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                    <Input
-                      value={field.label}
-                      onChange={(e) => {
-                        const newFields = [...dynamicFields];
-                        newFields[index].label = e.target.value;
-                        setDynamicFields(newFields);
-                      }}
-                      placeholder="اسم الحقل"
-                      className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold text-center"
-                    />
-                    <Input
-                      value={field.value}
-                      onChange={(e) => {
-                        const newFields = [...dynamicFields];
-                        newFields[index].value = e.target.value;
-                        setDynamicFields(newFields);
-                      }}
-                      placeholder="القيمة"
-                      className="border-0 p-0 h-auto text-sm text-center"
-                    />
-                  </div>
-                ))}
+                <div className="grid grid-cols-4 gap-4 mb-4">
+                  {dynamicFields.map((field, index) => (
+                    <div key={index} className="border border-black p-2 relative">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newFields = [...dynamicFields];
+                          newFields.splice(index, 1);
+                          setDynamicFields(newFields);
+                        }}
+                        className="absolute top-1 left-1 text-red-500 hover:text-red-700 z-10"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                      <label className="text-xs text-gray-600 block mb-1 text-center">
+                        <Input
+                          value={field.label}
+                          onChange={(e) => {
+                            const newFields = [...dynamicFields];
+                            newFields[index].label = e.target.value;
+                            setDynamicFields(newFields);
+                          }}
+                          placeholder="اسم الحقل"
+                          className="border-0 p-0 h-auto text-xs text-center font-normal"
+                        />
+                      </label>
+                      <Input
+                        value={field.value}
+                        onChange={(e) => {
+                          const newFields = [...dynamicFields];
+                          newFields[index].value = e.target.value;
+                          setDynamicFields(newFields);
+                        }}
+                        placeholder="القيمة"
+                        className="border-0 p-0 h-auto text-sm text-center"
+                      />
+                    </div>
+                  ))}
+                </div>
                 
                 {/* زر إضافة حقل */}
                 <Button
