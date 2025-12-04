@@ -114,7 +114,7 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
     /* Education department and school name - below ministry name */
     .header-info {
       position: absolute;
-      top: 25mm;
+      top: 22mm;
       left: 50%;
       transform: translateX(-50%);
       text-align: center;
@@ -125,7 +125,7 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       font-family: 'Traditional Arabic', 'Arial', 'Tahoma', sans-serif;
       font-size: 16px;
       color: #000;
-      margin: 2px 0;
+      margin: 0;
       font-weight: bold;
     }
     

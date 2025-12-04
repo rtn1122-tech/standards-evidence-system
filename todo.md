@@ -199,3 +199,12 @@
 - [x] حذف استيراد مكتبة qrcode
 - [x] حذف دالة توليد QR Code
 - [x] اختبار PDF بدون QR Code - نجح! لا يوجد QR Code في الصفحتين
+
+## تعديل موقع اسم إدارة التعليم والمدرسة
+
+### تقريب ورفع header-info
+- [x] رفع header-info من top: 25mm إلى top: 22mm (رفع 3mm)
+- [x] تقليل margin بين النصوص من 2px إلى 0px
+- [x] تطبيق التعديل في generatePDF.ts
+- [x] تطبيق التعديل في generateEvidencePages.ts
+- [x] اختبار التعديل - نجح! النصوص أقرب ومرفوعة 3mm
