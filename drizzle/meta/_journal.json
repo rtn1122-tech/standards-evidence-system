@@ -71,6 +71,20 @@
       "when": 1764861778961,
       "tag": "0009_illegal_quicksilver",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1764863108642,
+      "tag": "0010_omniscient_medusa",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1764870799163,
+      "tag": "0011_friendly_morgan_stark",
+      "breakpoints": true
     }
   ]
 }

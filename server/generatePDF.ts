@@ -190,6 +190,7 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       text-align: center;
       margin-bottom: 12px;
       background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
     }
     
     .standard-box h2 {
@@ -197,36 +198,26 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       font-weight: bold;
     }
     
-    /* Element row */
+    /* Element row - مربع واحد لاسم الشاهد */
     .element-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    
-    .element-label {
-      border: 1px solid #000;
-      padding: 8px;
-      text-align: right;
-      font-weight: bold;
-      font-size: 12px;
-      background: rgba(255, 255, 255, 0.95);
-    }
-    
-    .element-value {
-      border: 1px solid #000;
+      border: 2px solid #000;
       padding: 8px;
       text-align: center;
-      font-weight: bold;
-      font-size: 12px;
+      margin-bottom: 12px;
       background: rgba(249, 249, 249, 0.95);
+      border-radius: 20px;
+    }
+    
+    .element-row h3 {
+      font-size: 14px;
+      font-weight: bold;
+      margin: 0;
     }
     
     /* Fields grid */
     .fields-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
       margin-bottom: 12px;
     }
@@ -236,6 +227,7 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       padding: 8px;
       text-align: center;
       background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
     }
     
     .field-label {
@@ -390,8 +382,7 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       </div>
       
       <div class="element-row">
-        <div class="element-value">${data.elementTitle}</div>
-        <div class="element-label">اسم العنصر</div>
+        <h3>اسم الشاهد: ${data.elementTitle}</h3>
       </div>
       
       <div class="fields-grid">
@@ -505,8 +496,7 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       </div>
       
       <div class="element-row">
-        <div class="element-value">${data.elementTitle}</div>
-        <div class="element-label">اسم العنصر</div>
+        <h3>اسم الشاهد: ${data.elementTitle}</h3>
       </div>
       
       <div class="sections-grid">

@@ -109,8 +109,23 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
       color: white;
       padding: 20px;
       text-align: center;
-      border-radius: 10px;
+      border-radius: 20px;
       margin-bottom: 20px;
+    }
+    
+    .evidence-title-box {
+      border: 2px solid #00A896;
+      padding: 15px;
+      text-align: center;
+      border-radius: 20px;
+      background: #f9fffe;
+      margin-bottom: 20px;
+    }
+    
+    .evidence-title-box h2 {
+      font-size: 22px;
+      color: #333;
+      margin: 0;
     }
     
     .info-header h1 {
@@ -125,7 +140,7 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
     
     .info-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 15px;
       margin-bottom: 20px;
     }
@@ -133,8 +148,9 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
     .info-item {
       border: 2px solid #00A896;
       padding: 15px;
-      border-radius: 8px;
+      border-radius: 20px;
       background: #f9fffe;
+      text-align: center;
     }
     
     .info-label {
@@ -152,7 +168,7 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
     .description-box {
       border: 2px solid #00A896;
       padding: 20px;
-      border-radius: 8px;
+      border-radius: 20px;
       background: #f9fffe;
       min-height: 200px;
     }
@@ -217,7 +233,7 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
     .section-box {
       border: 2px solid #00A896;
       padding: 15px;
-      border-radius: 8px;
+      border-radius: 20px;
       background: #f9fffe;
       min-height: 150px;
     }
@@ -299,8 +315,11 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
   <!-- Page 8: Basic Information -->
   <div class="page info-page">
     <div class="info-header">
-      <h1>${data.title}</h1>
-      <p>${data.standardName}</p>
+      <h1>معيار: ${data.standardName}</h1>
+    </div>
+    
+    <div class="evidence-title-box">
+      <h2>اسم الشاهد: ${data.title}</h2>
     </div>
     
     <div class="info-grid">
@@ -327,14 +346,6 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
       <div class="info-item">
         <div class="info-label">المدة</div>
         <div class="info-value">${data.duration || '-'}</div>
-      </div>
-      <div class="info-item">
-        <div class="info-label">مكان التنفيذ</div>
-        <div class="info-value">${data.executionLocation || '-'}</div>
-      </div>
-      <div class="info-item">
-        <div class="info-label">عدد الطلاب</div>
-        <div class="info-value">${data.studentsCount || '-'}</div>
       </div>
     </div>
     

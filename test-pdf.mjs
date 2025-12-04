@@ -1,4 +1,4 @@
-import { generateEvidencePDF } from './server/generatePDF.js';
+import { generateEvidencePDF } from './server/generatePDF.ts';
 import fs from 'fs';
 
 const testData = {
