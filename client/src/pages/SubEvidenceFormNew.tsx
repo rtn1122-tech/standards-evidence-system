@@ -4,7 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, Save, Upload, Loader2 } from "lucide-react";
+import { ArrowRight, Save, Upload, Loader2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 
@@ -384,12 +384,15 @@ export default function SubEvidenceFormNew() {
               <>
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div className="border border-black p-2">
-                    <Input
-                      value={field3Label}
-                      onChange={(e) => setField3Label(e.target.value)}
-                      placeholder="المستفيدون"
-                      className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold"
-                    />
+                    <div className="relative group">
+                      <Input
+                        value={field3Label}
+                        onChange={(e) => setField3Label(e.target.value)}
+                        placeholder="المستفيدون"
+                        className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold pr-5"
+                      />
+                      <Pencil className="absolute left-0 top-0 w-3 h-3 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                    </div>
                     <Input
                       value={beneficiaries}
                       onChange={(e) => setBeneficiaries(e.target.value)}
@@ -398,12 +401,15 @@ export default function SubEvidenceFormNew() {
                     />
                   </div>
                   <div className="border border-black p-2">
-                    <Input
-                      value={field2Label}
-                      onChange={(e) => setField2Label(e.target.value)}
-                      placeholder="الوسائل المستخدمة"
-                      className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold"
-                    />
+                    <div className="relative group">
+                      <Input
+                        value={field2Label}
+                        onChange={(e) => setField2Label(e.target.value)}
+                        placeholder="الوسائل المستخدمة"
+                        className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold pr-5"
+                      />
+                      <Pencil className="absolute left-0 top-0 w-3 h-3 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                    </div>
                     <Input
                       value={executionLocation}
                       onChange={(e) => setExecutionLocation(e.target.value)}
@@ -412,12 +418,15 @@ export default function SubEvidenceFormNew() {
                     />
                   </div>
                   <div className="border border-black p-2">
-                    <Input
-                      value={field1Label}
-                      onChange={(e) => setField1Label(e.target.value)}
-                      placeholder="مدة البرنامج"
-                      className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold"
-                    />
+                    <div className="relative group">
+                      <Input
+                        value={field1Label}
+                        onChange={(e) => setField1Label(e.target.value)}
+                        placeholder="مدة البرنامج"
+                        className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold pr-5"
+                      />
+                      <Pencil className="absolute left-0 top-0 w-3 h-3 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                    </div>
                     <Input
                       value={duration}
                       onChange={(e) => setDuration(e.target.value)}
@@ -426,12 +435,15 @@ export default function SubEvidenceFormNew() {
                     />
                   </div>
                   <div className="border border-black p-2">
-                    <Input
-                      value={field4Label}
-                      onChange={(e) => setField4Label(e.target.value)}
-                      placeholder="التاريخ"
-                      className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold"
-                    />
+                    <div className="relative group">
+                      <Input
+                        value={field4Label}
+                        onChange={(e) => setField4Label(e.target.value)}
+                        placeholder="التاريخ"
+                        className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold pr-5"
+                      />
+                      <Pencil className="absolute left-0 top-0 w-3 h-3 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                    </div>
                     <Input
                       type="date"
                       value={date}
