@@ -217,6 +217,35 @@ export const appRouter = router({
         return { success: true, evidenceDetailId };
       }),
     
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        dynamicFields: z.any(),
+        section1: z.string(),
+        section2: z.string(),
+        section3: z.string(),
+        section4: z.string(),
+        section5: z.string(),
+        section6: z.string(),
+        image1: z.string().nullable(),
+        image2: z.string().nullable(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await db.updateEvidenceDetail(input.id, {
+          customFields: JSON.stringify(input.dynamicFields),
+          section1Content: input.section1,
+          section2Content: input.section2,
+          section3Content: input.section3,
+          section4Content: input.section4,
+          section5Content: input.section5,
+          section6Content: input.section6,
+          image1Url: input.image1,
+          image2Url: input.image2,
+        });
+        
+        return { success: true };
+      }),
+    
     uploadImage: protectedProcedure
       .input(z.object({
         file: z.string(), // base64 encoded image
@@ -351,6 +380,7 @@ export const appRouter = router({
           teacherName: profile?.teacherName || ctx.user.name || "المعلم",
           schoolName: profile?.schoolName || "المدرسة",
           principalName: profile?.principalName || "",
+          educationDepartment: profile?.educationDepartment || "",
         };
         
         const pdfBuffer = await generateEvidencePDF(evidenceData);

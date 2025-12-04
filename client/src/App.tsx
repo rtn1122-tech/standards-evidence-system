@@ -9,6 +9,7 @@ import ProfileSetup from "./pages/ProfileSetup";
 import StandardDetail from "./pages/StandardDetail";
 import Dashboard from "./pages/Dashboard";
 import SubEvidenceFormNew from "./pages/SubEvidenceFormNew";
+import SubEvidenceFormEdit from "./pages/SubEvidenceFormEdit";
 import SubEvidencePreview from "./pages/SubEvidencePreview";
 import MyEvidence from "./pages/MyEvidence";
 import LandingPage from "./pages/LandingPage";
@@ -27,6 +28,7 @@ function Router() {
       <Route path="/standard/:id" component={StandardDetail} />
       <Route path="/evidence/sub/:subTemplateId" component={SubEvidenceFormNew} />
       <Route path="/evidence/sub-new/:subTemplateId" component={SubEvidenceFormNew} />
+      <Route path="/evidence/edit/:evidenceId" component={SubEvidenceFormEdit} />
       <Route path="/evidence/sub-preview/:id" component={SubEvidencePreview} />
       <Route path="/my-evidence" component={MyEvidence} />
       <Route path={"/404"} component={NotFound} />

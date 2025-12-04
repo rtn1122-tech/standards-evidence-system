@@ -8,17 +8,17 @@ import { ArrowRight, Save, Upload, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 
-export default function SubEvidenceFormNew() {
-  const [, params] = useRoute("/evidence/sub-new/:subTemplateId");
+export default function SubEvidenceFormEdit() {
+  const [, params] = useRoute("/evidence/edit/:evidenceId");
   const [, setLocation] = useLocation();
   const { user, loading: authLoading } = useAuth();
   
-  const subTemplateId = params?.subTemplateId ? parseInt(params.subTemplateId) : null;
+  const evidenceId = params?.evidenceId ? parseInt(params.evidenceId) : null;
   
-  // Fetch sub-evidence template data
-  const { data: subTemplate, isLoading } = trpc.evidenceTemplates.getSubTemplateById.useQuery(
-    { id: subTemplateId! },
-    { enabled: !!subTemplateId }
+  // Fetch evidence detail data
+  const { data: evidenceDetail, isLoading } = trpc.evidenceDetails.getById.useQuery(
+    { id: evidenceId! },
+    { enabled: !!evidenceId }
   );
   
   const { data: profile } = trpc.teacherProfile.get.useQuery(undefined, {
@@ -97,27 +97,44 @@ export default function SubEvidenceFormNew() {
   
   const [currentPage, setCurrentPage] = useState(1);
   
-  // Pre-fill sections and default images when data loads
+  // Load saved evidence data when available
   useEffect(() => {
-    if (subTemplate) {
-      setSection1(subTemplate.section1Content || "");
-      setSection2(subTemplate.section2Content || "");
-      setSection3(subTemplate.section3Content || "");
-      setSection4(subTemplate.section4Content || "");
-      setSection5(subTemplate.section5Content || "");
-      setSection6(subTemplate.section6Content || "");
+    if (evidenceDetail) {
+      // Parse customFields
+      const customFields = typeof evidenceDetail.customFields === 'string' 
+        ? JSON.parse(evidenceDetail.customFields) 
+        : evidenceDetail.customFields;
       
-      // Set default images if available
-      if (subTemplate.defaultImage1Url) {
-        setImage1Preview(subTemplate.defaultImage1Url);
-        setImage1Url(subTemplate.defaultImage1Url);
+      // Page 1 fields
+      setTitle(customFields.title || "");
+      setGrade(customFields.grade || "");
+      setBeneficiaries(customFields.beneficiaries || "");
+      setDuration(customFields.duration || "");
+      setExecutionLocation(customFields.executionLocation || "");
+      setStudentsCount(customFields.studentsCount || "");
+      setLessonTitle(customFields.lessonTitle || "");
+      setDescription(customFields.description || "");
+      setDate(customFields.date || new Date().toISOString().split('T')[0]);
+      
+      // Page 2 sections
+      setSection1(evidenceDetail.section1Content || "");
+      setSection2(evidenceDetail.section2Content || "");
+      setSection3(evidenceDetail.section3Content || "");
+      setSection4(evidenceDetail.section4Content || "");
+      setSection5(evidenceDetail.section5Content || "");
+      setSection6(evidenceDetail.section6Content || "");
+      
+      // Images
+      if (evidenceDetail.image1Url) {
+        setImage1Preview(evidenceDetail.image1Url);
+        setImage1Url(evidenceDetail.image1Url);
       }
-      if (subTemplate.defaultImage2Url) {
-        setImage2Preview(subTemplate.defaultImage2Url);
-        setImage2Url(subTemplate.defaultImage2Url);
+      if (evidenceDetail.image2Url) {
+        setImage2Preview(evidenceDetail.image2Url);
+        setImage2Url(evidenceDetail.image2Url);
       }
     }
-  }, [subTemplate]);
+  }, [evidenceDetail]);
   
   // Upload image mutation
   const uploadImageMutation = trpc.evidenceDetails.uploadImage.useMutation();
@@ -196,20 +213,20 @@ export default function SubEvidenceFormNew() {
     e.preventDefault();
   };
   
-  // Save mutation
-  const saveMutation = trpc.evidenceDetails.save.useMutation({
-    onSuccess: (data) => {
-      toast.success("تم حفظ بيانات الشاهد بنجاح");
-      // Navigate to preview page with the returned evidenceDetailId
-      setLocation(`/evidence/sub-preview/${data.evidenceDetailId}`);
+  // Update mutation
+  const updateMutation = trpc.evidenceDetails.update.useMutation({
+    onSuccess: () => {
+      toast.success("تم تحديث بيانات الشاهد بنجاح");
+      // Navigate back to my evidence page
+      setLocation("/my-evidence");
     },
     onError: (error) => {
-      toast.error(error.message || "حدث خطأ أثناء الحفظ");
+      toast.error(error.message || "حدث خطأ أثناء التحديث");
     },
   });
   
   const handleSave = async () => {
-    if (!subTemplateId || !profile) {
+    if (!evidenceId || !evidenceDetail) {
       toast.error("معلومات غير كاملة");
       return;
     }
@@ -227,16 +244,11 @@ export default function SubEvidenceFormNew() {
       location: executionLocation,
       studentsCount,
       lessonTitle,
-      teacherName: profile.teacherName,
-      principalName: profile.principalName || "", // Principal name from profile
-      date: date, // Use the editable date field
-      standardName: subTemplate?.standardId ? `المعيار ${subTemplate.standardId}` : "",
-      evidenceName: subTemplate?.title || "",
+      date: date,
     };
     
-    saveMutation.mutate({
-      subTemplateId,
-      templateId: subTemplate?.evidenceTemplateId || 30002,
+    updateMutation.mutate({
+      id: evidenceId,
       dynamicFields,
       section1,
       section2,
@@ -246,7 +258,6 @@ export default function SubEvidenceFormNew() {
       section6,
       image1: image1Url,
       image2: image2Url,
-      theme: "default",
     });
   };
   

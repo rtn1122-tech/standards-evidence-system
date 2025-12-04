@@ -317,6 +317,40 @@ export async function createEvidenceDetail(data: {
 }
 
 /**
+ * Update evidence detail
+ */
+export async function updateEvidenceDetail(id: number, data: {
+  customFields: string;
+  section1Content: string;
+  section2Content: string;
+  section3Content: string;
+  section4Content: string;
+  section5Content: string;
+  section6Content: string;
+  image1Url: string | null;
+  image2Url: string | null;
+}) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db
+    .update(schema.evidenceDetails)
+    .set({
+      customFields: data.customFields,
+      section1Content: data.section1Content,
+      section2Content: data.section2Content,
+      section3Content: data.section3Content,
+      section4Content: data.section4Content,
+      section5Content: data.section5Content,
+      section6Content: data.section6Content,
+      image1Url: data.image1Url,
+      image2Url: data.image2Url,
+      updatedAt: new Date(),
+    })
+    .where(eq(schema.evidenceDetails.id, id));
+}
+
+/**
  * Get evidence detail by ID with all related data
  */
 export async function getEvidenceDetailById(id: number) {

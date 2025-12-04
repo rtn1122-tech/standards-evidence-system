@@ -92,8 +92,9 @@ export default function MyEvidence() {
     );
   };
 
-  const handleEdit = (id: number) => {
-    navigate(`/evidence/sub-new/${id}`);
+  const handleEdit = (evidence: any) => {
+    // Navigate to edit page with evidenceDetailId
+    navigate(`/evidence/edit/${evidence.id}`);
   };
 
   const generateAllPDF = trpc.evidenceDetails.generateAllPDF.useMutation({
@@ -275,7 +276,7 @@ export default function MyEvidence() {
                     </div>
 
                     <Button
-                      onClick={() => handleEdit(evidence.id)}
+                      onClick={() => handleEdit(evidence)}
                       variant="outline"
                       size="sm"
                       className="border-blue-300 text-blue-700 hover:bg-blue-50"
