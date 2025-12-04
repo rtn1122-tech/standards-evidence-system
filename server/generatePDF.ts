@@ -44,6 +44,11 @@ interface EvidenceData {
   studentsCount: string;
   lessonTitle: string;
   date: string;
+  // Custom field labels
+  field1Label?: string;
+  field2Label?: string;
+  field3Label?: string;
+  field4Label?: string;
   // Page 2 sections
   section1: string;
   section2: string;
@@ -387,19 +392,19 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
         ${data.subTemplateId === 102 ? `
           <!-- 4 حقول فقط للشاهد 102 -->
           <div class="field-item">
-            <div class="field-label">التاريخ</div>
+            <div class="field-label">${data.field4Label || 'التاريخ'}</div>
             <div class="field-value">${data.date}</div>
           </div>
           <div class="field-item">
-            <div class="field-label">مدة البرنامج</div>
+            <div class="field-label">${data.field1Label || 'مدة البرنامج'}</div>
             <div class="field-value">${data.duration}</div>
           </div>
           <div class="field-item">
-            <div class="field-label">الوسائل المستخدمة</div>
+            <div class="field-label">${data.field2Label || 'الوسائل المستخدمة'}</div>
             <div class="field-value">${data.executionLocation}</div>
           </div>
           <div class="field-item">
-            <div class="field-label">المستفيدون</div>
+            <div class="field-label">${data.field3Label || 'المستفيدون'}</div>
             <div class="field-value">${data.beneficiaries}</div>
           </div>
         ` : `

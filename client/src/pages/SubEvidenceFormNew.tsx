@@ -39,6 +39,12 @@ export default function SubEvidenceFormNew() {
     const today = new Date();
     return today.toISOString().split('T')[0];
   });
+  
+  // Custom field labels (editable by user)
+  const [field1Label, setField1Label] = useState("مدة البرنامج");
+  const [field2Label, setField2Label] = useState("الوسائل المستخدمة");
+  const [field3Label, setField3Label] = useState("المستفيدون");
+  const [field4Label, setField4Label] = useState("التاريخ");
 
   
   // Page 2 - 6 sections (pre-filled from database)
@@ -232,6 +238,11 @@ export default function SubEvidenceFormNew() {
       date: date, // Use the editable date field
       standardName: subTemplate?.standardId ? `المعيار ${subTemplate.standardId}` : "",
       evidenceName: subTemplate?.title || "",
+      // Custom field labels for sub-template 102
+      field1Label,
+      field2Label,
+      field3Label,
+      field4Label,
     };
     
     saveMutation.mutate({
@@ -373,7 +384,12 @@ export default function SubEvidenceFormNew() {
               <>
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1">المستفيدون</label>
+                    <Input
+                      value={field3Label}
+                      onChange={(e) => setField3Label(e.target.value)}
+                      placeholder="المستفيدون"
+                      className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold"
+                    />
                     <Input
                       value={beneficiaries}
                       onChange={(e) => setBeneficiaries(e.target.value)}
@@ -382,7 +398,12 @@ export default function SubEvidenceFormNew() {
                     />
                   </div>
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1">الوسائل المستخدمة</label>
+                    <Input
+                      value={field2Label}
+                      onChange={(e) => setField2Label(e.target.value)}
+                      placeholder="الوسائل المستخدمة"
+                      className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold"
+                    />
                     <Input
                       value={executionLocation}
                       onChange={(e) => setExecutionLocation(e.target.value)}
@@ -391,7 +412,12 @@ export default function SubEvidenceFormNew() {
                     />
                   </div>
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1">مدة البرنامج</label>
+                    <Input
+                      value={field1Label}
+                      onChange={(e) => setField1Label(e.target.value)}
+                      placeholder="مدة البرنامج"
+                      className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold"
+                    />
                     <Input
                       value={duration}
                       onChange={(e) => setDuration(e.target.value)}
@@ -400,7 +426,12 @@ export default function SubEvidenceFormNew() {
                     />
                   </div>
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1">التاريخ</label>
+                    <Input
+                      value={field4Label}
+                      onChange={(e) => setField4Label(e.target.value)}
+                      placeholder="التاريخ"
+                      className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold"
+                    />
                     <Input
                       type="date"
                       value={date}

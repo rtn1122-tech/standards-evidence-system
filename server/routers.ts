@@ -367,6 +367,11 @@ export const appRouter = router({
           studentsCount: customFields.studentsCount || "",
           lessonTitle: customFields.lessonTitle || "",
           date: customFields.date || new Date().toISOString().split('T')[0],
+          // Custom field labels
+          field1Label: customFields.field1Label || "مدة البرنامج",
+          field2Label: customFields.field2Label || "الوسائل المستخدمة",
+          field3Label: customFields.field3Label || "المستفيدون",
+          field4Label: customFields.field4Label || "التاريخ",
           // Page 2 sections
           section1: evidenceDetail.section1Content || "",
           section2: evidenceDetail.section2Content || "",
