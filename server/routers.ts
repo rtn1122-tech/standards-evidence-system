@@ -596,8 +596,90 @@ export const appRouter = router({
   evidenceSubTemplates: router({
     listByStandard: publicProcedure
       .input(z.object({ standardId: z.number() }))
-      .query(async ({ input }) => {
-        return await db.getEvidenceSubTemplatesByStandard(input.standardId);
+      .query(async ({ input, ctx }) => {
+        // Get all sub-templates for this standard
+        const allTemplates = await db.getEvidenceSubTemplatesByStandard(input.standardId);
+        
+        // If user is not logged in, return all templates
+        if (!ctx.user) {
+          return allTemplates;
+        }
+        
+        // Get teacher profile to filter by stages and subjects
+        const profile = await db.getTeacherProfileByUserId(ctx.user.id);
+        
+        // If no profile, return all templates
+        if (!profile) {
+          return allTemplates;
+        }
+        
+        // Parse teacher's stages and subjects
+        let userStages: string[] = [];
+        let userSubjects: string[] = [];
+        
+        try {
+          if (profile.stage) {
+            // Try to parse as JSON array first
+            try {
+              userStages = JSON.parse(profile.stage);
+            } catch {
+              // If not JSON, treat as single value
+              userStages = [profile.stage];
+            }
+          }
+          
+          if (profile.subjects) {
+            // Try to parse as JSON array first
+            try {
+              userSubjects = JSON.parse(profile.subjects);
+            } catch {
+              // If not JSON, treat as single value
+              userSubjects = [profile.subjects];
+            }
+          }
+        } catch (e) {
+          console.error('Error parsing teacher profile data:', e);
+        }
+        
+        // Filter templates based on teacher's profile
+        const filteredTemplates = allTemplates.filter((template: any) => {
+          // If template has no restrictions (all fields are null/empty), it's general → show it
+          const hasNoRestrictions = 
+            (!template.applicableStages || template.applicableStages === '[]') &&
+            (!template.applicableSubjects || template.applicableSubjects === '[]') &&
+            (!template.applicableGrades || template.applicableGrades === '[]');
+          
+          if (hasNoRestrictions) {
+            return true; // Show general templates to everyone
+          }
+          
+          // Parse template's applicable stages and subjects
+          let templateStages: string[] = [];
+          let templateSubjects: string[] = [];
+          
+          try {
+            if (template.applicableStages && template.applicableStages !== '[]') {
+              templateStages = JSON.parse(template.applicableStages);
+            }
+            if (template.applicableSubjects && template.applicableSubjects !== '[]') {
+              templateSubjects = JSON.parse(template.applicableSubjects);
+            }
+          } catch (e) {
+            console.error('Error parsing template restrictions:', e);
+          }
+          
+          // Check if template matches teacher's stages or subjects
+          const matchesStage = templateStages.length === 0 || 
+            templateStages.some((stage: string) => userStages.includes(stage));
+          
+          const matchesSubject = templateSubjects.length === 0 || 
+            templateSubjects.some((subject: string) => userSubjects.includes(subject));
+          
+          // Show template if it matches either stage OR subject
+          return matchesStage || matchesSubject;
+        });
+        
+        return filteredTemplates;
       }),
   }),
 
