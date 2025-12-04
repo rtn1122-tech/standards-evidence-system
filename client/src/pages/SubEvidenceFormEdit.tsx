@@ -33,9 +33,13 @@ export default function SubEvidenceFormEdit() {
   
   // Custom field labels (editable by user)
   const [field1Label, setField1Label] = useState("مدة البرنامج");
-  const [field2Label, setField2Label] = useState("الوسائل المستخدمة");
+  const [field2Label, setField2Label] = useState("مكان التنفيذ");
   const [field3Label, setField3Label] = useState("المستفيدون");
   const [field4Label, setField4Label] = useState("التاريخ");
+  const [field5Label, setField5Label] = useState("الصف");
+  const [field6Label, setField6Label] = useState("العنوان");
+  const [field7Label, setField7Label] = useState("عدد الطلاب");
+  const [field8Label, setField8Label] = useState("عنوان الدرس");
   
   // Dynamic fields (additional fields beyond the 8 default ones)
   const [dynamicFields, setDynamicFields] = useState<Array<{ label: string; value: string }>>([]);
@@ -133,9 +137,13 @@ export default function SubEvidenceFormEdit() {
       
       // Custom field labels
       setField1Label(customFields.field1Label || "مدة البرنامج");
-      setField2Label(customFields.field2Label || "الوسائل المستخدمة");
+      setField2Label(customFields.field2Label || "مكان التنفيذ");
       setField3Label(customFields.field3Label || "المستفيدون");
       setField4Label(customFields.field4Label || "التاريخ");
+      setField5Label(customFields.field5Label || "الصف");
+      setField6Label(customFields.field6Label || "العنوان");
+      setField7Label(customFields.field7Label || "عدد الطلاب");
+      setField8Label(customFields.field8Label || "عنوان الدرس");
       
       // Load additional dynamic fields
       if (customFields.additionalFields) {
@@ -276,11 +284,15 @@ export default function SubEvidenceFormEdit() {
       studentsCount,
       lessonTitle,
       date: date,
-      // Custom field labels for sub-template 102
+      // Custom field labels (editable by user for all templates)
       field1Label,
       field2Label,
       field3Label,
       field4Label,
+      field5Label,
+      field6Label,
+      field7Label,
+      field8Label,
       // Additional dynamic fields
       additionalFields: JSON.stringify(dynamicFields),
     };
@@ -496,7 +508,15 @@ export default function SubEvidenceFormEdit() {
               <>
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1 text-center">مدة البرنامج</label>
+                    <div className="relative group">
+                      <Input
+                        value={field1Label}
+                        onChange={(e) => setField1Label(e.target.value)}
+                        placeholder="مدة البرنامج"
+                        className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold pr-5 text-center"
+                      />
+                      <Pencil className="absolute left-0 top-0 w-3 h-3 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                    </div>
                     <Input
                       value={duration}
                       onChange={(e) => setDuration(e.target.value)}
@@ -505,7 +525,15 @@ export default function SubEvidenceFormEdit() {
                     />
                   </div>
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1 text-center">المستفيدون</label>
+                    <div className="relative group">
+                      <Input
+                        value={field3Label}
+                        onChange={(e) => setField3Label(e.target.value)}
+                        placeholder="المستفيدون"
+                        className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold pr-5 text-center"
+                      />
+                      <Pencil className="absolute left-0 top-0 w-3 h-3 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                    </div>
                     <Input
                       value={beneficiaries}
                       onChange={(e) => setBeneficiaries(e.target.value)}
@@ -514,7 +542,15 @@ export default function SubEvidenceFormEdit() {
                     />
                   </div>
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1 text-center">الصف</label>
+                    <div className="relative group">
+                      <Input
+                        value={field5Label}
+                        onChange={(e) => setField5Label(e.target.value)}
+                        placeholder="الصف"
+                        className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold pr-5 text-center"
+                      />
+                      <Pencil className="absolute left-0 top-0 w-3 h-3 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                    </div>
                     <Input
                       value={grade}
                       onChange={(e) => setGrade(e.target.value)}
@@ -523,7 +559,15 @@ export default function SubEvidenceFormEdit() {
                     />
                   </div>
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1 text-center">العنوان</label>
+                    <div className="relative group">
+                      <Input
+                        value={field6Label}
+                        onChange={(e) => setField6Label(e.target.value)}
+                        placeholder="العنوان"
+                        className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold pr-5 text-center"
+                      />
+                      <Pencil className="absolute left-0 top-0 w-3 h-3 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                    </div>
                     <Input
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
@@ -536,7 +580,15 @@ export default function SubEvidenceFormEdit() {
                 {/* 3 حقول */}
                 <div className="grid grid-cols-3 gap-4 mb-4">
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1 text-center">عدد الطلاب</label>
+                    <div className="relative group">
+                      <Input
+                        value={field7Label}
+                        onChange={(e) => setField7Label(e.target.value)}
+                        placeholder="عدد الطلاب"
+                        className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold pr-5 text-center"
+                      />
+                      <Pencil className="absolute left-0 top-0 w-3 h-3 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                    </div>
                     <Input
                       value={studentsCount}
                       onChange={(e) => setStudentsCount(e.target.value)}
@@ -545,7 +597,15 @@ export default function SubEvidenceFormEdit() {
                     />
                   </div>
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1 text-center">مكان التنفيذ</label>
+                    <div className="relative group">
+                      <Input
+                        value={field2Label}
+                        onChange={(e) => setField2Label(e.target.value)}
+                        placeholder="مكان التنفيذ"
+                        className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold pr-5 text-center"
+                      />
+                      <Pencil className="absolute left-0 top-0 w-3 h-3 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                    </div>
                     <Input
                     value={executionLocation}
                     onChange={(e) => setExecutionLocation(e.target.value)}
@@ -554,7 +614,15 @@ export default function SubEvidenceFormEdit() {
                     />
                   </div>
                   <div className="border border-black p-2">
-                    <label className="text-xs text-gray-600 block mb-1 text-center">التاريخ</label>
+                    <div className="relative group">
+                      <Input
+                        value={field4Label}
+                        onChange={(e) => setField4Label(e.target.value)}
+                        placeholder="التاريخ"
+                        className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold pr-5 text-center"
+                      />
+                      <Pencil className="absolute left-0 top-0 w-3 h-3 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                    </div>
                     <Input
                       type="date"
                       value={date}
@@ -566,7 +634,15 @@ export default function SubEvidenceFormEdit() {
 
                 {/* عنوان الدرس */}
                 <div className="border border-black p-2 mb-6">
-                  <label className="text-xs text-gray-600 block mb-1 text-center">عنوان الدرس</label>
+                  <div className="relative group">
+                    <Input
+                      value={field8Label}
+                      onChange={(e) => setField8Label(e.target.value)}
+                      placeholder="عنوان الدرس"
+                      className="text-xs text-gray-600 block mb-1 border-0 p-0 h-auto font-semibold pr-5 text-center"
+                    />
+                    <Pencil className="absolute left-0 top-0 w-3 h-3 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                  </div>
                   <Input
                     value={lessonTitle}
                     onChange={(e) => setLessonTitle(e.target.value)}

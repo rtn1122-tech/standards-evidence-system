@@ -44,11 +44,15 @@ interface EvidenceData {
   studentsCount: string;
   lessonTitle: string;
   date: string;
-  // Custom field labels
+  // Custom field labels (editable by user for all templates)
   field1Label?: string;
   field2Label?: string;
   field3Label?: string;
   field4Label?: string;
+  field5Label?: string;
+  field6Label?: string;
+  field7Label?: string;
+  field8Label?: string;
   // Additional dynamic fields
   additionalFields?: string;
   // Page 2 sections
@@ -417,43 +421,43 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
           <!-- 8 حقول للشواهد الأخرى - إخفاء الحقول الفارغة -->
           ${data.date && data.date.trim() ? `
           <div class="field-item">
-            <div class="field-label">التاريخ</div>
+            <div class="field-label">${data.field4Label || 'التاريخ'}</div>
             <div class="field-value">${data.date}</div>
           </div>` : ''}
           ${data.lessonTitle && data.lessonTitle.trim() ? `
           <div class="field-item">
-            <div class="field-label">عنوان الدرس</div>
+            <div class="field-label">${data.field8Label || 'عنوان الدرس'}</div>
             <div class="field-value">${data.lessonTitle}</div>
           </div>` : ''}
           ${data.studentsCount && data.studentsCount.trim() ? `
           <div class="field-item">
-            <div class="field-label">عدد الطلاب</div>
+            <div class="field-label">${data.field7Label || 'عدد الطلاب'}</div>
             <div class="field-value">${data.studentsCount}</div>
           </div>` : ''}
           ${data.executionLocation && data.executionLocation.trim() ? `
           <div class="field-item">
-            <div class="field-label">مكان التنفيذ</div>
+            <div class="field-label">${data.field2Label || 'مكان التنفيذ'}</div>
             <div class="field-value">${data.executionLocation}</div>
           </div>` : ''}
           ${data.duration && data.duration.trim() ? `
           <div class="field-item">
-            <div class="field-label">المدة الزمنية</div>
+            <div class="field-label">${data.field1Label || 'المدة الزمنية'}</div>
             <div class="field-value">${data.duration}</div>
           </div>` : ''}
           ${data.beneficiaries && data.beneficiaries.trim() ? `
           <div class="field-item">
-            <div class="field-label">المستفيدون</div>
+            <div class="field-label">${data.field3Label || 'المستفيدون'}</div>
             <div class="field-value">${data.beneficiaries}</div>
           </div>` : ''}
           ${data.grade && data.grade.trim() ? `
           <div class="field-item">
-            <div class="field-label">الصف</div>
+            <div class="field-label">${data.field5Label || 'الصف'}</div>
             <div class="field-value">${data.grade}</div>
           </div>` : ''}
-          ${data.teacherName && data.teacherName.trim() ? `
+          ${data.elementTitle && data.elementTitle.trim() ? `
           <div class="field-item">
-            <div class="field-label">المنفذ</div>
-            <div class="field-value">${data.teacherName}</div>
+            <div class="field-label">${data.field6Label || 'العنوان'}</div>
+            <div class="field-value">${data.elementTitle}</div>
           </div>` : ''}
           
           <!-- الحقول الديناميكية الإضافية -->
