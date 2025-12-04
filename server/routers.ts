@@ -595,7 +595,10 @@ export const appRouter = router({
 
   evidenceSubTemplates: router({
     listByStandard: publicProcedure
-      .input(z.object({ standardId: z.number() }))
+      .input(z.object({ 
+        standardId: z.number(),
+        sortBy: z.enum(['newest', 'oldest', 'priority']).optional().default('newest')
+      }))
       .query(async ({ input, ctx }) => {
         // Get all sub-templates for this standard
         const allTemplates = await db.getEvidenceSubTemplatesByStandard(input.standardId);
@@ -679,7 +682,37 @@ export const appRouter = router({
           return matchesStage || matchesSubject;
         });
         
-        return filteredTemplates;
+        // Sort templates based on sortBy parameter
+        let sortedTemplates = [...filteredTemplates];
+        
+        if (input.sortBy === 'newest') {
+          // Sort by createdAt descending (newest first)
+          sortedTemplates.sort((a: any, b: any) => {
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
+            return dateB - dateA;
+          });
+        } else if (input.sortBy === 'oldest') {
+          // Sort by createdAt ascending (oldest first)
+          sortedTemplates.sort((a: any, b: any) => {
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
+            return dateA - dateB;
+          });
+        } else if (input.sortBy === 'priority') {
+          // Sort by priority descending (highest priority first), then by createdAt
+          sortedTemplates.sort((a: any, b: any) => {
+            if (b.priority !== a.priority) {
+              return b.priority - a.priority;
+            }
+            // If same priority, sort by newest
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
+            return dateB - dateA;
+          });
+        }
+        
+        return sortedTemplates;
       }),
   }),
 

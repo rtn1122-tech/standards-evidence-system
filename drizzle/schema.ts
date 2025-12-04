@@ -120,6 +120,7 @@ export const evidenceSubTemplates = mysqlTable("evidenceSubTemplates", {
   applicableTracks: text("applicableTracks"), // JSON array - المسارات (عام، علمي، أدبي، إلخ)
   
   orderIndex: int("orderIndex").notNull(),
+  priority: int("priority").default(0).notNull(), // الأهمية: 0=عادي, 1=مهم, 2=مهم جداً
   
   // Tracking who created this template
   createdByCollaboratorId: int("createdByCollaboratorId"), // null if created by admin
