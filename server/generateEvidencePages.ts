@@ -1,5 +1,4 @@
 import puppeteer from "puppeteer";
-import QRCode from "qrcode";
 import axios from "axios";
 import fs from "fs";
 import path from "path";
@@ -73,13 +72,6 @@ interface EvidenceData {
 }
 
 export async function generateEvidencePages(data: EvidenceData): Promise<Buffer> {
-  // Generate QR Code
-  const qrCodeUrl = `https://standards-evidence-system.manus.space/verify/${data.id}`;
-  const qrCodeDataUrl = await QRCode.toDataURL(qrCodeUrl, {
-    width: 150,
-    margin: 1,
-  });
-
   // Convert images to base64
   const image1Base64 = data.image1Url ? await imageUrlToBase64(data.image1Url) : '';
   const image2Base64 = data.image2Url ? await imageUrlToBase64(data.image2Url) : '';
@@ -119,16 +111,6 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
       background-repeat: no-repeat;
     }
     
-    /* QR Code positioning - between text and vision logo */
-    .qr-code {
-      position: absolute;
-      top: 15mm;
-      left: 65mm;
-      width: 20mm;
-      height: 20mm;
-      z-index: 10;
-    }
-    
     /* Education department and school name - below ministry name */
     .header-info {
       position: absolute;
@@ -145,11 +127,6 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
       color: #000;
       margin: 2px 0;
       font-weight: bold;
-    }
-    
-    .qr-code img {
-      width: 100%;
-      height: 100%;
     }
     
     /* Content area - white space in the middle */
@@ -364,11 +341,6 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
 <body>
   <!-- Page 1: Basic Information -->
   <div class="page">
-    <!-- QR Code -->
-    <div class="qr-code">
-      <img src="${qrCodeDataUrl}" alt="QR Code" />
-    </div>
-    
     <!-- Header Info -->
     <div class="header-info">
       <div class="header-info-text">${data.educationDepartment || ''}</div>
@@ -478,11 +450,6 @@ export async function generateEvidencePages(data: EvidenceData): Promise<Buffer>
   
   <!-- Page 2: Evidence Details -->
   <div class="page">
-    <!-- QR Code -->
-    <div class="qr-code">
-      <img src="${qrCodeDataUrl}" alt="QR Code" />
-    </div>
-    
     <!-- Header Info -->
     <div class="header-info">
       <div class="header-info-text">${data.educationDepartment || ''}</div>

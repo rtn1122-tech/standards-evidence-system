@@ -190,3 +190,12 @@
 - [x] تطبيق التعديل في generatePDF.ts (top: 60mm → 35mm)
 - [x] تطبيق التعديل في generateEvidencePages.ts (top: 60mm → 35mm)
 - [x] اختبار التعديل وتوليد PDF تجريبي - نجح!
+
+## حذف الباركود (QR Code)
+
+### إزالة QR Code من PDF
+- [x] حذف QR Code من generatePDF.ts (الصفحة الأولى والثانية)
+- [x] حذف QR Code من generateEvidencePages.ts (الصفحة الأولى والثانية)
+- [x] حذف استيراد مكتبة qrcode
+- [x] حذف دالة توليد QR Code
+- [x] اختبار PDF بدون QR Code - نجح! لا يوجد QR Code في الصفحتين
