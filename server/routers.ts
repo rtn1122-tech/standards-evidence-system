@@ -492,6 +492,81 @@ export const appRouter = router({
           filename: `all-evidence-${ctx.user.id}-${Date.now()}.pdf`,
         };
       }),
+    
+    generatePreviewPDF: protectedProcedure
+      .input(z.object({
+        subTemplateId: z.number(),
+        dynamicFields: z.any(),
+        section1: z.string(),
+        section2: z.string(),
+        section3: z.string(),
+        section4: z.string(),
+        section5: z.string(),
+        section6: z.string(),
+        image1: z.string().nullable(),
+        image2: z.string().nullable(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { generateEvidencePDF } = await import('./generatePDF');
+        
+        // Fetch teacher profile for additional data
+        const profile = await db.getTeacherProfileByUserId(ctx.user.id);
+        
+        // Fetch sub-template for title and description
+        const subTemplate = await db.getSubTemplateById(input.subTemplateId);
+        
+        // Build evidence data for PDF generation (without saving to DB)
+        const evidenceData = {
+          id: 0, // Temporary ID for preview
+          subTemplateId: input.subTemplateId,
+          title: subTemplate?.title || "شاهد",
+          standardName: "أداء الواجبات الوظيفية",
+          description: subTemplate?.description || "",
+          // Page 1 fields from dynamicFields
+          elementTitle: input.dynamicFields.title || "",
+          grade: input.dynamicFields.grade || "",
+          beneficiaries: input.dynamicFields.beneficiaries || "",
+          duration: input.dynamicFields.duration || "",
+          executionLocation: input.dynamicFields.location || "",
+          studentsCount: input.dynamicFields.studentsCount || "",
+          lessonTitle: input.dynamicFields.lessonTitle || "",
+          date: input.dynamicFields.date || new Date().toISOString().split('T')[0],
+          // Custom field labels
+          field1Label: input.dynamicFields.field1Label || "مدة البرنامج",
+          field2Label: input.dynamicFields.field2Label || "مكان التنفيذ",
+          field3Label: input.dynamicFields.field3Label || "المستفيدون",
+          field4Label: input.dynamicFields.field4Label || "التاريخ",
+          field5Label: input.dynamicFields.field5Label || "الصف",
+          field6Label: input.dynamicFields.field6Label || "العنوان",
+          field7Label: input.dynamicFields.field7Label || "عدد الطلاب",
+          field8Label: input.dynamicFields.field8Label || "عنوان الدرس",
+          // Additional dynamic fields
+          additionalFields: input.dynamicFields.additionalFields || "",
+          // Page 2 sections
+          section1: input.section1,
+          section2: input.section2,
+          section3: input.section3,
+          section4: input.section4,
+          section5: input.section5,
+          section6: input.section6,
+          // Images
+          image1Url: input.image1,
+          image2Url: input.image2,
+          // Teacher info
+          teacherName: profile?.teacherName || ctx.user.name || "المعلم",
+          schoolName: profile?.schoolName || "المدرسة",
+          principalName: profile?.principalName || "",
+          educationDepartment: profile?.educationDepartment || "",
+        };
+        
+        const pdfBuffer = await generateEvidencePDF(evidenceData);
+        
+        // Return as base64 for preview
+        return {
+          pdf: pdfBuffer.toString('base64'),
+          filename: `preview-${Date.now()}.pdf`,
+        };
+      }),
   }),
 
   backgrounds: router({

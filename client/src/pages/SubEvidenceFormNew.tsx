@@ -4,7 +4,13 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, Save, Upload, Loader2, Pencil, Plus, X } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ArrowRight, Save, Upload, Loader2, Pencil, Plus, X, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 
@@ -24,6 +30,10 @@ export default function SubEvidenceFormNew() {
   const { data: profile } = trpc.teacherProfile.get.useQuery(undefined, {
     enabled: !!user
   });
+  
+  // PDF Preview state
+  const [showPdfPreview, setShowPdfPreview] = useState(false);
+  const [previewPdfUrl, setPreviewPdfUrl] = useState<string | null>(null);
   
   // Page 1 - Dynamic fields (8 fields + date)
   const [title, setTitle] = useState("");
@@ -221,6 +231,72 @@ export default function SubEvidenceFormNew() {
     },
   });
   
+  // Preview PDF mutation
+  const previewMutation = trpc.evidenceDetails.generatePreviewPDF.useMutation({
+    onSuccess: (data) => {
+      // Convert base64 to blob URL
+      const byteCharacters = atob(data.pdf);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      
+      setPreviewPdfUrl(url);
+      setShowPdfPreview(true);
+      toast.success("تم توليد معاينة PDF");
+    },
+    onError: (error) => {
+      toast.error(error.message || "حدث خطأ أثناء توليد المعاينة");
+    },
+  });
+  
+  const handlePreview = async () => {
+    if (!subTemplateId || !profile) {
+      toast.error("معلومات غير كاملة");
+      return;
+    }
+    
+    const dynamicFieldsData = {
+      title,
+      grade,
+      beneficiaries,
+      duration,
+      location: executionLocation,
+      studentsCount,
+      lessonTitle,
+      teacherName: profile.teacherName,
+      principalName: profile.principalName || "",
+      date: date,
+      standardName: subTemplate?.standardId ? `المعيار ${subTemplate.standardId}` : "",
+      evidenceName: subTemplate?.title || "",
+      field1Label,
+      field2Label,
+      field3Label,
+      field4Label,
+      field5Label,
+      field6Label,
+      field7Label,
+      field8Label,
+      additionalFields: JSON.stringify(dynamicFields),
+    };
+    
+    previewMutation.mutate({
+      subTemplateId,
+      dynamicFields: dynamicFieldsData,
+      section1,
+      section2,
+      section3,
+      section4,
+      section5,
+      section6,
+      image1: image1Url,
+      image2: image2Url,
+    });
+  };
+  
   const handleSave = async () => {
     if (!subTemplateId || !profile) {
       toast.error("معلومات غير كاملة");
@@ -324,19 +400,38 @@ export default function SubEvidenceFormNew() {
                 <h1 className="text-xl font-bold">نموذج تعبئة الشاهد</h1>
               </div>
             </div>
-            <Button onClick={handleSave} disabled={saveMutation.isPending}>
-              {saveMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 ml-2 animate-spin" />
-                  جاري الحفظ...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 ml-2" />
-                  حفظ
-                </>
-              )}
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={handlePreview} 
+                disabled={previewMutation.isPending}
+                variant="outline"
+              >
+                {previewMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                    جاري التوليد...
+                  </>
+                ) : (
+                  <>
+                    <Eye className="h-4 w-4 ml-2" />
+                    معاينة PDF
+                  </>
+                )}
+              </Button>
+              <Button onClick={handleSave} disabled={saveMutation.isPending}>
+                {saveMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                    جاري الحفظ...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 ml-2" />
+                    حفظ
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -867,6 +962,51 @@ export default function SubEvidenceFormNew() {
           </div>
         )}
       </div>
+      
+      {/* PDF Preview Dialog */}
+      <Dialog open={showPdfPreview} onOpenChange={setShowPdfPreview}>
+        <DialogContent className="max-w-6xl h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>معاينة PDF</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            {previewPdfUrl && (
+              <iframe
+                src={previewPdfUrl}
+                className="w-full h-full border-0"
+                title="PDF Preview"
+              />
+            )}
+          </div>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowPdfPreview(false);
+                if (previewPdfUrl) {
+                  URL.revokeObjectURL(previewPdfUrl);
+                  setPreviewPdfUrl(null);
+                }
+              }}
+            >
+              إغلاق
+            </Button>
+            <Button onClick={handleSave} disabled={saveMutation.isPending}>
+              {saveMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                  جاري الحفظ...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 ml-2" />
+                  حفظ الشاهد
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
