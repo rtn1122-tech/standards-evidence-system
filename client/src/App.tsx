@@ -8,6 +8,8 @@ import Home from "./pages/Home";
 import ProfileSetup from "./pages/ProfileSetup";
 import LandingPage from "./pages/LandingPage";
 import About from "./pages/About";
+import RequestCustomService from "./pages/RequestCustomService";
+import RequestPrint from "./pages/RequestPrint";
 
 function Router() {
   return (
@@ -16,6 +18,8 @@ function Router() {
       <Route path={"/landing"} component={LandingPage} />
       <Route path="/about" component={About} />
       <Route path={"/profile-setup"} component={ProfileSetup} />
+      <Route path={"/request-custom-service"} component={RequestCustomService} />
+      <Route path={"/request-print"} component={RequestPrint} />
 
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />

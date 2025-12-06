@@ -254,3 +254,101 @@ export async function upsertUser(data: any) {
     return { id: Number(result[0].insertId), ...data };
   }
 }
+
+
+// ========================================
+// Custom Service
+// ========================================
+
+export async function createCustomServiceRequest(data: {
+  userId: number;
+  templateIds: number[];
+  imageUrls: string[];
+  notes?: string;
+}) {
+  // Create the request
+  const requestResult: any = await db.execute(
+    sql`INSERT INTO customServiceRequests (userId, requestedTemplateIds, notes, status)
+        VALUES (${data.userId}, ${JSON.stringify(data.templateIds)}, ${data.notes || null}, 'pending')`
+  );
+  
+  const requestId = Number(requestResult[0].insertId);
+  
+  // Insert images
+  for (const imageUrl of data.imageUrls) {
+    await db.execute(
+      sql`INSERT INTO customServiceImages (requestId, imageUrl, originalFilename)
+          VALUES (${requestId}, ${imageUrl}, ${imageUrl.split('/').pop() || 'image'})`
+    );
+  }
+  
+  return { id: requestId, status: "pending" };
+}
+
+export async function listCustomServiceRequests(userId: number) {
+  const result: any = await db.execute(
+    sql`SELECT * FROM customServiceRequests WHERE userId = ${userId} ORDER BY createdAt DESC`
+  );
+  
+  return result[0] || [];
+}
+
+export async function getCustomServiceRequest(requestId: number, userId: number) {
+  const requestResult: any = await db.execute(
+    sql`SELECT * FROM customServiceRequests WHERE id = ${requestId} AND userId = ${userId} LIMIT 1`
+  );
+  
+  const request = requestResult[0]?.[0];
+  if (!request) {
+    return null;
+  }
+  
+  // Get images
+  const imagesResult: any = await db.execute(
+    sql`SELECT * FROM customServiceImages WHERE requestId = ${requestId}`
+  );
+  
+  return {
+    ...request,
+    images: imagesResult[0] || [],
+  };
+}
+
+
+// ========================================
+// Print Orders
+// ========================================
+
+export async function createPrintOrder(data: {
+  userId: number;
+  evidenceIds: number[];
+  paperType: string;
+  bindingType: string;
+  copies: number;
+  price: number;
+  shippingAddress: string;
+  notes?: string;
+}) {
+  const result: any = await db.execute(
+    sql`INSERT INTO printOrders (userId, evidenceIds, paperType, bindingType, copies, price, shippingAddress, notes, status)
+        VALUES (${data.userId}, ${JSON.stringify(data.evidenceIds)}, ${data.paperType}, ${data.bindingType}, ${data.copies}, ${data.price}, ${data.shippingAddress}, ${data.notes || null}, 'pending')`
+  );
+  
+  return { id: Number(result[0].insertId) };
+}
+
+export async function listPrintOrders(userId: number) {
+  const result: any = await db.execute(
+    sql`SELECT * FROM printOrders WHERE userId = ${userId} ORDER BY createdAt DESC`
+  );
+  
+  return result[0] || [];
+}
+
+export async function getPrintOrder(orderId: number, userId: number) {
+  const result: any = await db.execute(
+    sql`SELECT * FROM printOrders WHERE id = ${orderId} AND userId = ${userId} LIMIT 1`
+  );
+  
+  return result[0]?.[0] || null;
+}

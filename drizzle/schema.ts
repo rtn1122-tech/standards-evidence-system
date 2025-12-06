@@ -173,3 +173,90 @@ export const activationCodes = mysqlTable("activationCodes", {
 
 export type ActivationCode = typeof activationCodes.$inferSelect;
 export type InsertActivationCode = typeof activationCodes.$inferInsert;
+
+/**
+ * Custom service requests - teacher requests custom filling service
+ * طلبات الخدمة المخصصة - المعلم يطلب تعبئة شواهد بصور مخصصة
+ */
+export const customServiceRequests = mysqlTable("customServiceRequests", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // المعلم الطالب
+  status: mysqlEnum("status", ["pending", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
+  
+  // Requested evidence templates (JSON array of template IDs)
+  // مثال: [1, 5, 12, 18, 23]
+  requestedTemplateIds: text("requestedTemplateIds").notNull(), // JSON array
+  
+  // Teacher notes
+  notes: text("notes"), // ملاحظات المعلم (اختياري)
+  
+  // Owner notes (internal)
+  ownerNotes: text("ownerNotes"), // ملاحظات المالك (داخلية)
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  completedAt: timestamp("completedAt"), // تاريخ الإكمال
+});
+
+export type CustomServiceRequest = typeof customServiceRequests.$inferSelect;
+export type InsertCustomServiceRequest = typeof customServiceRequests.$inferInsert;
+
+/**
+ * Custom service images - images uploaded by teacher for custom service
+ * الصور المرفوعة من المعلم للخدمة المخصصة
+ */
+export const customServiceImages = mysqlTable("customServiceImages", {
+  id: int("id").autoincrement().primaryKey(),
+  requestId: int("requestId").notNull(), // ربط مع customServiceRequests
+  imageUrl: text("imageUrl").notNull(), // رابط الصورة في S3
+  originalFilename: varchar("originalFilename", { length: 255 }), // اسم الملف الأصلي
+  fileSize: int("fileSize"), // حجم الملف (bytes)
+  mimeType: varchar("mimeType", { length: 100 }), // نوع الملف
+  uploadedAt: timestamp("uploadedAt").defaultNow().notNull(),
+});
+
+export type CustomServiceImage = typeof customServiceImages.$inferSelect;
+export type InsertCustomServiceImage = typeof customServiceImages.$inferInsert;
+
+/**
+ * Custom service assignments - owner assigns images to evidence templates
+ * ربط الصور بالشواهد - المالك يختار الصور المناسبة لكل شاهد
+ */
+export const customServiceAssignments = mysqlTable("customServiceAssignments", {
+  id: int("id").autoincrement().primaryKey(),
+  requestId: int("requestId").notNull(), // ربط مع customServiceRequests
+  templateId: int("templateId").notNull(), // القالب المطلوب
+  imageId: int("imageId").notNull(), // الصورة المختارة
+  position: int("position").notNull(), // موقع الصورة (1 أو 2)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CustomServiceAssignment = typeof customServiceAssignments.$inferSelect;
+export type InsertCustomServiceAssignment = typeof customServiceAssignments.$inferInsert;
+
+/**
+ * Print orders - professional printing service
+ * طلبات الطباعة - خدمة الطباعة الاحترافية
+ */
+export const printOrders = mysqlTable("printOrders", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  status: mysqlEnum("status", ["pending", "paid", "printing", "shipped", "delivered", "cancelled"]).default("pending").notNull(),
+  paperType: mysqlEnum("paperType", ["standard", "premium", "vip"]).default("standard").notNull(),
+  bindingType: mysqlEnum("bindingType", ["spiral", "thermal", "luxury"]).default("spiral").notNull(),
+  copies: int("copies").default(1).notNull(),
+  price: int("price").notNull(), // السعر بالريال (محفوظ كـ integer بدلاً من decimal)
+  evidenceIds: text("evidenceIds").notNull(), // JSON array of evidence IDs
+  shippingAddress: text("shippingAddress"),
+  trackingNumber: varchar("trackingNumber", { length: 255 }),
+  notes: text("notes"),
+  sallaOrderId: varchar("sallaOrderId", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  paidAt: timestamp("paidAt"),
+  shippedAt: timestamp("shippedAt"),
+  deliveredAt: timestamp("deliveredAt"),
+});
+
+export type PrintOrder = typeof printOrders.$inferSelect;
+export type InsertPrintOrder = typeof printOrders.$inferInsert;

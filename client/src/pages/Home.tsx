@@ -46,6 +46,38 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* خدمات مميزة */}
+          <Card className="hover:shadow-lg transition-shadow border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-2xl">🎨</span>
+                خدمة التعبئة المخصصة
+              </CardTitle>
+              <CardDescription>ارفع صورك ونحن نملأ الشواهد لك</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="w-full bg-purple-600 hover:bg-purple-700" onClick={() => window.location.href = "/request-custom-service"}>
+                طلب الخدمة
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-2xl">🖨️</span>
+                طباعة احترافية
+              </CardTitle>
+              <CardDescription>اطبع ملفك بجودة عالية واستلمه في منزلك</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="w-full bg-green-600 hover:bg-green-700" onClick={() => window.location.href = "/request-print"}>
+                طلب طباعة
+              </Button>
+            </CardContent>
+          </Card>
+          
+          {/* الخدمات الأساسية */}
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle>المعايير</CardTitle>
@@ -80,21 +112,32 @@ export default function Home() {
         </div>
 
         <div className="mt-12 text-center">
-          <Card>
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50">
             <CardHeader>
-              <CardTitle>النظام قيد التطوير</CardTitle>
+              <CardTitle>✨ ميزات جديدة!</CardTitle>
               <CardDescription>
-                جاري العمل على إكمال الواجهات والميزات
+                تم إضافة خدمات مميزة لتسهيل عملك
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">
-                ✅ قاعدة البيانات: جاهزة<br/>
-                ✅ ملف Excel: جاهز<br/>
-                ✅ سكريبت الاستيراد: يعمل<br/>
-                ⏳ الواجهات: قيد التطوير<br/>
-                ⏳ نظام PDF: قيد التطوير
-              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-right">
+                <div className="bg-white p-4 rounded-lg">
+                  <h3 className="font-bold text-purple-600 mb-2">🎨 خدمة التعبئة المخصصة</h3>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>✅ ارفع صورك دفعة واحدة</li>
+                    <li>✅ نحن نفرز ونملأ الشواهد</li>
+                    <li>✅ استلم شواهد جاهزة 100%</li>
+                  </ul>
+                </div>
+                <div className="bg-white p-4 rounded-lg">
+                  <h3 className="font-bold text-green-600 mb-2">🖨️ طباعة احترافية</h3>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>✅ 3 أنواع ورق (عادي/فاخر/VIP)</li>
+                    <li>✅ 3 أنواع تجليد</li>
+                    <li>✅ شحن مجاني لجميع المناطق</li>
+                  </ul>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>

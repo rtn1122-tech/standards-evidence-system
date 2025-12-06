@@ -220,6 +220,128 @@ export const appRouter = router({
   }),
 
   // ========================================
+  // Custom Service
+  // ========================================
+  customService: router({
+    // Create a new custom service request
+    createRequest: protectedProcedure
+      .input(
+        z.object({
+          templateIds: z.array(z.number()),
+          imageUrls: z.array(z.string()),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        return await db.createCustomServiceRequest({
+          userId: ctx.user.id,
+          templateIds: input.templateIds,
+          imageUrls: input.imageUrls,
+          notes: input.notes,
+        });
+      }),
+
+    // Upload image to S3
+    uploadImage: protectedProcedure
+      .input(
+        z.object({
+          imageData: z.string(), // base64 data URL
+          filename: z.string(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        // Extract base64 data
+        const matches = input.imageData.match(/^data:(.+);base64,(.+)$/);
+        if (!matches) {
+          throw new Error("صيغة الصورة غير صحيحة");
+        }
+        
+        const mimeType = matches[1];
+        const base64Data = matches[2];
+        const buffer = Buffer.from(base64Data, 'base64');
+        
+        // Generate unique filename
+        const timestamp = Date.now();
+        const randomSuffix = Math.random().toString(36).substring(2, 8);
+        const ext = input.filename.split('.').pop();
+        const fileKey = `custom-service/${timestamp}-${randomSuffix}.${ext}`;
+        
+        // Upload to S3
+        const { storagePut } = await import("./storage");
+        const { url } = await storagePut(fileKey, buffer, mimeType);
+        
+        return { url };
+      }),
+
+    // List user's custom service requests
+    listRequests: protectedProcedure.query(async ({ ctx }) => {
+      return await db.listCustomServiceRequests(ctx.user.id);
+    }),
+
+    // Get request details
+    getRequest: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getCustomServiceRequest(input.id, ctx.user.id);
+      }),
+  }),
+
+  // ========================================
+  // Print Orders
+  // ========================================
+  printOrders: router({
+    // Create a new print order
+    create: protectedProcedure
+      .input(
+        z.object({
+          evidenceIds: z.array(z.number()),
+          paperType: z.enum(["standard", "premium", "vip"]),
+          bindingType: z.enum(["spiral", "thermal", "luxury"]),
+          copies: z.number().min(1).max(5),
+          shippingAddress: z.string(),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        // Calculate price
+        const basePrices = {
+          standard: 50,
+          premium: 80,
+          vip: 120,
+        };
+        const price = basePrices[input.paperType] * input.copies;
+        
+        // Create order
+        const order = await db.createPrintOrder({
+          userId: ctx.user.id,
+          evidenceIds: input.evidenceIds,
+          paperType: input.paperType,
+          bindingType: input.bindingType,
+          copies: input.copies,
+          price,
+          shippingAddress: input.shippingAddress,
+          notes: input.notes,
+        });
+        
+        // TODO: Generate Salla payment link
+        // For now, return the order
+        return { orderId: order.id, paymentUrl: null };
+      }),
+
+    // List user's print orders
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return await db.listPrintOrders(ctx.user.id);
+    }),
+
+    // Get order details
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getPrintOrder(input.id, ctx.user.id);
+      }),
+  }),
+
+  // ========================================
   // Activation
   // ========================================
   activation: router({
