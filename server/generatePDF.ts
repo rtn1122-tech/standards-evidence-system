@@ -16,7 +16,7 @@ async function imageUrlToBase64(url: string): Promise<string> {
     return `data:${mimeType};base64,${base64}`;
   } catch (error) {
     console.error('Error converting image to base64:', error);
-    return ''; // Return empty string if image fails to load
+    return '';
   }
 }
 
@@ -28,42 +28,34 @@ function getThemeBackgroundBase64(): string {
   return `data:image/png;base64,${base64}`;
 }
 
-interface EvidenceData {
-  id: number;
-  subTemplateId?: number;
+interface UserField {
+  name: string;
+  type: string;
+  required: boolean;
+}
+
+interface Page2Box {
   title: string;
+  content: string;
+}
+
+interface EvidenceData {
+  // Template info
   standardName: string;
+  evidenceName: string;
   description: string;
-  // Page 1 fields
-  elementTitle: string;
-  grade: string;
-  beneficiaries: string;
-  duration: string;
-  executionLocation: string;
-  studentsCount: string;
-  lessonTitle: string;
-  date: string;
-  // Custom field labels (editable by user for all templates)
-  field1Label?: string;
-  field2Label?: string;
-  field3Label?: string;
-  field4Label?: string;
-  field5Label?: string;
-  field6Label?: string;
-  field7Label?: string;
-  field8Label?: string;
-  // Additional dynamic fields
-  additionalFields?: string;
-  // Page 2 sections
-  section1: string;
-  section2: string;
-  section3: string;
-  section4: string;
-  section5: string;
-  section6: string;
+  
+  // Dynamic fields (from template)
+  userFields: UserField[];
+  page2Boxes: Page2Box[];
+  
+  // User data (filled by teacher)
+  userData: Record<string, string>;
+  
   // Images
   image1Url: string | null;
   image2Url: string | null;
+  
   // Teacher info
   teacherName: string;
   schoolName: string;
@@ -78,6 +70,24 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
 
   // Load theme background
   const themeBackgroundBase64 = getThemeBackgroundBase64();
+
+  // Build dynamic fields HTML
+  const fieldsHTML = data.userFields
+    .filter(field => data.userData[field.name] && data.userData[field.name].trim())
+    .map(field => `
+      <div class="field-item">
+        <div class="field-label">${field.name}</div>
+        <div class="field-value">${data.userData[field.name]}</div>
+      </div>
+    `).join('');
+
+  // Build page 2 boxes HTML
+  const page2BoxesHTML = data.page2Boxes.map(box => `
+    <div class="section-box">
+      <div class="section-title">${box.title}</div>
+      <div class="section-content">${box.content}</div>
+    </div>
+  `).join('');
 
   const html = `
 <!DOCTYPE html>
@@ -111,10 +121,10 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       background-repeat: no-repeat;
     }
     
-    /* Education department and school name - below ministry name */
+    /* Education department and school name */
     .header-info {
       position: absolute;
-      top: 22mm;
+      top: 8mm;
       left: 50%;
       transform: translateX(-50%);
       text-align: center;
@@ -123,41 +133,20 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
     
     .header-info-text {
       font-family: 'Traditional Arabic', 'Arial', 'Tahoma', sans-serif;
-      font-size: 16px;
+      font-size: 14px;
       color: #000;
-      margin: 0;
+      margin: 1px 0;
       font-weight: bold;
     }
     
-    /* Content area - white space in the middle */
+    /* Content area */
     .content-area {
       position: absolute;
-      top: 35mm;
+      top: 40mm;
       left: 15mm;
       right: 15mm;
       bottom: 60mm;
       padding: 10mm;
-    }
-    
-    /* Title box */
-    .title-box {
-      border: 2px solid #00A896;
-      padding: 10px;
-      text-align: center;
-      margin-bottom: 15px;
-      background: rgba(255, 255, 255, 0.95);
-    }
-    
-    .title-box h1 {
-      font-size: 20px;
-      color: #00A896;
-      margin-bottom: 8px;
-    }
-    
-    .title-box p {
-      font-size: 12px;
-      color: #555;
-      line-height: 1.6;
     }
     
     /* Standard box */
@@ -167,7 +156,7 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       text-align: center;
       margin-bottom: 12px;
       background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
+      border-radius: 15px;
     }
     
     .standard-box h2 {
@@ -175,19 +164,20 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       font-weight: bold;
     }
     
-    /* Element row - مربع واحد لاسم الشاهد */
-    .element-row {
-      border: 2px solid #000;
-      padding: 8px;
+    /* Evidence title box */
+    .evidence-title-box {
+      border: 2px solid #00A896;
+      padding: 10px;
       text-align: center;
       margin-bottom: 12px;
-      background: rgba(249, 249, 249, 0.95);
-      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
     }
     
-    .element-row h3 {
-      font-size: 14px;
+    .evidence-title-box h3 {
+      font-size: 16px;
       font-weight: bold;
+      color: #00A896;
       margin: 0;
     }
     
@@ -196,7 +186,7 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 20px;
     }
     
     .field-item {
@@ -204,7 +194,7 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       padding: 8px;
       text-align: center;
       background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
+      border-radius: 15px;
     }
     
     .field-label {
@@ -226,7 +216,7 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       min-height: 120px;
       text-align: right;
       background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
+      border-radius: 15px;
     }
     
     .description-label {
@@ -238,12 +228,23 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
     
     .description-text {
       font-size: 11px;
-      line-height: 1.8;
+      line-height: 2;
       color: #333;
       white-space: pre-wrap;
       word-wrap: break-word;
-      text-align: right;
+      text-align: justify;
       direction: rtl;
+    }
+    
+    /* Content area for page 2 */
+    .content-area-page2 {
+      position: absolute;
+      top: 40mm;
+      left: 15mm;
+      right: 15mm;
+      bottom: 67mm;
+      padding: 10mm;
+      overflow: hidden;
     }
     
     /* Sections grid for page 2 */
@@ -251,40 +252,45 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 10px;
-      margin-bottom: 15px;
     }
     
     .section-box {
       border: 1px solid #000;
       padding: 10px;
-      min-height: 100px;
+      min-height: 80px;
       background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
     }
     
     .section-title {
       font-weight: bold;
-      font-size: 12px;
-      margin-bottom: 6px;
+      font-size: 10px;
+      margin-bottom: 4px;
       color: #00A896;
       text-align: right;
     }
     
     .section-content {
-      font-size: 11px;
-      line-height: 1.8;
+      font-size: 9px;
+      line-height: 1.5;
       color: #333;
-      text-align: right;
+      text-align: justify;
       white-space: pre-wrap;
       word-wrap: break-word;
       direction: rtl;
     }
     
-    /* Images row */
+    /* Images row - fixed at bottom */
     .images-row {
+      position: absolute;
+      bottom: 45mm;
+      left: 15mm;
+      right: 15mm;
+      height: 40mm;
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 10px;
-      margin-bottom: 15px;
+      z-index: 10;
     }
     
     .image-box {
@@ -292,13 +298,19 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       padding: 5px;
       text-align: center;
       background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     
     .image-box img {
       width: 100%;
-      height: auto;
-      max-height: 150px;
-      object-fit: contain;
+      height: 100%;
+      max-height: 38mm;
+      object-fit: cover;
+      border-radius: 10px;
     }
     
     .image-label {
@@ -307,35 +319,40 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
       margin-top: 5px;
     }
     
-    /* Signature boxes - positioned at bottom to match theme */
+    /* Signature boxes */
     .signature-row {
       position: absolute;
-      bottom: 8mm;
-      left: 15mm;
-      right: 15mm;
+      bottom: 7mm;
+      left: 20mm;
+      right: 20mm;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 15px;
+      gap: 20px;
       z-index: 10;
     }
     
     .signature-box {
       background: transparent;
       border: none;
-      padding: 8px 12px;
-      text-align: right;
-      min-height: 40px;
+      padding: 6px 10px;
+      text-align: center;
+      min-height: 35px;
       display: flex;
       align-items: center;
-      justify-content: flex-start;
+      justify-content: center;
+      gap: 6px;
+    }
+    
+    .signature-label {
+      font-size: 11px;
+      font-weight: normal;
+      color: #333;
     }
     
     .signature-name {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: bold;
       color: #333;
-      flex: 1;
-      text-align: center;
     }
   </style>
 </head>
@@ -344,6 +361,8 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
   <div class="page">
     <!-- Header Info -->
     <div class="header-info">
+      <div class="header-info-text">المملكة العربية السعودية</div>
+      <div class="header-info-text">وزارة التعليم</div>
       <div class="header-info-text">${data.educationDepartment || ''}</div>
       <div class="header-info-text">${data.schoolName || ''}</div>
     </div>
@@ -354,93 +373,11 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
         <h2>معيار: ${data.standardName}</h2>
       </div>
       
-      <div class="element-row">
-        <h3>اسم الشاهد: ${data.elementTitle}</h3>
+      <div class="evidence-title-box">
+        <h3>${data.evidenceName}</h3>
       </div>
       
-      <div class="fields-grid">
-        ${data.subTemplateId === 102 ? `
-          <!-- 4 حقول فقط للشاهد 102 - إخفاء الحقول الفارغة -->
-          ${data.date && data.date.trim() ? `
-          <div class="field-item">
-            <div class="field-label">${data.field4Label || 'التاريخ'}</div>
-            <div class="field-value">${data.date}</div>
-          </div>` : ''}
-          ${data.duration && data.duration.trim() ? `
-          <div class="field-item">
-            <div class="field-label">${data.field1Label || 'مدة البرنامج'}</div>
-            <div class="field-value">${data.duration}</div>
-          </div>` : ''}
-          ${data.executionLocation && data.executionLocation.trim() ? `
-          <div class="field-item">
-            <div class="field-label">${data.field2Label || 'الوسائل المستخدمة'}</div>
-            <div class="field-value">${data.executionLocation}</div>
-          </div>` : ''}
-          ${data.beneficiaries && data.beneficiaries.trim() ? `
-          <div class="field-item">
-            <div class="field-label">${data.field3Label || 'المستفيدون'}</div>
-            <div class="field-value">${data.beneficiaries}</div>
-          </div>` : ''}
-        ` : `
-          <!-- 8 حقول للشواهد الأخرى - إخفاء الحقول الفارغة -->
-          ${data.date && data.date.trim() ? `
-          <div class="field-item">
-            <div class="field-label">${data.field4Label || 'التاريخ'}</div>
-            <div class="field-value">${data.date}</div>
-          </div>` : ''}
-          ${data.lessonTitle && data.lessonTitle.trim() ? `
-          <div class="field-item">
-            <div class="field-label">${data.field8Label || 'عنوان الدرس'}</div>
-            <div class="field-value">${data.lessonTitle}</div>
-          </div>` : ''}
-          ${data.studentsCount && data.studentsCount.trim() ? `
-          <div class="field-item">
-            <div class="field-label">${data.field7Label || 'عدد الطلاب'}</div>
-            <div class="field-value">${data.studentsCount}</div>
-          </div>` : ''}
-          ${data.executionLocation && data.executionLocation.trim() ? `
-          <div class="field-item">
-            <div class="field-label">${data.field2Label || 'مكان التنفيذ'}</div>
-            <div class="field-value">${data.executionLocation}</div>
-          </div>` : ''}
-          ${data.duration && data.duration.trim() ? `
-          <div class="field-item">
-            <div class="field-label">${data.field1Label || 'المدة الزمنية'}</div>
-            <div class="field-value">${data.duration}</div>
-          </div>` : ''}
-          ${data.beneficiaries && data.beneficiaries.trim() ? `
-          <div class="field-item">
-            <div class="field-label">${data.field3Label || 'المستفيدون'}</div>
-            <div class="field-value">${data.beneficiaries}</div>
-          </div>` : ''}
-          ${data.grade && data.grade.trim() ? `
-          <div class="field-item">
-            <div class="field-label">${data.field5Label || 'الصف'}</div>
-            <div class="field-value">${data.grade}</div>
-          </div>` : ''}
-          ${data.elementTitle && data.elementTitle.trim() ? `
-          <div class="field-item">
-            <div class="field-label">${data.field6Label || 'العنوان'}</div>
-            <div class="field-value">${data.elementTitle}</div>
-          </div>` : ''}
-          
-          <!-- الحقول الديناميكية الإضافية -->
-          ${data.additionalFields ? (() => {
-            try {
-              const additionalFields = JSON.parse(data.additionalFields);
-              return additionalFields.map((field: { label: string; value: string }) => 
-                field.value && field.value.trim() ? `
-                <div class="field-item">
-                  <div class="field-label">${field.label}</div>
-                  <div class="field-value">${field.value}</div>
-                </div>` : ''
-              ).join('');
-            } catch (e) {
-              return '';
-            }
-          })() : ''}
-        `}
-      </div>
+      ${fieldsHTML ? `<div class="fields-grid">${fieldsHTML}</div>` : ''}
       
       <div class="description-box">
         <div class="description-label">الوصف</div>
@@ -453,71 +390,53 @@ export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
   <div class="page">
     <!-- Header Info -->
     <div class="header-info">
+      <div class="header-info-text">المملكة العربية السعودية</div>
+      <div class="header-info-text">وزارة التعليم</div>
       <div class="header-info-text">${data.educationDepartment || ''}</div>
       <div class="header-info-text">${data.schoolName || ''}</div>
     </div>
     
     <!-- Content Area for Page 2 -->
-    <div class="content-area">
+    <div class="content-area-page2">
       <div class="standard-box">
         <h2>معيار: ${data.standardName}</h2>
       </div>
       
-      <div class="element-row">
-        <h3>اسم الشاهد: ${data.elementTitle}</h3>
+      <div class="evidence-title-box">
+        <h3>${data.evidenceName}</h3>
       </div>
       
       <div class="sections-grid">
-        <div class="section-box">
-          <div class="section-title">الهدف من الشاهد</div>
-          <div class="section-content">${data.section1}</div>
-        </div>
-        <div class="section-box">
-          <div class="section-title">الإجراءات</div>
-          <div class="section-content">${data.section2}</div>
-        </div>
-        <div class="section-box">
-          <div class="section-title">النتائج</div>
-          <div class="section-content">${data.section3}</div>
-        </div>
-        <div class="section-box">
-          <div class="section-title">آلية التنفيذ</div>
-          <div class="section-content">${data.section4}</div>
-        </div>
-        <div class="section-box">
-          <div class="section-title">توصيات</div>
-          <div class="section-content">${data.section5}</div>
-        </div>
-        <div class="section-box">
-          <div class="section-title">الوسائل المستخدمة</div>
-          <div class="section-content">${data.section6}</div>
-        </div>
+        ${page2BoxesHTML}
       </div>
-      
-      ${image1Base64 || image2Base64 ? `
-      <div class="images-row">
-        ${image1Base64 ? `
-        <div class="image-box">
-          <img src="${image1Base64}" alt="صورة 1" />
-          <div class="image-label">صورة توضيحية 1</div>
-        </div>
-        ` : ''}
-        ${image2Base64 ? `
-        <div class="image-box">
-          <img src="${image2Base64}" alt="صورة 2" />
-          <div class="image-label">صورة توضيحية 2</div>
-        </div>
-        ` : ''}
+    </div>
+    
+    <!-- Images row - fixed at bottom -->
+    ${image1Base64 || image2Base64 ? `
+    <div class="images-row">
+      ${image1Base64 ? `
+      <div class="image-box">
+        <img src="${image1Base64}" alt="صورة 1" />
+        <div class="image-label">صورة توضيحية 1</div>
+      </div>
+      ` : ''}
+      ${image2Base64 ? `
+      <div class="image-box">
+        <img src="${image2Base64}" alt="صورة 2" />
+        <div class="image-label">صورة توضيحية 2</div>
       </div>
       ` : ''}
     </div>
+    ` : ''}
     
     <!-- Signature boxes -->
     <div class="signature-row">
       <div class="signature-box">
+        <span class="signature-label">اسم المعلم:</span>
         <span class="signature-name">${data.teacherName || ''}</span>
       </div>
       <div class="signature-box">
+        <span class="signature-label">مدير المدرسة:</span>
         <span class="signature-name">${data.principalName || ''}</span>
       </div>
     </div>

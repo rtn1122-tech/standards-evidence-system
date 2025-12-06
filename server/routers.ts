@@ -26,29 +26,35 @@ export const appRouter = router({
     upsert: protectedProcedure
       .input(
         z.object({
+          // معلومات أساسية
+          teacherName: z.string().optional(),
+          email: z.string().optional(),
+          phone: z.string().optional(),
+          gender: z.enum(["male", "female"]),
+          profileImage: z.string().optional(),
+          
+          // معلومات مهنية
           educationDepartment: z.string().optional(),
           schoolName: z.string().optional(),
-          teacherName: z.string().optional(),
           principalName: z.string().optional(),
-          gender: z.enum(["male", "female"]),
-          stage: z.string().optional(),
-          subjects: z.string().optional(),
-          selectedTheme: z.string().optional(),
-          email: z.string().optional(),
-          phoneNumber: z.string().optional(),
-          professionalLicenseNumber: z.string().optional(),
-          licenseStartDate: z.string().optional(),
-          licenseEndDate: z.string().optional(),
-          employeeNumber: z.string().optional(),
-          jobTitle: z.string().optional(),
+          educationLevel: z.enum(["elementary", "middle", "high"]).optional(),
+          subjects: z.string().optional(), // JSON string
+          
+          // معلومات الرخصة
+          licenseNumber: z.string().optional(),
+          licenseIssueDate: z.string().optional(),
+          licenseExpiryDate: z.string().optional(),
+          teacherLevel: z.enum(["practitioner", "advanced", "expert"]).optional(),
+          
+          // إعدادات التصميم
+          preferredTheme: z.string().optional(),
+          preferredCoverTheme: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
         return await db.upsertTeacherProfile({
           userId: ctx.user.id,
           ...input,
-          licenseStartDate: input.licenseStartDate ? new Date(input.licenseStartDate) : undefined,
-          licenseEndDate: input.licenseEndDate ? new Date(input.licenseEndDate) : undefined,
         } as any);
       }),
   }),
