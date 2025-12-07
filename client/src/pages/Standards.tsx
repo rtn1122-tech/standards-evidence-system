@@ -2,7 +2,7 @@ import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
-import { ArrowRight, BookOpen } from "lucide-react";
+import { ArrowRight, ArrowLeft, BookOpen } from "lucide-react";
 
 export default function Standards() {
   const [, setLocation] = useLocation();
@@ -42,7 +42,8 @@ export default function Standards() {
           {standards?.map((standard: any) => (
             <Card 
               key={standard.id}
-              className="hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-400 group"
+              className="hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-400 group cursor-pointer"
+              onClick={() => setLocation(`/standard/${standard.id}`)}
             >
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -59,7 +60,7 @@ export default function Standards() {
                       الوزن النسبي: {standard.weight}%
                     </CardDescription>
                   </div>
-
+                  <ArrowLeft className="w-5 h-5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
                 </div>
               </CardHeader>
               <CardContent>

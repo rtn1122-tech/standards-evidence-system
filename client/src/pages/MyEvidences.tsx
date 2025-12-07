@@ -2,19 +2,28 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
-import { ArrowRight, FileText, Sparkles, Trash2 } from "lucide-react";
+import { ArrowRight, FileText, Sparkles, Trash2, Download, Filter } from "lucide-react";
+import { useState } from "react";
 
 export default function MyEvidences() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
+  const [filterStandard, setFilterStandard] = useState<string>("all");
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [pdfProgress, setPdfProgress] = useState(0);
   
   // الشواهد العادية
   const { data: userEvidences, isLoading: loadingUser } = trpc.userEvidences.list.useQuery();
   
   // الشواهد الخاصة
   const { data: customEvidences, isLoading: loadingCustom } = trpc.customEvidences.list.useQuery();
+  
+  // المعايير للفلترة
+  const { data: standards } = trpc.standards.list.useQuery();
   
   const utils = trpc.useUtils();
   
@@ -40,26 +49,140 @@ export default function MyEvidences() {
     );
   }
 
-  const totalCount = (userEvidences?.length || 0) + (customEvidences?.length || 0);
+  // فلترة الشواهد حسب المعيار
+  const filteredUserEvidences = filterStandard === "all" 
+    ? userEvidences 
+    : userEvidences?.filter((e: any) => e.standardId?.toString() === filterStandard);
+
+  const totalCount = (filteredUserEvidences?.length || 0) + (customEvidences?.length || 0);
+
+  // دالة تحميل جميع الشواهد PDF
+  const handleDownloadAllPDF = async () => {
+    if (!userEvidences || userEvidences.length === 0) {
+      alert("لا توجد شواهد لتحميلها");
+      return;
+    }
+
+    setIsGeneratingPDF(true);
+    setPdfProgress(0);
+
+    try {
+      // محاكاة التقدم (في الواقع يجب استدعاء API)
+      const interval = setInterval(() => {
+        setPdfProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(interval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 500);
+
+      // TODO: استدعاء API لتوليد PDF لجميع الشواهد
+      // const result = await trpc.userEvidences.generateAllPDF.mutate();
+      
+      // محاكاة التحميل (استبدل هذا باستدعاء حقيقي)
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      
+      clearInterval(interval);
+      setPdfProgress(100);
+      
+      // TODO: تحميل الملف
+      alert("تم توليد PDF بنجاح! (ميزة قيد التطوير)");
+      
+      setTimeout(() => {
+        setIsGeneratingPDF(false);
+        setPdfProgress(0);
+      }, 1000);
+    } catch (error) {
+      console.error("خطأ في توليد PDF:", error);
+      alert("حدث خطأ أثناء توليد PDF");
+      setIsGeneratingPDF(false);
+      setPdfProgress(0);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8" dir="rtl">
       <div className="max-w-7xl mx-auto">
-        <Button
-          variant="ghost"
-          onClick={() => setLocation("/")}
-          className="mb-4"
-        >
-          <ArrowRight className="ml-2 h-4 w-4" />
-          العودة للرئيسية
-        </Button>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => setLocation("/")}
+          >
+            <ArrowRight className="ml-2 h-4 w-4" />
+            العودة للرئيسية
+          </Button>
 
+          {userEvidences && userEvidences.length > 0 && (
+            <Button
+              onClick={handleDownloadAllPDF}
+              disabled={isGeneratingPDF}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Download className="ml-2 h-4 w-4" />
+              {isGeneratingPDF ? "جاري التوليد..." : "تحميل PDF لجميع الشواهد"}
+            </Button>
+          )}
+        </div>
+
+        {/* Progress Bar */}
+        {isGeneratingPDF && (
+          <Card className="mb-6 border-green-200 bg-green-50">
+            <CardContent className="pt-6">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-green-900">جاري توليد ملف PDF...</span>
+                  <span className="text-green-700">{pdfProgress}%</span>
+                </div>
+                <Progress value={pdfProgress} className="h-2" />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Title & Stats */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">شواهدي</h1>
           <p className="text-xl text-gray-600">
-            لديك {totalCount} شاهد ({userEvidences?.length || 0} عادي + {customEvidences?.length || 0} خاص)
+            لديك {totalCount} شاهد ({filteredUserEvidences?.length || 0} عادي + {customEvidences?.length || 0} خاص)
           </p>
         </div>
+
+        {/* Filter */}
+        {userEvidences && userEvidences.length > 0 && (
+          <Card className="mb-6">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <Filter className="h-5 w-5 text-gray-600" />
+                <label className="text-sm font-medium text-gray-700">فلترة حسب المعيار:</label>
+                <Select value={filterStandard} onValueChange={setFilterStandard}>
+                  <SelectTrigger className="w-64">
+                    <SelectValue placeholder="جميع المعايير" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">جميع المعايير</SelectItem>
+                    {standards?.map((standard: any) => (
+                      <SelectItem key={standard.id} value={standard.id.toString()}>
+                        المعيار {standard.orderIndex}: {standard.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {filterStandard !== "all" && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setFilterStandard("all")}
+                  >
+                    إعادة تعيين
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* الشواهد الخاصة */}
         {customEvidences && customEvidences.length > 0 && (
@@ -118,18 +241,18 @@ export default function MyEvidences() {
         )}
 
         {/* الشواهد العادية */}
-        {userEvidences && userEvidences.length > 0 && (
+        {filteredUserEvidences && filteredUserEvidences.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-4">
               <FileText className="h-6 w-6 text-blue-600" />
               <h2 className="text-2xl font-bold text-gray-900">الشواهد العادية</h2>
               <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                {userEvidences.length}
+                {filteredUserEvidences.length}
               </Badge>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {userEvidences.map((evidence: any) => (
+              {filteredUserEvidences.map((evidence: any) => (
                 <Card key={evidence.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <CardTitle className="text-lg">{evidence.title || 'شاهد'}</CardTitle>
@@ -187,6 +310,22 @@ export default function MyEvidences() {
                   إنشاء شاهد خاص
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* رسالة عند عدم وجود نتائج بعد الفلترة */}
+        {filterStandard !== "all" && filteredUserEvidences?.length === 0 && userEvidences && userEvidences.length > 0 && (
+          <Card className="text-center p-12 mt-6">
+            <CardContent>
+              <Filter className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+              <h3 className="text-xl font-bold text-gray-900 mb-2">لا توجد شواهد لهذا المعيار</h3>
+              <p className="text-gray-600 mb-6">
+                جرب اختيار معيار آخر أو إعادة تعيين الفلتر
+              </p>
+              <Button onClick={() => setFilterStandard("all")}>
+                عرض جميع الشواهد
+              </Button>
             </CardContent>
           </Card>
         )}

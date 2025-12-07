@@ -113,6 +113,21 @@ export default function Home() {
             </CardContent>
           </Card>
 
+          <Card className="hover:shadow-lg transition-shadow border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-2xl">📈</span>
+                إحصائيات التقدم
+              </CardTitle>
+              <CardDescription>تتبع تقدمك في إكمال الشواهد</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={() => window.location.href = "/progress"}>
+                عرض الإحصائيات
+              </Button>
+            </CardContent>
+          </Card>
+
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle>الملف الشخصي</CardTitle>

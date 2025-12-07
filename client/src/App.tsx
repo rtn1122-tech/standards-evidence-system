@@ -14,6 +14,8 @@ import CreateCustomEvidence from "./pages/CreateCustomEvidence";
 import MyEvidences from "./pages/MyEvidences";
 import OwnerDashboard from "./pages/OwnerDashboard";
 import Standards from "./pages/Standards";
+import StandardDetail from "./pages/StandardDetail";
+import ProgressStats from "./pages/ProgressStats";
 
 function Router() {
   return (
@@ -28,6 +30,8 @@ function Router() {
       <Route path={"/my-evidences"} component={MyEvidences} />
       <Route path={"/owner-dashboard"} component={OwnerDashboard} />
       <Route path={"/standards"} component={Standards} />
+      <Route path={"/standard/:id"} component={StandardDetail} />
+      <Route path={"/progress"} component={ProgressStats} />
 
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
