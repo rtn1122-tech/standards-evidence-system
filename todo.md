@@ -210,3 +210,6 @@
 
 - [x] زر "عرض المعايير" في الصفحة الرئيسية لا يعمل (لا يفتح صفحة) - تم إضافة onClick
 - [x] رسائل خطأ متكررة في الملف الشخصي عند الحفظ (error 1, error 2, error 3...) - تم إصلاح upsertTeacherProfile
+
+- [x] خطأ OAuth callback failed عند تسجيل الدخول - تم إعادة تشغيل السيرفر
+- [x] صفحة /standards غير موجودة (404 error) - تم إنشاء Standards.tsx

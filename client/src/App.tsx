@@ -13,6 +13,7 @@ import RequestPrint from "./pages/RequestPrint";
 import CreateCustomEvidence from "./pages/CreateCustomEvidence";
 import MyEvidences from "./pages/MyEvidences";
 import OwnerDashboard from "./pages/OwnerDashboard";
+import Standards from "./pages/Standards";
 
 function Router() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Route path={"/create-custom-evidence"} component={CreateCustomEvidence} />
       <Route path={"/my-evidences"} component={MyEvidences} />
       <Route path={"/owner-dashboard"} component={OwnerDashboard} />
+      <Route path={"/standards"} component={Standards} />
 
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />

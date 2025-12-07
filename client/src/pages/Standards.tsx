@@ -1,0 +1,90 @@
+import { trpc } from "@/lib/trpc";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
+import { ArrowRight, BookOpen } from "lucide-react";
+
+export default function Standards() {
+  const [, setLocation] = useLocation();
+  const { data: standards, isLoading } = trpc.standards.list.useQuery();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-8">
+        <div className="container max-w-6xl mx-auto">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">جاري تحميل المعايير...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-8">
+      <div className="container max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
+            <BookOpen className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            المعايير المهنية للمعلمين
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            المعايير الـ 11 للأداء المهني للمعلمين في المملكة العربية السعودية
+          </p>
+        </div>
+
+        {/* Standards Grid */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
+          {standards?.map((standard: any) => (
+            <Card 
+              key={standard.id}
+              className="hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-400 cursor-pointer group"
+              onClick={() => setLocation(`/standard/${standard.id}`)}
+            >
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mb-3 group-hover:bg-blue-600 transition-colors">
+                      <span className="text-lg font-bold text-blue-600 group-hover:text-white">
+                        {standard.orderIndex}
+                      </span>
+                    </div>
+                    <CardTitle className="text-xl mb-2 group-hover:text-blue-600 transition-colors">
+                      {standard.title}
+                    </CardTitle>
+                    <CardDescription className="text-sm">
+                      الوزن النسبي: {standard.weight}%
+                    </CardDescription>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600 line-clamp-3">
+                  {standard.description}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Back Button */}
+        <div className="text-center">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => setLocation("/")}
+            className="gap-2"
+          >
+            <ArrowRight className="w-4 h-4 rotate-180" />
+            العودة للرئيسية
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
