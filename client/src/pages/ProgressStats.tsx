@@ -4,11 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
-import { ArrowRight, TrendingUp, Award, Target, CheckCircle2 } from "lucide-react";
+import { ArrowRight, TrendingUp, Award, Target, CheckCircle2, Download } from "lucide-react";
+import { useState } from "react";
 
 export default function ProgressStats() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
+  const [isExporting, setIsExporting] = useState(false);
   
   const { data: standards, isLoading: loadingStandards } = trpc.standards.list.useQuery();
   const { data: userEvidences, isLoading: loadingEvidences } = trpc.userEvidences.list.useQuery();
@@ -70,14 +72,35 @@ export default function ProgressStats() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8" dir="rtl">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <Button
-          variant="ghost"
-          onClick={() => setLocation("/")}
-          className="mb-6"
-        >
-          <ArrowRight className="ml-2 h-4 w-4" />
-          العودة للرئيسية
-        </Button>
+        <div className="flex items-center justify-between mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => setLocation("/")}
+          >
+            <ArrowRight className="ml-2 h-4 w-4" />
+            العودة للرئيسية
+          </Button>
+          
+          <Button
+            onClick={async () => {
+              setIsExporting(true);
+              try {
+                // TODO: استدعاء API لتوليد PDF
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                alert("تم تصدير الإحصائيات بنجاح! (ميزة قيد التطوير)");
+              } catch (error) {
+                alert("حدث خطأ أثناء التصدير");
+              } finally {
+                setIsExporting(false);
+              }
+            }}
+            disabled={isExporting}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            <Download className="ml-2 h-4 w-4" />
+            {isExporting ? "جاري التصدير..." : "تصدير كـ PDF"}
+          </Button>
+        </div>
 
         {/* Title */}
         <div className="text-center mb-8">

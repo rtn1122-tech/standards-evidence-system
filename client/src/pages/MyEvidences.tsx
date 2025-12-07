@@ -6,13 +6,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
-import { ArrowRight, FileText, Sparkles, Trash2, Download, Filter } from "lucide-react";
+import { ArrowRight, FileText, Sparkles, Trash2, Download, Filter, Search } from "lucide-react";
 import { useState } from "react";
+import { Input } from "@/components/ui/input";
 
 export default function MyEvidences() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [filterStandard, setFilterStandard] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [pdfProgress, setPdfProgress] = useState(0);
   
@@ -49,10 +51,20 @@ export default function MyEvidences() {
     );
   }
 
-  // فلترة الشواهد حسب المعيار
-  const filteredUserEvidences = filterStandard === "all" 
+  // فلترة الشواهد حسب المعيار والبحث
+  let filteredUserEvidences = filterStandard === "all" 
     ? userEvidences 
     : userEvidences?.filter((e: any) => e.standardId?.toString() === filterStandard);
+  
+  // تطبيق البحث
+  if (searchQuery.trim()) {
+    const query = searchQuery.toLowerCase();
+    filteredUserEvidences = filteredUserEvidences?.filter((e: any) => {
+      const title = (e.title || '').toLowerCase();
+      const description = (e.description || '').toLowerCase();
+      return title.includes(query) || description.includes(query);
+    });
+  }
 
   const totalCount = (filteredUserEvidences?.length || 0) + (customEvidences?.length || 0);
 
@@ -150,11 +162,34 @@ export default function MyEvidences() {
           </p>
         </div>
 
-        {/* Filter */}
+        {/* Search & Filter */}
         {userEvidences && userEvidences.length > 0 && (
           <Card className="mb-6">
             <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Search Bar */}
+                <div className="flex items-center gap-3">
+                  <Search className="h-5 w-5 text-gray-600" />
+                  <Input
+                    type="text"
+                    placeholder="ابحث في الشواهد (الاسم، الوصف، المعيار)..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="flex-1"
+                  />
+                  {searchQuery && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSearchQuery("")}
+                    >
+                      مسح
+                    </Button>
+                  )}
+                </div>
+                
+                {/* Filter */}
+                <div className="flex items-center gap-4">
                 <Filter className="h-5 w-5 text-gray-600" />
                 <label className="text-sm font-medium text-gray-700">فلترة حسب المعيار:</label>
                 <Select value={filterStandard} onValueChange={setFilterStandard}>
@@ -179,6 +214,7 @@ export default function MyEvidences() {
                     إعادة تعيين
                   </Button>
                 )}
+              </div>
               </div>
             </CardContent>
           </Card>
