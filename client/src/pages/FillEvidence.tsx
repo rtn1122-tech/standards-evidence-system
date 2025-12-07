@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowRight, Save, Loader2, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { ArrowRight, Save, Loader2, X, Upload, Eye, Check } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 
 interface Box {
   title: string;
@@ -26,7 +26,15 @@ export default function FillEvidence() {
     description: "",
     userFieldsData: {} as Record<string, string>,
     page2BoxesData: [] as Box[],
+    image1: null as File | null,
+    image2: null as File | null,
+    image1Preview: "",
+    image2Preview: "",
   });
+
+  const [autoSaveStatus, setAutoSaveStatus] = useState<string>("");
+  const image1InputRef = useRef<HTMLInputElement>(null);
+  const image2InputRef = useRef<HTMLInputElement>(null);
 
   // تحميل البيانات الافتراضية من القالب
   useEffect(() => {
@@ -39,17 +47,63 @@ export default function FillEvidence() {
         console.error("Error parsing page2Boxes:", e);
       }
 
+      // محاولة استعادة البيانات من localStorage
+      const savedData = localStorage.getItem(`evidence_draft_${templateId}`);
+      if (savedData) {
+        try {
+          const parsed = JSON.parse(savedData);
+          setFormData({
+            ...parsed,
+            image1: null,
+            image2: null,
+            image1Preview: parsed.image1Preview || template.defaultImageUrl || "",
+            image2Preview: parsed.image2Preview || "",
+          });
+          setAutoSaveStatus("تم استعادة المسودة المحفوظة");
+          setTimeout(() => setAutoSaveStatus(""), 3000);
+          return;
+        } catch (e) {
+          console.error("Error restoring draft:", e);
+        }
+      }
+
       setFormData({
         description: template.description || "",
         userFieldsData: {},
         page2BoxesData: boxes,
+        image1: null,
+        image2: null,
+        image1Preview: template.defaultImageUrl || "",
+        image2Preview: "",
       });
     }
-  }, [template]);
+  }, [template, templateId]);
+
+  // الحفظ التلقائي كل دقيقة
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (template) {
+        const dataToSave = {
+          description: formData.description,
+          userFieldsData: formData.userFieldsData,
+          page2BoxesData: formData.page2BoxesData,
+          image1Preview: formData.image1Preview,
+          image2Preview: formData.image2Preview,
+        };
+        localStorage.setItem(`evidence_draft_${templateId}`, JSON.stringify(dataToSave));
+        setAutoSaveStatus("تم الحفظ تلقائياً");
+        setTimeout(() => setAutoSaveStatus(""), 2000);
+      }
+    }, 60000); // كل دقيقة
+
+    return () => clearInterval(interval);
+  }, [formData, template, templateId]);
 
   // Mutation للحفظ
   const saveMutation = trpc.userEvidences.create.useMutation({
     onSuccess: () => {
+      // حذف المسودة بعد الحفظ الناجح
+      localStorage.removeItem(`evidence_draft_${templateId}`);
       alert("تم حفظ الشاهد بنجاح");
       navigate("/my-evidences");
     },
@@ -61,14 +115,32 @@ export default function FillEvidence() {
   const handleSave = async () => {
     if (!template) return;
 
+    // رفع الصور إلى S3 إذا كانت موجودة
+    let image1Url = formData.image1Preview;
+    let image2Url = formData.image2Preview;
+
+    if (formData.image1) {
+      // TODO: رفع الصورة إلى S3
+      // في الوقت الحالي، سنستخدم الصورة الافتراضية
+    }
+
+    if (formData.image2) {
+      // TODO: رفع الصورة إلى S3
+    }
+
     saveMutation.mutate({
       templateId: template.id,
       description: formData.description,
       customFields: JSON.stringify(formData.userFieldsData),
       sections: JSON.stringify(formData.page2BoxesData),
-      image1Url: template.defaultImageUrl || null,
-      image2Url: null,
+      image1Url: image1Url || null,
+      image2Url: image2Url || null,
     });
+  };
+
+  const handlePreviewPDF = () => {
+    // TODO: إضافة معاينة PDF
+    alert("معاينة PDF - قيد التطوير");
   };
 
   const updateBoxContent = (index: number, content: string) => {
@@ -85,6 +157,63 @@ export default function FillEvidence() {
         [fieldName]: value,
       },
     });
+  };
+
+  const handleImageChange = (imageNumber: 1 | 2, file: File | null) => {
+    if (!file) return;
+
+    // التحقق من نوع الملف
+    if (!file.type.startsWith("image/")) {
+      alert("يرجى اختيار ملف صورة");
+      return;
+    }
+
+    // التحقق من حجم الملف (أقل من 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("حجم الصورة يجب أن يكون أقل من 5 ميجابايت");
+      return;
+    }
+
+    // إنشاء معاينة
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (imageNumber === 1) {
+        setFormData({
+          ...formData,
+          image1: file,
+          image1Preview: reader.result as string,
+        });
+      } else {
+        setFormData({
+          ...formData,
+          image2: file,
+          image2Preview: reader.result as string,
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = (imageNumber: 1 | 2) => {
+    if (imageNumber === 1) {
+      setFormData({
+        ...formData,
+        image1: null,
+        image1Preview: template?.defaultImageUrl || "",
+      });
+      if (image1InputRef.current) {
+        image1InputRef.current.value = "";
+      }
+    } else {
+      setFormData({
+        ...formData,
+        image2: null,
+        image2Preview: "",
+      });
+      if (image2InputRef.current) {
+        image2InputRef.current.value = "";
+      }
+    }
   };
 
   if (isLoading) {
@@ -132,12 +261,20 @@ export default function FillEvidence() {
               <p className="text-sm text-gray-500">المملكة العربية السعودية</p>
               <h1 className="text-xl font-bold text-gray-800">وزارة التعليم</h1>
             </div>
-            <Link href={`/standard/${template.standardId}`}>
-              <Button variant="outline" size="sm">
-                <ArrowRight className="ml-2 w-4 h-4" />
-                العودة
-              </Button>
-            </Link>
+            <div className="flex items-center gap-3">
+              {autoSaveStatus && (
+                <div className="flex items-center gap-2 text-sm text-green-600">
+                  <Check className="w-4 h-4" />
+                  {autoSaveStatus}
+                </div>
+              )}
+              <Link href={`/standard/${template.standardId}`}>
+                <Button variant="outline" size="sm">
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                  العودة
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -209,6 +346,80 @@ export default function FillEvidence() {
                 </div>
               </div>
             )}
+
+            {/* رفع الصور */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">الصور</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* الصورة الأولى */}
+                <div>
+                  <Label className="mb-2 block">الصورة الأولى</Label>
+                  {formData.image1Preview ? (
+                    <div className="relative">
+                      <img
+                        src={formData.image1Preview}
+                        alt="معاينة الصورة الأولى"
+                        className="w-full h-48 object-cover rounded-lg border-2 border-gray-300"
+                      />
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 left-2"
+                        onClick={() => removeImage(1)}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                      <Upload className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500 mb-2">اضغط لرفع صورة</p>
+                    </div>
+                  )}
+                  <Input
+                    ref={image1InputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageChange(1, e.target.files?.[0] || null)}
+                    className="mt-2"
+                  />
+                </div>
+
+                {/* الصورة الثانية */}
+                <div>
+                  <Label className="mb-2 block">الصورة الثانية (اختياري)</Label>
+                  {formData.image2Preview ? (
+                    <div className="relative">
+                      <img
+                        src={formData.image2Preview}
+                        alt="معاينة الصورة الثانية"
+                        className="w-full h-48 object-cover rounded-lg border-2 border-gray-300"
+                      />
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 left-2"
+                        onClick={() => removeImage(2)}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                      <Upload className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500 mb-2">اضغط لرفع صورة</p>
+                    </div>
+                  )}
+                  <Input
+                    ref={image2InputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageChange(2, e.target.files?.[0] || null)}
+                    className="mt-2"
+                  />
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -241,8 +452,17 @@ export default function FillEvidence() {
           </Card>
         )}
 
-        {/* أزرار الحفظ */}
+        {/* أزرار الحفظ والمعاينة */}
         <div className="flex gap-4 pt-6">
+          <Button
+            onClick={handlePreviewPDF}
+            variant="outline"
+            size="lg"
+            className="flex-1"
+          >
+            <Eye className="ml-2 w-4 h-4" />
+            معاينة PDF
+          </Button>
           <Button
             onClick={handleSave}
             disabled={saveMutation.isPending}
