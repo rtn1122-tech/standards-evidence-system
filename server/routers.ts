@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { router, publicProcedure, protectedProcedure } from "./_core/trpc";
 import * as db from "./db";
+import { notifyOwner } from "./_core/notification";
 
 export const appRouter = router({
   // ========================================
@@ -37,7 +38,7 @@ export const appRouter = router({
           educationDepartment: z.string().optional(),
           schoolName: z.string().optional(),
           principalName: z.string().optional(),
-          educationLevel: z.enum(["elementary", "middle", "high"]).optional(),
+          stage: z.string().optional(), // JSON string للصفوف الدراسية
           subjects: z.string().optional(), // JSON string
           
           // معلومات الرخصة
@@ -377,6 +378,68 @@ export const appRouter = router({
         });
         
         return { success: true, subscriptionEnd };
+      }),
+  }),
+
+  // ========================================
+  // Custom Evidences
+  // ========================================
+  customEvidences: router({
+    create: protectedProcedure
+      .input(
+        z.object({
+          standardId: z.number(),
+          evidenceName: z.string(),
+          description: z.string(),
+          grades: z.array(z.string()), // مصفوفة من أسماء الصفوف
+          subject: z.string().optional(),
+          customFields: z.array(z.any()).optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const result = await db.createCustomEvidence({
+          userId: ctx.user.id,
+          ...input,
+        });
+        
+        // إرسال إشعار للمالك
+        await notifyOwner({
+          title: "طلب شاهد خاص جديد",
+          content: `المعلم: ${ctx.user.name || 'غير محدد'}\nاسم الشاهد: ${input.evidenceName}\nالوصف: ${input.description.substring(0, 200)}...\nالصفوف: ${input.grades.join(', ')}`,
+        }).catch(err => {
+          console.error('فشل إرسال الإشعار:', err);
+        });
+        
+        return result;
+      }),
+
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return await db.listCustomEvidences(ctx.user.id);
+    }),
+
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getCustomEvidence(input.id);
+      }),
+
+    // للمالك فقط
+    listAll: protectedProcedure.query(async ({ ctx }) => {
+      // TODO: إضافة فحص للمالك (ctx.user.role === 'admin')
+      return await db.listAllCustomEvidences();
+    }),
+
+    makePublic: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          ownerNotes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        // TODO: إضافة فحص للمالك (ctx.user.role === 'admin')
+        await db.makeCustomEvidencePublic(input.id, input.ownerNotes);
+        return { success: true };
       }),
   }),
 });

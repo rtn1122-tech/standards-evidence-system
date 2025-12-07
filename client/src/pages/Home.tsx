@@ -76,6 +76,21 @@ export default function Home() {
               </Button>
             </CardContent>
           </Card>
+
+          <Card className="hover:shadow-lg transition-shadow border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-yellow-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-2xl">✨</span>
+                إنشاء شاهد خاص
+              </CardTitle>
+              <CardDescription>أنشئ شاهد مخصص حسب احتياجاتك</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="w-full bg-orange-600 hover:bg-orange-700" onClick={() => window.location.href = "/create-custom-evidence"}>
+                إنشاء شاهد
+              </Button>
+            </CardContent>
+          </Card>
           
           {/* الخدمات الأساسية */}
           <Card className="hover:shadow-lg transition-shadow">
@@ -94,7 +109,7 @@ export default function Home() {
               <CardDescription>عرض الشواهد التي أنشأتها</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full">عرض شواهدي</Button>
+              <Button className="w-full" onClick={() => window.location.href = "/my-evidences"}>عرض شواهدي</Button>
             </CardContent>
           </Card>
 

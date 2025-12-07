@@ -11,6 +11,8 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Upload, User } from "lucide-react";
 
+import { STAGES, SUBJECTS as ALL_SUBJECTS } from "../../../shared/constants";
+
 const SUBJECTS = [
   "الرياضيات",
   "العلوم",
@@ -42,7 +44,7 @@ export default function ProfileSetup() {
     educationDepartment: "",
     schoolName: "",
     principalName: "",
-    educationLevel: "elementary" as "elementary" | "middle" | "high",
+    grades: [] as string[], // الصفوف الدراسية
     subjects: [] as string[],
     
     // معلومات الرخصة المهنية
@@ -69,7 +71,7 @@ export default function ProfileSetup() {
         educationDepartment: profile.educationDepartment || "",
         schoolName: profile.schoolName || "",
         principalName: profile.principalName || "",
-        educationLevel: profile.educationLevel || "elementary",
+        grades: profile.stage ? (typeof profile.stage === 'string' && profile.stage.startsWith('[') ? JSON.parse(profile.stage) : [profile.stage]) : [],
         subjects: profile.subjects ? JSON.parse(profile.subjects) : [],
         licenseNumber: profile.licenseNumber || "",
         licenseIssueDate: profile.licenseIssueDate || "",
@@ -105,6 +107,13 @@ export default function ProfileSetup() {
     reader.readAsDataURL(file);
   };
 
+  const handleGradeToggle = (grade: string) => {
+    const newGrades = formData.grades.includes(grade)
+      ? formData.grades.filter(g => g !== grade)
+      : [...formData.grades, grade];
+    setFormData({ ...formData, grades: newGrades });
+  };
+
   const handleSubjectToggle = (subject: string) => {
     const newSubjects = formData.subjects.includes(subject)
       ? formData.subjects.filter(s => s !== subject)
@@ -116,6 +125,7 @@ export default function ProfileSetup() {
     e.preventDefault();
     upsertMutation.mutate({
       ...formData,
+      stage: JSON.stringify(formData.grades),
       subjects: JSON.stringify(formData.subjects),
     });
   };
@@ -270,21 +280,22 @@ export default function ProfileSetup() {
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="educationLevel">المرحلة الدراسية *</Label>
-                    <Select
-                      value={formData.educationLevel}
-                      onValueChange={(value) => setFormData({ ...formData, educationLevel: value as any })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="elementary">ابتدائي</SelectItem>
-                        <SelectItem value="middle">متوسط</SelectItem>
-                        <SelectItem value="high">ثانوي</SelectItem>
-                      </SelectContent>
-                    </Select>
+
+                </div>
+
+                <div className="space-y-2">
+                  <Label>الصفوف الدراسية * (اختر صف أو أكثر)</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-lg">
+                    {STAGES.map((grade) => (
+                      <div key={grade} className="flex items-center gap-2">
+                        <Checkbox
+                          id={grade}
+                          checked={formData.grades.includes(grade)}
+                          onCheckedChange={() => handleGradeToggle(grade)}
+                        />
+                        <Label htmlFor={grade} className="cursor-pointer">{grade}</Label>
+                      </div>
+                    ))}
                   </div>
                 </div>
 

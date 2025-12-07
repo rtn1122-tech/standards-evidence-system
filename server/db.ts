@@ -381,3 +381,69 @@ export async function getPrintOrder(orderId: number, userId: number) {
   
   return result[0]?.[0] || null;
 }
+
+// ========================================
+// Custom Evidences
+// ========================================
+
+export async function createCustomEvidence(data: {
+  userId: number;
+  standardId: number;
+  evidenceName: string;
+  description: string;
+  grades: string[]; // Array of grade names
+  subject?: string;
+  customFields?: any[];
+}) {
+  const result: any = await db.execute(
+    sql`INSERT INTO customEvidences (userId, standardId, evidenceName, description, grades, subject, customFields, status)
+        VALUES (${data.userId}, ${data.standardId}, ${data.evidenceName}, ${data.description}, ${JSON.stringify(data.grades)}, ${data.subject || null}, ${JSON.stringify(data.customFields || [])}, 'pending')`
+  );
+  
+  return { id: Number(result[0].insertId), status: "pending" };
+}
+
+export async function listCustomEvidences(userId: number) {
+  const result: any = await db.execute(
+    sql`SELECT * FROM customEvidences WHERE userId = ${userId} ORDER BY createdAt DESC`
+  );
+  
+  return result[0] || [];
+}
+
+export async function listAllCustomEvidences() {
+  const result: any = await db.execute(
+    sql`SELECT ce.*, u.name as userName, u.email as userEmail 
+        FROM customEvidences ce 
+        LEFT JOIN users u ON ce.userId = u.id 
+        ORDER BY ce.createdAt DESC`
+  );
+  
+  return result[0] || [];
+}
+
+export async function listPublicCustomEvidences() {
+  const result: any = await db.execute(
+    sql`SELECT * FROM customEvidences WHERE isPublic = TRUE ORDER BY createdAt DESC`
+  );
+  
+  return result[0] || [];
+}
+
+export async function makeCustomEvidencePublic(id: number, ownerNotes?: string) {
+  await db.execute(
+    sql`UPDATE customEvidences 
+        SET isPublic = TRUE, ownerNotes = ${ownerNotes || null}, reviewedAt = NOW() 
+        WHERE id = ${id}`
+  );
+}
+
+
+
+export async function getCustomEvidence(id: number) {
+  const result: any = await db.execute(
+    sql`SELECT * FROM customEvidences WHERE id = ${id} LIMIT 1`
+  );
+  
+  return result[0]?.[0] || null;
+}

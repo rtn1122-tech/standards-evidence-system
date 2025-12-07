@@ -10,6 +10,9 @@ import LandingPage from "./pages/LandingPage";
 import About from "./pages/About";
 import RequestCustomService from "./pages/RequestCustomService";
 import RequestPrint from "./pages/RequestPrint";
+import CreateCustomEvidence from "./pages/CreateCustomEvidence";
+import MyEvidences from "./pages/MyEvidences";
+import OwnerDashboard from "./pages/OwnerDashboard";
 
 function Router() {
   return (
@@ -20,6 +23,9 @@ function Router() {
       <Route path={"/profile-setup"} component={ProfileSetup} />
       <Route path={"/request-custom-service"} component={RequestCustomService} />
       <Route path={"/request-print"} component={RequestPrint} />
+      <Route path={"/create-custom-evidence"} component={CreateCustomEvidence} />
+      <Route path={"/my-evidences"} component={MyEvidences} />
+      <Route path={"/owner-dashboard"} component={OwnerDashboard} />
 
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />

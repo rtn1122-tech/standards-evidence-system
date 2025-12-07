@@ -260,3 +260,36 @@ export const printOrders = mysqlTable("printOrders", {
 
 export type PrintOrder = typeof printOrders.$inferSelect;
 export type InsertPrintOrder = typeof printOrders.$inferInsert;
+
+/**
+ * Custom evidences - teacher-created custom evidence requests
+ * الشواهد الخاصة - شواهد مخصصة ينشئها المعلم
+ */
+export const customEvidences = mysqlTable("customEvidences", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // المعلم الذي أنشأ الشاهد
+  standardId: int("standardId").notNull(), // المعيار (1-11)
+  
+  // معلومات الشاهد
+  evidenceName: varchar("evidenceName", { length: 255 }).notNull(), // اسم الشاهد
+  description: text("description").notNull(), // الوصف
+  grades: text("grades").notNull(), // الصفوف المناسبة (JSON array)
+  subject: varchar("subject", { length: 255 }), // المادة
+  
+  // حقول إضافية يريدها المعلم
+  customFields: text("customFields"), // JSON array of {name, type, required}
+  
+  // هل الشاهد عام أم خاص
+  isPublic: boolean("isPublic").default(false).notNull(), // false = خاص بالمعلم, true = عام للجميع
+  
+  // حالة المراجعة (دائماً approved للاستخدام الفوري)
+  status: mysqlEnum("status", ["pending", "approved", "rejected"]).default("approved").notNull(),
+  ownerNotes: text("ownerNotes"), // ملاحظات المالك
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  reviewedAt: timestamp("reviewedAt"), // تاريخ المراجعة
+});
+
+export type CustomEvidence = typeof customEvidences.$inferSelect;
+export type InsertCustomEvidence = typeof customEvidences.$inferInsert;
