@@ -11,20 +11,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Upload, User } from "lucide-react";
 
-import { STAGES, SUBJECTS as ALL_SUBJECTS } from "../../../shared/constants";
-
-const SUBJECTS = [
-  "الرياضيات",
-  "العلوم",
-  "اللغة العربية",
-  "اللغة الإنجليزية",
-  "التربية الإسلامية",
-  "الاجتماعيات",
-  "الحاسب الآلي",
-  "التربية الفنية",
-  "التربية البدنية",
-  "التربية الأسرية",
-];
+import { STAGES, SUBJECTS } from "../../../shared/constants";
 
 export default function ProfileSetup() {
   const { user } = useAuth();
