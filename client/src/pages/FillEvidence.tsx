@@ -139,8 +139,24 @@ export default function FillEvidence() {
   };
 
   const handlePreviewPDF = () => {
-    // TODO: إضافة معاينة PDF
-    alert("معاينة PDF - قيد التطوير");
+    if (!template) return;
+
+    // حفظ البيانات في localStorage للمعاينة
+    const previewData = {
+      templateId: template.id,
+      evidenceName: template.evidenceName,
+      subEvidenceName: template.subEvidenceName,
+      description: formData.description,
+      userFieldsData: formData.userFieldsData,
+      page2BoxesData: formData.page2BoxesData,
+      image1Preview: formData.image1Preview,
+      image2Preview: formData.image2Preview,
+    };
+    
+    localStorage.setItem(`evidence_preview_${template.id}`, JSON.stringify(previewData));
+    
+    // فتح صورة معاينة الثيمات في تبويب جديد
+    window.open(`/preview-themes?templateId=${template.id}`, '_blank');
   };
 
   const updateBoxContent = (index: number, content: string) => {
