@@ -64,7 +64,7 @@ interface EvidenceData {
 }
 
 // Generate standard page (placeholder - white page with text)
-async function generateStandardPage(data: {
+export async function generateStandardPage(data: {
   standardName: string;
   standardDescription: string;
   standardNumber: number;
