@@ -203,8 +203,8 @@ export const appRouter = router({
             title: z.string(),
             content: z.string(),
           })),
-          image1Url: z.string().optional(),
-          image2Url: z.string().optional(),
+          image1Url: z.string().nullable().optional(),
+          image2Url: z.string().nullable().optional(),
           selectedTheme: z.string(),
         })
       )
@@ -225,8 +225,8 @@ export const appRouter = router({
         z.object({
           templateId: z.number(),
           userData: z.string(), // JSON
-          image1Url: z.string().optional(),
-          image2Url: z.string().optional(),
+          image1Url: z.string().nullable().optional(),
+          image2Url: z.string().nullable().optional(),
           selectedTheme: z.string().optional(),
         })
       )

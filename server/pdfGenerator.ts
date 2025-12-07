@@ -11,8 +11,8 @@ interface PDFData {
   description: string;
   userFieldsData: Record<string, unknown>;
   page2BoxesData: Box[];
-  image1Url?: string;
-  image2Url?: string;
+  image1Url?: string | null;
+  image2Url?: string | null;
   selectedTheme: string;
 }
 
