@@ -99,7 +99,7 @@ export default function Home() {
               <CardDescription>عرض جميع المعايير الـ 11</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full">عرض المعايير</Button>
+              <Button className="w-full" onClick={() => window.location.href = "/standards"}>عرض المعايير</Button>
             </CardContent>
           </Card>
 

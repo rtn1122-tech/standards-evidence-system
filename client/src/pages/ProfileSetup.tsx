@@ -91,6 +91,10 @@ export default function ProfileSetup() {
       utils.teacherProfile.get.invalidate();
       setLocation("/");
     },
+    onError: (error) => {
+      console.error("خطأ في حفظ البيانات:", error);
+      // منع رسائل الخطأ المتكررة
+    },
   });
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

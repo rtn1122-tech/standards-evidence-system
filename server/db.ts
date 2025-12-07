@@ -38,44 +38,43 @@ export async function getTeacherProfile(userId: number) {
 export async function upsertTeacherProfile(data: any) {
   const existing = await getTeacherProfile(data.userId);
   
+  // تحويل الحقول إلى أسماء الأعمدة الصحيحة
+  const profileData: any = {
+    userId: data.userId,
+    educationDepartment: data.educationDepartment,
+    schoolName: data.schoolName,
+    teacherName: data.teacherName,
+    principalName: data.principalName,
+    gender: data.gender,
+    stage: data.stage, // JSON string للصفوف الدراسية
+    subjects: data.subjects, // JSON string
+    email: data.email,
+    phoneNumber: data.phone, // phone -> phoneNumber
+    professionalLicenseNumber: data.licenseNumber, // licenseNumber -> professionalLicenseNumber
+    licenseStartDate: data.licenseIssueDate, // licenseIssueDate -> licenseStartDate
+    licenseEndDate: data.licenseExpiryDate, // licenseExpiryDate -> licenseEndDate
+    selectedTheme: data.preferredTheme, // preferredTheme -> selectedTheme
+  };
+  
+  // حذف الحقول undefined
+  Object.keys(profileData).forEach(key => {
+    if (profileData[key] === undefined) {
+      delete profileData[key];
+    }
+  });
+  
   if (existing) {
     // Update existing profile
-    const fields = Object.keys(data)
-      .filter(key => key !== 'userId' && data[key] !== undefined)
-      .map(key => `${key} = ?`)
-      .join(', ');
+    await db
+      .update(schema.teacherProfiles)
+      .set(profileData)
+      .where(eq(schema.teacherProfiles.userId, data.userId));
     
-    const values = Object.keys(data)
-      .filter(key => key !== 'userId' && data[key] !== undefined)
-      .map(key => data[key]);
-    
-    if (fields) {
-      await db.execute(
-        `UPDATE users SET ${fields} WHERE id = ?`,
-        [...values, data.userId]
-      );
-    }
-    
-    return { ...existing, ...data };
+    return { ...existing, ...profileData };
   } else {
-    // For new profiles, just update the user record
-    const fields = Object.keys(data)
-      .filter(key => key !== 'userId' && data[key] !== undefined)
-      .map(key => `${key} = ?`)
-      .join(', ');
-    
-    const values = Object.keys(data)
-      .filter(key => key !== 'userId' && data[key] !== undefined)
-      .map(key => data[key]);
-    
-    if (fields) {
-      await db.execute(
-        `UPDATE users SET ${fields} WHERE id = ?`,
-        [...values, data.userId]
-      );
-    }
-    
-    return { id: data.userId, ...data };
+    // Insert new profile
+    await db.insert(schema.teacherProfiles).values(profileData);
+    return profileData;
   }
 }
 
