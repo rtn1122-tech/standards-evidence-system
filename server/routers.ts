@@ -4,6 +4,9 @@ import * as db from "./db";
 import { notifyOwner } from "./_core/notification";
 import { createDatabaseBackup } from "./backup";
 import { TRPCError } from "@trpc/server";
+import { storagePut } from "./storage";
+import crypto from "crypto";
+import { generatePDF } from "./pdfGenerator";
 
 export const appRouter = router({
   // ========================================
@@ -165,22 +168,98 @@ export const appRouter = router({
         return await db.getUserEvidence(input.id);
       }),
 
+    uploadImage: protectedProcedure
+      .input(
+        z.object({
+          imageData: z.string(), // base64
+          fileName: z.string(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        // تحويل base64 إلى buffer
+        const base64Data = input.imageData.replace(/^data:image\/\w+;base64,/, "");
+        const buffer = Buffer.from(base64Data, 'base64');
+        
+        // توليد اسم ملف فريد
+        const randomSuffix = crypto.randomBytes(8).toString('hex');
+        const ext = input.fileName.split('.').pop() || 'jpg';
+        const fileKey = `evidence-images/${ctx.user.id}/${Date.now()}-${randomSuffix}.${ext}`;
+        
+        // رفع إلى S3
+        const mimeType = input.imageData.match(/^data:([^;]+);/)?.[1] || 'image/jpeg';
+        const result = await storagePut(fileKey, buffer, mimeType);
+        
+        return { url: result.url, key: fileKey };
+      }),
+
+    generatePDF: protectedProcedure
+      .input(
+        z.object({
+          evidenceName: z.string(),
+          subEvidenceName: z.string().optional(),
+          description: z.string(),
+          userFieldsData: z.record(z.string(), z.unknown()),
+          page2BoxesData: z.array(z.object({
+            title: z.string(),
+            content: z.string(),
+          })),
+          image1Url: z.string().optional(),
+          image2Url: z.string().optional(),
+          selectedTheme: z.string(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        // توليد PDF
+        const pdfBuffer = await generatePDF(input);
+        
+        // رفع PDF إلى S3
+        const randomSuffix = crypto.randomBytes(8).toString('hex');
+        const fileKey = `evidence-pdfs/${ctx.user.id}/${Date.now()}-${randomSuffix}.pdf`;
+        const result = await storagePut(fileKey, pdfBuffer, 'application/pdf');
+        
+        return { url: result.url, key: fileKey };
+      }),
+
     create: protectedProcedure
       .input(
         z.object({
           templateId: z.number(),
           userData: z.string(), // JSON
-          customImageUrl: z.string().optional(),
-          themeId: z.number().optional(),
-          coverThemeId: z.number().optional(),
+          image1Url: z.string().optional(),
+          image2Url: z.string().optional(),
+          selectedTheme: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
         // Increment template usage count
         await db.incrementTemplateUsage(input.templateId);
         
+        // توليد PDF
+        const template = await db.getEvidenceTemplate(input.templateId);
+        const userData = JSON.parse(input.userData);
+        
+        const pdfData = {
+          evidenceName: template.evidenceName,
+          subEvidenceName: template.subEvidenceName || undefined,
+          description: userData.description,
+          userFieldsData: userData.userFieldsData,
+          page2BoxesData: userData.page2BoxesData,
+          image1Url: input.image1Url,
+          image2Url: input.image2Url,
+          selectedTheme: input.selectedTheme || 'classic',
+        };
+        
+        const pdfBuffer = await generatePDF(pdfData);
+        
+        // رفع PDF إلى S3
+        const randomSuffix = crypto.randomBytes(8).toString('hex');
+        const fileKey = `evidence-pdfs/${ctx.user.id}/${Date.now()}-${randomSuffix}.pdf`;
+        const pdfResult = await storagePut(fileKey, pdfBuffer, 'application/pdf');
+        
         return await db.createUserEvidence({
           userId: ctx.user.id,
+          customImageUrl: input.image1Url,
+          pdfUrl: pdfResult.url,
           ...input,
         } as any);
       }),

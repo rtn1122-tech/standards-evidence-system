@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
-import { ArrowRight, FileText, Sparkles, Trash2, Download, Filter, Search } from "lucide-react";
+import { ArrowRight, FileText, Sparkles, Trash2, Download, Filter, Search, Edit } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 
@@ -305,8 +305,29 @@ export default function MyEvidences() {
                       >
                         عرض
                       </Button>
-                      <Button 
-                        size="sm" 
+                      {/* زر تحميل PDF */}
+                      {evidence.pdfUrl && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => window.open(evidence.pdfUrl, '_blank')}
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      )}
+                      
+                      {/* زر تعديل */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setLocation(`/evidence/edit/${evidence.id}`)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      
+                      {/* زر حذف */}
+                      <Button
+                        size="sm"
                         variant="destructive"
                         onClick={() => {
                           if (confirm('هل أنت متأكد من حذف هذا الشاهد؟')) {

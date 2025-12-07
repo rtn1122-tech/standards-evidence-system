@@ -30,6 +30,8 @@ export default function FillEvidence() {
     image2: null as File | null,
     image1Preview: "",
     image2Preview: "",
+    image1Url: "",
+    image2Url: "",
   });
 
   const [autoSaveStatus, setAutoSaveStatus] = useState<string>("");
@@ -115,26 +117,19 @@ export default function FillEvidence() {
   const handleSave = async () => {
     if (!template) return;
 
-    // رفع الصور إلى S3 إذا كانت موجودة
-    let image1Url = formData.image1Preview;
-    let image2Url = formData.image2Preview;
-
-    if (formData.image1) {
-      // TODO: رفع الصورة إلى S3
-      // في الوقت الحالي، سنستخدم الصورة الافتراضية
-    }
-
-    if (formData.image2) {
-      // TODO: رفع الصورة إلى S3
-    }
+    // استخدام روابط S3 المحفوظة (تم رفعها مسبقاً)
+    const selectedTheme = localStorage.getItem(`selected_theme_${template.id}`) || 'classic';
 
     saveMutation.mutate({
       templateId: template.id,
-      description: formData.description,
-      customFields: JSON.stringify(formData.userFieldsData),
-      sections: JSON.stringify(formData.page2BoxesData),
-      image1Url: image1Url || null,
-      image2Url: image2Url || null,
+      userData: JSON.stringify({
+        description: formData.description,
+        userFieldsData: formData.userFieldsData,
+        page2BoxesData: formData.page2BoxesData,
+      }),
+      image1Url: formData.image1Url || formData.image1Preview || null,
+      image2Url: formData.image2Url || formData.image2Preview || null,
+      selectedTheme,
     });
   };
 
@@ -175,7 +170,9 @@ export default function FillEvidence() {
     });
   };
 
-  const handleImageChange = (imageNumber: 1 | 2, file: File | null) => {
+  const uploadImageMutation = trpc.userEvidences.uploadImage.useMutation();
+
+  const handleImageChange = async (imageNumber: 1 | 2, file: File | null) => {
     if (!file) return;
 
     // التحقق من نوع الملف
@@ -192,19 +189,40 @@ export default function FillEvidence() {
 
     // إنشاء معاينة
     const reader = new FileReader();
-    reader.onloadend = () => {
+    reader.onloadend = async () => {
+      const base64 = reader.result as string;
+      
+      // معاينة فورية
       if (imageNumber === 1) {
-        setFormData({
-          ...formData,
+        setFormData(prev => ({
+          ...prev,
           image1: file,
-          image1Preview: reader.result as string,
-        });
+          image1Preview: base64,
+        }));
       } else {
-        setFormData({
-          ...formData,
+        setFormData(prev => ({
+          ...prev,
           image2: file,
-          image2Preview: reader.result as string,
+          image2Preview: base64,
+        }));
+      }
+      
+      // رفع إلى S3 في الخلفية
+      try {
+        const result = await uploadImageMutation.mutateAsync({
+          imageData: base64,
+          fileName: file.name,
         });
+        
+        // حفظ رابط S3
+        if (imageNumber === 1) {
+          setFormData(prev => ({ ...prev, image1Url: result.url }));
+        } else {
+          setFormData(prev => ({ ...prev, image2Url: result.url }));
+        }
+      } catch (error) {
+        console.error('خطأ في رفع الصورة:', error);
+        alert('فشل رفع الصورة. حاول مرة أخرى.');
       }
     };
     reader.readAsDataURL(file);

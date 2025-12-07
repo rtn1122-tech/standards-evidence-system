@@ -34,9 +34,8 @@ function Router() {
       <Route path={"/admin"} component={AdminPanel} />
       <Route path={"/standards"} component={Standards} />
       <Route path={"/standard/:id"} component={StandardDetail} />
-      <Route path={"/progress"} component={ProgressStats} />
-      <Route path={"/evidence/fill/:id"} component={FillEvidence} />
-      <Route path={"/preview-themes"} component={PreviewThemes} />
+      <Route path={"/progress"} component={ProgressStats} />          <Route path="/evidence/fill/:id" component={FillEvidence} />
+          <Route path="/evidence/edit/:id" component={FillEvidence} />      <Route path={"/preview-themes"} component={PreviewThemes} />
 
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
