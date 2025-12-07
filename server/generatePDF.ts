@@ -63,6 +63,79 @@ interface EvidenceData {
   educationDepartment: string;
 }
 
+// Generate standard page (placeholder - white page with text)
+async function generateStandardPage(data: {
+  standardName: string;
+  standardDescription: string;
+  standardNumber: number;
+}): Promise<string> {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: white;
+          width: 210mm;
+          height: 297mm;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          padding: 40mm;
+        }
+        
+        .standard-number {
+          font-size: 16px;
+          color: #6b7280;
+          margin-bottom: 20px;
+          text-align: center;
+        }
+        
+        .standard-title {
+          font-size: 32px;
+          font-weight: bold;
+          color: #1e3a8a;
+          text-align: center;
+          margin-bottom: 15px;
+          line-height: 1.4;
+        }
+        
+        .divider {
+          width: 100px;
+          height: 3px;
+          background: #f59e0b;
+          margin: 0 auto 30px;
+        }
+        
+        .standard-description {
+          font-size: 16px;
+          color: #374151;
+          text-align: center;
+          line-height: 1.9;
+          max-width: 600px;
+          direction: rtl;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="standard-number">المعيار ${data.standardNumber}</div>
+      <div class="standard-title">${data.standardName}</div>
+      <div class="divider"></div>
+      <div class="standard-description">${data.standardDescription}</div>
+    </body>
+    </html>
+  `;
+}
+
 export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
   // Convert images to base64
   const image1Base64 = data.image1Url ? await imageUrlToBase64(data.image1Url) : '';
