@@ -3,22 +3,34 @@ import mysql from "mysql2/promise";
 import { eq, and, or, sql } from "drizzle-orm";
 import * as schema from "../drizzle/schema";
 
-let db: any;
-let dbPromise: Promise<any> | null = null;
+// Create connection pool with automatic reconnection
+const pool = mysql.createPool({
+  uri: process.env.DATABASE_URL!,
+  waitForConnections: true,
+  connectionLimit: 10,
+  maxIdle: 10,
+  idleTimeout: 60000,
+  queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0,
+});
+
+// Initialize Drizzle with the pool
+const db = drizzle(pool, { schema, mode: "default" });
+
+// Test connection on startup
+pool.getConnection()
+  .then((conn) => {
+    console.log('[DB] Connection pool initialized successfully');
+    conn.release();
+  })
+  .catch((err) => {
+    console.error('[DB] Failed to initialize connection pool:', err);
+  });
 
 export async function initDb() {
-  if (!dbPromise) {
-    dbPromise = (async () => {
-      const connection = await mysql.createConnection(process.env.DATABASE_URL!);
-      db = drizzle(connection, { schema, mode: "default" });
-      return db;
-    })();
-  }
-  return dbPromise;
+  return db;
 }
-
-// Initialize immediately
-initDb().catch(console.error);
 
 export { db };
 
