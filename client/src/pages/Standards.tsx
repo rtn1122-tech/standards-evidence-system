@@ -42,8 +42,7 @@ export default function Standards() {
           {standards?.map((standard: any) => (
             <Card 
               key={standard.id}
-              className="hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-400 cursor-pointer group"
-              onClick={() => setLocation(`/standard/${standard.id}`)}
+              className="hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-400 group"
             >
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -60,7 +59,7 @@ export default function Standards() {
                       الوزن النسبي: {standard.weight}%
                     </CardDescription>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+
                 </div>
               </CardHeader>
               <CardContent>
