@@ -17,6 +17,7 @@ import Standards from "./pages/Standards";
 import StandardDetail from "./pages/StandardDetail";
 import ProgressStats from "./pages/ProgressStats";
 import AdminPanel from "./pages/AdminPanel";
+import FillEvidence from "./pages/FillEvidence";
 
 function Router() {
   return (
@@ -33,6 +34,7 @@ function Router() {
       <Route path={"/standards"} component={Standards} />
       <Route path={"/standard/:id"} component={StandardDetail} />
       <Route path={"/progress"} component={ProgressStats} />
+      <Route path={"/evidence/fill/:id"} component={FillEvidence} />
 
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
