@@ -458,3 +458,64 @@ export async function getCustomEvidence(id: number) {
   
   return result[0]?.[0] || null;
 }
+
+
+// ========================================
+// Admin Functions
+// ========================================
+
+export async function getAllUsers() {
+  const result: any = await db.execute(
+    sql`SELECT 
+          u.id, 
+          u.name, 
+          u.email, 
+          u.role,
+          u.createdAt,
+          tp.teacherName,
+          tp.schoolName,
+          tp.educationDepartment,
+          tp.licenseNumber
+        FROM users u
+        LEFT JOIN teacherProfiles tp ON u.id = tp.userId
+        ORDER BY u.createdAt DESC`
+  );
+  
+  return result[0] || [];
+}
+
+export async function getUserStatistics(userId: number) {
+  // عدد الشواهد العادية
+  const evidencesResult: any = await db.execute(
+    sql`SELECT COUNT(*) as count FROM userEvidences WHERE userId = ${userId}`
+  );
+  const evidencesCount = evidencesResult[0]?.[0]?.count || 0;
+
+  // عدد الشواهد الخاصة
+  const customEvidencesResult: any = await db.execute(
+    sql`SELECT COUNT(*) as count FROM customEvidences WHERE userId = ${userId}`
+  );
+  const customEvidencesCount = customEvidencesResult[0]?.[0]?.count || 0;
+
+  // التقدم حسب المعيار
+  const progressResult: any = await db.execute(
+    sql`SELECT 
+          s.id as standardId,
+          s.title as standardTitle,
+          COUNT(DISTINCT ue.templateId) as completedCount,
+          (SELECT COUNT(*) FROM evidenceTemplates WHERE standardId = s.id) as totalCount
+        FROM standards s
+        LEFT JOIN evidenceTemplates et ON s.id = et.standardId
+        LEFT JOIN userEvidences ue ON et.id = ue.templateId AND ue.userId = ${userId}
+        GROUP BY s.id, s.title
+        ORDER BY s.orderIndex`
+  );
+
+  return {
+    userId,
+    evidencesCount,
+    customEvidencesCount,
+    totalCount: evidencesCount + customEvidencesCount,
+    progressByStandard: progressResult[0] || [],
+  };
+}

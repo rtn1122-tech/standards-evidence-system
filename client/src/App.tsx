@@ -16,6 +16,7 @@ import OwnerDashboard from "./pages/OwnerDashboard";
 import Standards from "./pages/Standards";
 import StandardDetail from "./pages/StandardDetail";
 import ProgressStats from "./pages/ProgressStats";
+import AdminPanel from "./pages/AdminPanel";
 
 function Router() {
   return (
@@ -27,8 +28,8 @@ function Router() {
       <Route path={"/request-custom-service"} component={RequestCustomService} />
       <Route path={"/request-print"} component={RequestPrint} />
       <Route path={"/create-custom-evidence"} component={CreateCustomEvidence} />
-      <Route path={"/my-evidences"} component={MyEvidences} />
-      <Route path={"/owner-dashboard"} component={OwnerDashboard} />
+      <Route path={"/my-evidences"} component={MyEvidences} />      <Route path={"/ owner-dashboard"} component={OwnerDashboard} />
+      <Route path={"/admin"} component={AdminPanel} />
       <Route path={"/standards"} component={Standards} />
       <Route path={"/standard/:id"} component={StandardDetail} />
       <Route path={"/progress"} component={ProgressStats} />

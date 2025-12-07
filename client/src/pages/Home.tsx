@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
-import { User, Save, X, ArrowLeft, BookOpen, FileText, Sparkles, Printer, Palette, TrendingUp } from "lucide-react";
+import { User, Save, X, ArrowLeft, BookOpen, FileText, Sparkles, Printer, Palette, TrendingUp, Shield } from "lucide-react";
 
 export default function Home() {
   const { user } = useAuth();
@@ -208,6 +208,29 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
+
+        {/* لوحة الإدارة - للمشرفين فقط */}
+        {user.role === "admin" && (
+          <Card className="hover:shadow-lg transition-shadow border-2 border-red-200 bg-gradient-to-br from-red-50 to-pink-50 cursor-pointer"
+                onClick={() => window.location.href = "/admin"}>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center">
+                    <Shield className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl">🛡️ لوحة الإدارة</CardTitle>
+                    <CardDescription>إدارة المستخدمين والنسخ الاحتياطي</CardDescription>
+                  </div>
+                </div>
+                <Button className="bg-red-600 hover:bg-red-700">
+                  فتح لوحة الإدارة
+                </Button>
+              </div>
+            </CardHeader>
+          </Card>
+        )}
 
         {/* إحصائيات التقدم */}
         <Card className="hover:shadow-lg transition-shadow border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50 cursor-pointer"

@@ -2,6 +2,8 @@ import { z } from "zod";
 import { router, publicProcedure, protectedProcedure } from "./_core/trpc";
 import * as db from "./db";
 import { notifyOwner } from "./_core/notification";
+import { createDatabaseBackup } from "./backup";
+import { TRPCError } from "@trpc/server";
 
 export const appRouter = router({
   // ========================================
@@ -440,6 +442,42 @@ export const appRouter = router({
         // TODO: إضافة فحص للمالك (ctx.user.role === 'admin')
         await db.makeCustomEvidencePublic(input.id, input.ownerNotes);
         return { success: true };
+      }),
+  }),
+
+  // ========================================
+  // Admin Panel
+  // ========================================
+  admin: router({
+    // النسخ الاحتياطي
+    createBackup: protectedProcedure.mutation(async ({ ctx }) => {
+      // التحقق من صلاحيات المشرف
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+
+      const result = await createDatabaseBackup();
+      return result;
+    }),
+
+    // قائمة جميع المستخدمين
+    listUsers: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+
+      return await db.getAllUsers();
+    }),
+
+    // إحصائيات مستخدم معين
+    getUserStats: protectedProcedure
+      .input(z.object({ userId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+
+        return await db.getUserStatistics(input.userId);
       }),
   }),
 });
