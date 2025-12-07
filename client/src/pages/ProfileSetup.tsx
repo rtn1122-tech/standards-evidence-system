@@ -11,7 +11,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Upload, User } from "lucide-react";
 
-import { STAGES, SUBJECTS } from "../../../shared/constants";
+import { STAGES, getSubjectsForGrades } from "../../../shared/constants";
 
 export default function ProfileSetup() {
   const { user } = useAuth();
@@ -292,18 +292,24 @@ export default function ProfileSetup() {
 
                 <div className="space-y-2">
                   <Label>مواد التدريس * (اختر واحدة أو أكثر)</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-lg">
-                    {SUBJECTS.map((subject) => (
-                      <div key={subject} className="flex items-center gap-2">
-                        <Checkbox
-                          id={subject}
-                          checked={formData.subjects.includes(subject)}
-                          onCheckedChange={() => handleSubjectToggle(subject)}
-                        />
-                        <Label htmlFor={subject} className="cursor-pointer">{subject}</Label>
-                      </div>
-                    ))}
-                  </div>
+                  {formData.grades.length === 0 ? (
+                    <div className="p-6 bg-yellow-50 border-2 border-yellow-200 rounded-lg text-center">
+                      <p className="text-yellow-800 font-medium">⚠️ يرجى اختيار المرحلة الدراسية أولاً لعرض المواد المناسبة</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-lg max-h-96 overflow-y-auto">
+                      {getSubjectsForGrades(formData.grades).map((subject) => (
+                        <div key={subject} className="flex items-center gap-2">
+                          <Checkbox
+                            id={subject}
+                            checked={formData.subjects.includes(subject)}
+                            onCheckedChange={() => handleSubjectToggle(subject)}
+                          />
+                          <Label htmlFor={subject} className="cursor-pointer">{subject}</Label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
