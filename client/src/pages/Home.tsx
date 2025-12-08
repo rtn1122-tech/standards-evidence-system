@@ -103,10 +103,14 @@ export default function Home() {
           
           {profile && (
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                 <div>
                   <p className="text-gray-500">الاسم</p>
                   <p className="font-medium">{profile.teacherName || "غير محدد"}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">رقم الجوال</p>
+                  <p className="font-medium">{profile.phoneNumber || "غير محدد"}</p>
                 </div>
                 <div>
                   <p className="text-gray-500">المدرسة</p>
