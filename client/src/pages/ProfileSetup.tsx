@@ -54,7 +54,7 @@ export default function ProfileSetup() {
       setFormData({
         teacherName: profile.teacherName || "",
         email: profile.email || "",
-        phone: profile.phone || "",
+        phone: profile.phoneNumber || "",
         gender: profile.gender,
         profileImage: profile.profileImage || "",
         educationDepartment: profile.educationDepartment || "",
@@ -62,10 +62,10 @@ export default function ProfileSetup() {
         principalName: profile.principalName || "",
         grades: profile.stage ? (typeof profile.stage === 'string' && profile.stage.startsWith('[') ? JSON.parse(profile.stage) : [profile.stage]) : [],
         subjects: profile.subjects ? JSON.parse(profile.subjects) : [],
-        licenseNumber: profile.licenseNumber || "",
-        licenseIssueDate: profile.licenseIssueDate || "",
-        licenseExpiryDate: profile.licenseExpiryDate || "",
-        teacherLevel: profile.teacherLevel || "practitioner",
+        licenseNumber: profile.professionalLicenseNumber || "",
+        licenseIssueDate: profile.licenseStartDate ? (profile.licenseStartDate instanceof Date ? profile.licenseStartDate.toISOString().split('T')[0] : profile.licenseStartDate) : "",
+        licenseExpiryDate: profile.licenseEndDate ? (profile.licenseEndDate instanceof Date ? profile.licenseEndDate.toISOString().split('T')[0] : profile.licenseEndDate) : "",
+        teacherLevel: (profile.jobTitle === "practitioner" || profile.jobTitle === "advanced" || profile.jobTitle === "expert") ? profile.jobTitle : "practitioner",
         preferredTheme: profile.preferredTheme || "modern",
         preferredCoverTheme: profile.preferredCoverTheme || "classic",
       });

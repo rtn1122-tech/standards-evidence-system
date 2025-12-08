@@ -22,6 +22,54 @@ interface PDFData {
   selectedTheme: string; // e.g., "white", "theme2"
 }
 
+// Convert text with bullet points to HTML
+function formatTextWithBullets(text: string): string {
+  if (!text) return '';
+  
+  // Split text into lines
+  const lines = text.split('\n');
+  let html = '';
+  let inList = false;
+  
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    
+    // Check if line starts with bullet point markers
+    if (trimmedLine.startsWith('-') || trimmedLine.startsWith('•') || trimmedLine.startsWith('*')) {
+      // Remove the bullet marker and trim
+      const content = trimmedLine.substring(1).trim();
+      
+      if (!inList) {
+        html += '<ul>';
+        inList = true;
+      }
+      
+      html += `<li>${content}</li>`;
+    } else if (trimmedLine === '') {
+      // Empty line - close list if open
+      if (inList) {
+        html += '</ul>';
+        inList = false;
+      }
+      html += '<br/>';
+    } else {
+      // Regular text - close list if open
+      if (inList) {
+        html += '</ul>';
+        inList = false;
+      }
+      html += `<p>${trimmedLine}</p>`;
+    }
+  }
+  
+  // Close list if still open at end
+  if (inList) {
+    html += '</ul>';
+  }
+  
+  return html;
+}
+
 // Load theme background image as base64
 function getThemeBackgroundBase64(themeName: string): string {
   // If white theme, return empty string (no background)
@@ -138,6 +186,28 @@ function generateHTML(data: PDFData): string {
       line-height: 1.7;
       white-space: pre-wrap;
     }
+    .detail-box ul {
+      margin: 10px 0;
+      padding-right: 25px;
+      list-style-type: disc;
+    }
+    .detail-box li {
+      font-size: 15px;
+      color: #1e293b;
+      margin-bottom: 8px;
+      line-height: 1.7;
+    }
+    .description-box ul {
+      margin: 10px 0;
+      padding-right: 25px;
+      list-style-type: disc;
+    }
+    .description-box li {
+      font-size: 16px;
+      color: #1e293b;
+      margin-bottom: 8px;
+      line-height: 1.8;
+    }
   </style>
 </head>
 <body>
@@ -157,7 +227,7 @@ function generateHTML(data: PDFData): string {
     ` : ''}
 
     <div class="description-box">
-      ${data.description}
+      ${formatTextWithBullets(data.description)}
     </div>
   </div>
 
@@ -170,7 +240,7 @@ function generateHTML(data: PDFData): string {
     ${data.page2BoxesData.map(box => `
       <div class="detail-box">
         <h3>${box.title}</h3>
-        <p>${box.content}</p>
+        <div>${formatTextWithBullets(box.content)}</div>
       </div>
     `).join('')}
 

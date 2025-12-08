@@ -118,7 +118,7 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="text-gray-500">رقم الرخصة</p>
-                  <p className="font-medium">{profile.licenseNumber || "غير محدد"}</p>
+                  <p className="font-medium">{profile.professionalLicenseNumber || "غير محدد"}</p>
                 </div>
               </div>
               

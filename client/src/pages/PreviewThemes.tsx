@@ -55,7 +55,14 @@ const themes = [
 ];
 
 export default function PreviewThemes() {
-  const [, navigate] = useLocation();
+  const [, setLocation] = useLocation();
+  const navigate = (path: string | number) => {
+    if (typeof path === 'number') {
+      window.history.go(path);
+    } else {
+      setLocation(path);
+    }
+  };
   const [selectedTheme, setSelectedTheme] = useState(themes[0]);
   const [previewData, setPreviewData] = useState<PreviewData | null>(null);
 

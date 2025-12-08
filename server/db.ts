@@ -65,7 +65,11 @@ export async function upsertTeacherProfile(data: any) {
     professionalLicenseNumber: data.licenseNumber, // licenseNumber -> professionalLicenseNumber
     licenseStartDate: data.licenseIssueDate, // licenseIssueDate -> licenseStartDate
     licenseEndDate: data.licenseExpiryDate, // licenseExpiryDate -> licenseEndDate
-    selectedTheme: data.preferredTheme, // preferredTheme -> selectedTheme
+    employeeNumber: data.employeeNumber,
+    jobTitle: data.teacherLevel, // teacherLevel -> jobTitle
+    profileImage: data.profileImage,
+    preferredTheme: data.preferredTheme,
+    preferredCoverTheme: data.preferredCoverTheme,
   };
   
   // حذف الحقول undefined

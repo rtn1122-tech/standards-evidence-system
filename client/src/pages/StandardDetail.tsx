@@ -68,7 +68,7 @@ export default function StandardDetail() {
             <div className="flex items-start justify-between">
               <div>
                 <CardTitle className="text-2xl mb-2">
-                  المعيار {standard.id}: {standard.name}
+                  المعيار {standard.id}: {standard.title}
                 </CardTitle>
                 <CardDescription className="text-blue-100">
                   الوزن النسبي: {standard.weight}%

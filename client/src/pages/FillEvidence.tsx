@@ -89,6 +89,8 @@ export default function FillEvidence() {
         image2: null,
         image1Preview: template.defaultImageUrl || "",
         image2Preview: "",
+        image1Url: "",
+        image2Url: "",
       });
     }
   }, [template, templateId]);
