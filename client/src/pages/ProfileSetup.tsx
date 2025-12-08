@@ -371,45 +371,195 @@ export default function ProfileSetup() {
               </div>
 
               {/* إعدادات التصميم */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-bold text-gray-900 border-b pb-2">إعدادات التصميم</h3>
-                <p className="text-sm text-gray-600">
-                  يمكنك تغيير الثيمات لاحقاً من صفحة الإعدادات
-                </p>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 border-b pb-2">إعدادات التصميم</h3>
+                  <p className="text-sm text-gray-600 mt-2">
+                    اختر الثيم المفضل لديك من خلال النقر على الصورة
+                  </p>
+                </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="preferredTheme">ثيم الشواهد</Label>
-                    <Select
-                      value={formData.preferredTheme}
-                      onValueChange={(value) => setFormData({ ...formData, preferredTheme: value })}
+                {/* ثيمات الشواهد */}
+                <div className="space-y-3">
+                  <Label className="text-lg font-semibold">ثيم الشواهد</Label>
+                  <div className="grid grid-cols-3 gap-4">
+                    {/* ورقة بيضاء */}
+                    <div
+                      onClick={() => setFormData({ ...formData, preferredTheme: 'white' })}
+                      className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
+                        formData.preferredTheme === 'white'
+                          ? 'border-green-500 shadow-xl'
+                          : 'border-gray-200 hover:border-blue-300'
+                      }`}
                     >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="white">ورقة بيضاء (الافتراضي)</SelectItem>
-                        <SelectItem value="theme1">ثيم الشواهد 1</SelectItem>
-                        <SelectItem value="theme2">ثيم الشواهد 2</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                      <div className="relative">
+                        <div className="aspect-[3/4] bg-white flex items-center justify-center border border-gray-300">
+                          <span className="text-gray-400 text-sm">ورقة بيضاء</span>
+                        </div>
+                        {formData.preferredTheme === 'white' && (
+                          <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-2 bg-gray-50 text-center">
+                        <p className="text-sm font-medium">ورقة بيضاء</p>
+                        <p className="text-xs text-gray-500">الافتراضي</p>
+                      </div>
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="preferredCoverTheme">ثيم الغلاف</Label>
-                    <Select
-                      value={formData.preferredCoverTheme}
-                      onValueChange={(value) => setFormData({ ...formData, preferredCoverTheme: value })}
+                    {/* ثيم 1 */}
+                    <div
+                      onClick={() => setFormData({ ...formData, preferredTheme: 'theme1' })}
+                      className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
+                        formData.preferredTheme === 'theme1'
+                          ? 'border-green-500 shadow-xl'
+                          : 'border-gray-200 hover:border-blue-300'
+                      }`}
                     >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="theme1">ثيم الغلاف 1</SelectItem>
-                        <SelectItem value="theme2">ثيم الغلاف 2</SelectItem>
-                        <SelectItem value="theme3">ثيم الغلاف 3</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <div className="relative">
+                        <img
+                          src="/themes/evidences/evidence-theme1.png"
+                          alt="ثيم الشواهد 1"
+                          className="w-full aspect-[3/4] object-cover"
+                        />
+                        {formData.preferredTheme === 'theme1' && (
+                          <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-2 bg-gray-50 text-center">
+                        <p className="text-sm font-medium">ثيم الشواهد 1</p>
+                        <p className="text-xs text-gray-500">كلاسيكي</p>
+                      </div>
+                    </div>
+
+                    {/* ثيم 2 */}
+                    <div
+                      onClick={() => setFormData({ ...formData, preferredTheme: 'theme2' })}
+                      className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
+                        formData.preferredTheme === 'theme2'
+                          ? 'border-green-500 shadow-xl'
+                          : 'border-gray-200 hover:border-blue-300'
+                      }`}
+                    >
+                      <div className="relative">
+                        <img
+                          src="/themes/evidences/evidence-theme2.png"
+                          alt="ثيم الشواهد 2"
+                          className="w-full aspect-[3/4] object-cover"
+                        />
+                        {formData.preferredTheme === 'theme2' && (
+                          <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-2 bg-gray-50 text-center">
+                        <p className="text-sm font-medium">ثيم الشواهد 2</p>
+                        <p className="text-xs text-gray-500">حديث</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ثيمات الغلاف */}
+                <div className="space-y-3">
+                  <Label className="text-lg font-semibold">ثيم الغلاف</Label>
+                  <div className="grid grid-cols-3 gap-4">
+                    {/* ثيم غلاف 1 */}
+                    <div
+                      onClick={() => setFormData({ ...formData, preferredCoverTheme: 'theme1' })}
+                      className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
+                        formData.preferredCoverTheme === 'theme1'
+                          ? 'border-green-500 shadow-xl'
+                          : 'border-gray-200 hover:border-blue-300'
+                      }`}
+                    >
+                      <div className="relative">
+                        <img
+                          src="/themes/covers/cover-theme1.png"
+                          alt="ثيم الغلاف 1"
+                          className="w-full aspect-[3/4] object-cover"
+                        />
+                        {formData.preferredCoverTheme === 'theme1' && (
+                          <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-2 bg-gray-50 text-center">
+                        <p className="text-sm font-medium">ثيم الغلاف 1</p>
+                        <p className="text-xs text-gray-500">رسمي</p>
+                      </div>
+                    </div>
+
+                    {/* ثيم غلاف 2 */}
+                    <div
+                      onClick={() => setFormData({ ...formData, preferredCoverTheme: 'theme2' })}
+                      className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
+                        formData.preferredCoverTheme === 'theme2'
+                          ? 'border-green-500 shadow-xl'
+                          : 'border-gray-200 hover:border-blue-300'
+                      }`}
+                    >
+                      <div className="relative">
+                        <img
+                          src="/themes/covers/cover-theme2.png"
+                          alt="ثيم الغلاف 2"
+                          className="w-full aspect-[3/4] object-cover"
+                        />
+                        {formData.preferredCoverTheme === 'theme2' && (
+                          <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-2 bg-gray-50 text-center">
+                        <p className="text-sm font-medium">ثيم الغلاف 2</p>
+                        <p className="text-xs text-gray-500">أنيق</p>
+                      </div>
+                    </div>
+
+                    {/* ثيم غلاف 3 */}
+                    <div
+                      onClick={() => setFormData({ ...formData, preferredCoverTheme: 'theme3' })}
+                      className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
+                        formData.preferredCoverTheme === 'theme3'
+                          ? 'border-green-500 shadow-xl'
+                          : 'border-gray-200 hover:border-blue-300'
+                      }`}
+                    >
+                      <div className="relative">
+                        <img
+                          src="/themes/covers/cover-theme3.png"
+                          alt="ثيم الغلاف 3"
+                          className="w-full aspect-[3/4] object-cover"
+                        />
+                        {formData.preferredCoverTheme === 'theme3' && (
+                          <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-2 bg-gray-50 text-center">
+                        <p className="text-sm font-medium">ثيم الغلاف 3</p>
+                        <p className="text-xs text-gray-500">عصري</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
