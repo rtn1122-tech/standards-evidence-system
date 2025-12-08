@@ -2,11 +2,12 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
-import { ArrowRight, FileText, Sparkles, Trash2, Download, Filter, Search, Edit } from "lucide-react";
+import { ArrowRight, FileText, Sparkles, Trash2, Download, Filter, Search, Edit, Eye } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 
@@ -17,6 +18,7 @@ export default function MyEvidences() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [pdfProgress, setPdfProgress] = useState(0);
+  const [previewPdfUrl, setPreviewPdfUrl] = useState<string | null>(null);
   
   // الشواهد العادية
   const { data: userEvidences, isLoading: loadingUser } = trpc.userEvidences.list.useQuery();
@@ -128,14 +130,27 @@ export default function MyEvidences() {
           </Button>
 
           {userEvidences && userEvidences.length > 0 && (
-            <Button
-              onClick={handleDownloadAllPDF}
-              disabled={isGeneratingPDF}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              <Download className="ml-2 h-4 w-4" />
-              {isGeneratingPDF ? "جاري التوليد..." : "تحميل PDF لجميع الشواهد"}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleDownloadAllPDF}
+                disabled={isGeneratingPDF}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <Download className="ml-2 h-4 w-4" />
+                {isGeneratingPDF ? "جاري التوليد..." : "تحميل PDF"}
+              </Button>
+              <Button
+                onClick={() => {
+                  // مؤقتاً: فتح نافذة توضيحية (سيتم ربطها بـ API لاحقاً)
+                  alert("ميزة معاينة PDF قيد التطوير!\n\nسيتم فتح Dialog لعرض PDF بحجم كبير مع أزرار تحميل وطباعة.");
+                }}
+                variant="outline"
+                className="border-green-600 text-green-600 hover:bg-green-50"
+              >
+                <Eye className="ml-2 h-4 w-4" />
+                معاينة سريعة
+              </Button>
+            </div>
           )}
         </div>
 
@@ -387,6 +402,59 @@ export default function MyEvidences() {
           </Card>
         )}
       </div>
+
+      {/* Dialog معاينة PDF */}
+      <Dialog open={!!previewPdfUrl} onOpenChange={(open) => !open && setPreviewPdfUrl(null)}>
+        <DialogContent className="max-w-5xl h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>معاينة ملف الشواهد</DialogTitle>
+            <DialogDescription>
+              يمكنك تحميل أو طباعة الملف من هنا
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            {previewPdfUrl && (
+              <iframe
+                src={previewPdfUrl}
+                className="w-full h-full border-0 rounded-lg"
+                title="PDF Preview"
+              />
+            )}
+          </div>
+          <div className="flex gap-2 justify-end pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={() => setPreviewPdfUrl(null)}
+            >
+              إغلاق
+            </Button>
+            <Button
+              onClick={() => {
+                if (previewPdfUrl) {
+                  const link = document.createElement('a');
+                  link.href = previewPdfUrl;
+                  link.download = 'evidences.pdf';
+                  link.click();
+                }
+              }}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Download className="ml-2 h-4 w-4" />
+              تحميل
+            </Button>
+            <Button
+              onClick={() => {
+                if (previewPdfUrl) {
+                  window.open(previewPdfUrl, '_blank');
+                }
+              }}
+              variant="outline"
+            >
+              طباعة
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -78,6 +78,28 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return await db.getStandard(input.id);
       }),
+
+    // حساب عدد المعايير المرتبطة بالمادة والمرحلة
+    countBySubjectAndStage: protectedProcedure
+      .input(
+        z.object({
+          subject: z.string().optional(),
+          stage: z.string().optional(),
+        })
+      )
+      .query(async ({ input }) => {
+        // إذا لم يتم تحديد مادة أو مرحلة، نرجع إجمالي عدد المعايير
+        if (!input.subject && !input.stage) {
+          const allStandards = await db.listStandards();
+          return { count: allStandards.length };
+        }
+
+        // حساب عدد المعايير المرتبطة
+        const templates = await db.listEvidenceTemplates(input);
+        // استخراج المعايير الفريدة من القوالب
+        const uniqueStandardIds = new Set(templates.map((t: any) => t.standardId));
+        return { count: uniqueStandardIds.size };
+      }),
   }),
 
   // ========================================

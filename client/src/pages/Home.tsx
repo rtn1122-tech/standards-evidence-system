@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { User, Save, X, ArrowLeft, BookOpen, FileText, Sparkles, Printer, Palette, TrendingUp, Shield } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
   const { user } = useAuth();
@@ -14,6 +15,17 @@ export default function Home() {
   const { data: profile } = trpc.teacherProfile.get.useQuery(undefined, {
     enabled: !!user,
   });
+
+  // حساب عدد المعايير المرتبطة بالمادة والمرحلة
+  const { data: standardsCount } = trpc.standards.countBySubjectAndStage.useQuery(
+    {
+      subject: profile?.subjects ? JSON.parse(profile.subjects)[0] : undefined,
+      stage: profile?.stage ? JSON.parse(profile.stage)[0] : undefined,
+    },
+    {
+      enabled: !!user && !!profile,
+    }
+  );
 
   if (!user) {
     return (
@@ -151,15 +163,25 @@ export default function Home() {
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <div className="relative w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                     <BookOpen className="w-8 h-8 text-white" />
+                    {standardsCount && standardsCount.count > 0 && (
+                      <Badge 
+                        className="absolute -top-2 -right-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm px-2 py-1 rounded-full shadow-lg"
+                      >
+                        {standardsCount.count}
+                      </Badge>
+                    )}
                   </div>
                   <div>
                     <CardTitle className="text-2xl group-hover:text-blue-600 transition-colors">
                       1️⃣ المعايير
                     </CardTitle>
                     <CardDescription className="text-base">
-                      عرض جميع المعايير الـ 11
+                      {standardsCount && standardsCount.count > 0 
+                        ? `${standardsCount.count} معيار مرتبط بمادتك`
+                        : "عرض جميع المعايير الـ 11"
+                      }
                     </CardDescription>
                   </div>
                 </div>
