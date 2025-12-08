@@ -1,4 +1,10 @@
 import puppeteer from "puppeteer";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 interface Box {
   title: string;
@@ -13,38 +19,32 @@ interface PDFData {
   page2BoxesData: Box[];
   image1Url?: string | null;
   image2Url?: string | null;
-  selectedTheme: string;
+  selectedTheme: string; // e.g., "white", "theme2"
 }
 
-const themes = {
-  classic: {
-    headerBg: "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)",
-    boxBg: "#f8fafc",
-    boxBorder: "#cbd5e1",
-    textColor: "#1e293b",
-  },
-  modern: {
-    headerBg: "linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)",
-    boxBg: "#faf5ff",
-    boxBorder: "#d8b4fe",
-    textColor: "#581c87",
-  },
-  elegant: {
-    headerBg: "linear-gradient(135deg, #059669 0%, #10b981 100%)",
-    boxBg: "#f0fdf4",
-    boxBorder: "#86efac",
-    textColor: "#064e3b",
-  },
-  formal: {
-    headerBg: "linear-gradient(135deg, #334155 0%, #64748b 100%)",
-    boxBg: "#f8fafc",
-    boxBorder: "#94a3b8",
-    textColor: "#0f172a",
-  },
-};
+// Load theme background image as base64
+function getThemeBackgroundBase64(themeName: string): string {
+  // If white theme, return empty string (no background)
+  if (themeName === 'white') {
+    return '';
+  }
+  
+  const themePath = path.join(__dirname, '..', 'public', 'themes', 'evidences', `evidence-${themeName}.png`);
+  
+  // Check if theme file exists
+  if (!fs.existsSync(themePath)) {
+    console.warn(`Theme file not found: ${themePath}`);
+    return '';
+  }
+  
+  const imageBuffer = fs.readFileSync(themePath);
+  const base64 = imageBuffer.toString('base64');
+  return `data:image/png;base64,${base64}`;
+}
 
 function generateHTML(data: PDFData): string {
-  const theme = themes[data.selectedTheme as keyof typeof themes] || themes.classic;
+  const backgroundImage = getThemeBackgroundBase64(data.selectedTheme);
+  const hasBackground = backgroundImage !== '';
 
   return `
 <!DOCTYPE html>
@@ -68,13 +68,21 @@ function generateHTML(data: PDFData): string {
       padding: 20mm;
       background: white;
       page-break-after: always;
+      position: relative;
+      ${hasBackground ? `
+      background-image: url('${backgroundImage}');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      ` : ''}
     }
     .header {
       text-align: center;
       padding: 30px;
       border-radius: 10px;
-      background: ${theme.headerBg};
-      color: white;
+      ${hasBackground ? 'background: rgba(255, 255, 255, 0.95);' : 'background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);'}
+      ${hasBackground ? 'color: #1e293b;' : 'color: white;'}
+      ${hasBackground ? 'border: 2px solid #cbd5e1;' : ''}
       margin-bottom: 30px;
     }
     .header h1 {
@@ -104,9 +112,9 @@ function generateHTML(data: PDFData): string {
     .description-box {
       padding: 25px;
       border-radius: 10px;
-      background: ${theme.boxBg};
-      border-right: 4px solid ${theme.boxBorder};
-      color: ${theme.textColor};
+      background: rgba(255, 255, 255, 0.95);
+      border-right: 4px solid #cbd5e1;
+      color: #1e293b;
       margin-bottom: 30px;
       font-size: 16px;
       line-height: 1.8;
@@ -115,18 +123,18 @@ function generateHTML(data: PDFData): string {
     .detail-box {
       padding: 25px;
       border-radius: 10px;
-      background: ${theme.boxBg};
-      border-right: 4px solid ${theme.boxBorder};
+      background: rgba(255, 255, 255, 0.95);
+      border-right: 4px solid #cbd5e1;
       margin-bottom: 25px;
     }
     .detail-box h3 {
       font-size: 20px;
-      color: ${theme.textColor};
+      color: #1e293b;
       margin-bottom: 15px;
     }
     .detail-box p {
       font-size: 15px;
-      color: ${theme.textColor};
+      color: #1e293b;
       line-height: 1.7;
       white-space: pre-wrap;
     }

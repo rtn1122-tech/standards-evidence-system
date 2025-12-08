@@ -64,15 +64,28 @@ export default function PreviewThemes() {
     const params = new URLSearchParams(window.location.search);
     const templateId = params.get("templateId");
     
+    console.log('PreviewThemes - templateId from URL:', templateId);
+    
     if (templateId) {
-      const savedData = localStorage.getItem(`evidence_preview_${templateId}`);
+      const key = `evidence_preview_${templateId}`;
+      const savedData = localStorage.getItem(key);
+      
+      console.log('PreviewThemes - looking for key:', key);
+      console.log('PreviewThemes - found data:', savedData ? 'YES' : 'NO');
+      
       if (savedData) {
         try {
-          setPreviewData(JSON.parse(savedData));
+          const parsed = JSON.parse(savedData);
+          console.log('PreviewThemes - parsed data:', parsed);
+          setPreviewData(parsed);
         } catch (e) {
           console.error("Error loading preview data:", e);
         }
+      } else {
+        console.error('No preview data found in localStorage for key:', key);
       }
+    } else {
+      console.error('No templateId in URL');
     }
   }, []);
 

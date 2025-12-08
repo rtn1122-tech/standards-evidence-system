@@ -21,8 +21,21 @@ async function imageUrlToBase64(url: string): Promise<string> {
 }
 
 // Load theme background image
-function getThemeBackgroundBase64(): string {
-  const themePath = path.join(__dirname, 'theme-background.png');
+function getThemeBackgroundBase64(themeType: 'cover' | 'evidence', themeName: string): string {
+  // If white theme, return empty string (no background)
+  if (themeName === 'white') {
+    return '';
+  }
+  
+  const themeFolder = themeType === 'cover' ? 'covers' : 'evidences';
+  const themePath = path.join(__dirname, '..', 'public', 'themes', themeFolder, `${themeType}-${themeName}.png`);
+  
+  // Check if theme file exists
+  if (!fs.existsSync(themePath)) {
+    console.warn(`Theme file not found: ${themePath}`);
+    return '';
+  }
+  
   const imageBuffer = fs.readFileSync(themePath);
   const base64 = imageBuffer.toString('base64');
   return `data:image/png;base64,${base64}`;
@@ -136,13 +149,13 @@ export async function generateStandardPage(data: {
   `;
 }
 
-export async function generateEvidencePDF(data: EvidenceData): Promise<Buffer> {
+export async function generateEvidencePDF(data: EvidenceData, evidenceTheme: string = 'white'): Promise<Buffer> {
   // Convert images to base64
   const image1Base64 = data.image1Url ? await imageUrlToBase64(data.image1Url) : '';
   const image2Base64 = data.image2Url ? await imageUrlToBase64(data.image2Url) : '';
 
   // Load theme background
-  const themeBackgroundBase64 = getThemeBackgroundBase64();
+  const themeBackgroundBase64 = getThemeBackgroundBase64('evidence', evidenceTheme);
 
   // Build dynamic fields HTML
   const fieldsHTML = data.userFields

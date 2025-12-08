@@ -40,7 +40,11 @@ export const teacherProfiles = mysqlTable("teacherProfiles", {
   gender: mysqlEnum("gender", ["male", "female"]).notNull(), // معلم/معلمة
   stage: varchar("stage", { length: 100 }), // المرحلة (ابتدائي، متوسط، ثانوي) - JSON array
   subjects: text("subjects"), // المواد التدريسية (JSON array)
-  selectedTheme: varchar("selectedTheme", { length: 100 }).default("theme1"), // الثيم المختار للطباعة
+  
+  // Themes
+  preferredTheme: varchar("preferredTheme", { length: 100 }).default("white"), // ثيم الشواهد
+  preferredCoverTheme: varchar("preferredCoverTheme", { length: 100 }).default("theme1"), // ثيم الغلاف
+  profileImage: text("profileImage"), // صورة المعلم (base64)
   
   // حقول اختيارية
   email: varchar("email", { length: 255 }), // البريد الإلكتروني
@@ -73,6 +77,52 @@ export const standards = mysqlTable("standards", {
 
 export type Standard = typeof standards.$inferSelect;
 export type InsertStandard = typeof standards.$inferInsert;
+
+/**
+ * Evidences table - pre-filled evidence templates (100+ evidences)
+ * الشواهد الجاهزة - محتوى كامل جاهز للاستخدام
+ */
+export const evidences = mysqlTable("evidences", {
+  id: int("id").primaryKey(),
+  title: varchar("title", { length: 500 }).notNull(),
+  description: text("description"),
+  stage: mysqlEnum("stage", ["kindergarten", "elementary", "middle", "high", "all"]).notNull(),
+  standardId: int("standardId").notNull(), // المعيار (1-11)
+  
+  // Page 2 boxes (6 boxes)
+  box1Title: varchar("box1Title", { length: 200 }),
+  box1Content: text("box1Content"),
+  box2Title: varchar("box2Title", { length: 200 }),
+  box2Content: text("box2Content"),
+  box3Title: varchar("box3Title", { length: 200 }),
+  box3Content: text("box3Content"),
+  box4Title: varchar("box4Title", { length: 200 }),
+  box4Content: text("box4Content"),
+  box5Title: varchar("box5Title", { length: 200 }),
+  box5Content: text("box5Content"),
+  box6Title: varchar("box6Title", { length: 200 }),
+  box6Content: text("box6Content"),
+  
+  // Dynamic fields (6 fields on page 1)
+  field1Label: varchar("field1Label", { length: 200 }),
+  field1Value: varchar("field1Value", { length: 500 }),
+  field2Label: varchar("field2Label", { length: 200 }),
+  field2Value: varchar("field2Value", { length: 500 }),
+  field3Label: varchar("field3Label", { length: 200 }),
+  field3Value: varchar("field3Value", { length: 500 }),
+  field4Label: varchar("field4Label", { length: 200 }),
+  field4Value: varchar("field4Value", { length: 500 }),
+  field5Label: varchar("field5Label", { length: 200 }),
+  field5Value: varchar("field5Value", { length: 500 }),
+  field6Label: varchar("field6Label", { length: 200 }),
+  field6Value: varchar("field6Value", { length: 500 }),
+  
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type Evidence = typeof evidences.$inferSelect;
+export type InsertEvidence = typeof evidences.$inferInsert;
 
 /**
  * Evidence templates - pre-filled by owner (80+ templates)

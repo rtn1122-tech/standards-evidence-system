@@ -41,8 +41,8 @@ export default function ProfileSetup() {
     teacherLevel: "practitioner" as "practitioner" | "advanced" | "expert",
     
     // إعدادات التصميم
-    preferredTheme: "modern",
-    preferredCoverTheme: "classic",
+    preferredTheme: "white",
+    preferredCoverTheme: "theme1",
   });
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -388,9 +388,8 @@ export default function ProfileSetup() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="modern">عصري</SelectItem>
-                        <SelectItem value="classic">كلاسيكي</SelectItem>
-                        <SelectItem value="elegant">أنيق</SelectItem>
+                        <SelectItem value="white">ورقة بيضاء (الافتراضي)</SelectItem>
+                        <SelectItem value="theme2">ثيم الشواهد 2</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -405,9 +404,9 @@ export default function ProfileSetup() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="classic">كلاسيكي</SelectItem>
-                        <SelectItem value="modern">عصري</SelectItem>
-                        <SelectItem value="professional">احترافي</SelectItem>
+                        <SelectItem value="theme1">ثيم الغلاف 1</SelectItem>
+                        <SelectItem value="theme2">ثيم الغلاف 2</SelectItem>
+                        <SelectItem value="theme3">ثيم الغلاف 3</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

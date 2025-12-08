@@ -19,7 +19,12 @@ export default function FillEvidence() {
   const [, navigate] = useLocation();
 
   // جلب بيانات القالب
-  const { data: template, isLoading } = trpc.evidenceTemplates.get.useQuery({ id: templateId });
+  const { data: template, isLoading, error } = trpc.evidenceTemplates.get.useQuery({ id: templateId });
+  
+  console.log('=== QUERY STATUS ===');
+  console.log('isLoading:', isLoading);
+  console.log('template:', template);
+  console.log('error:', error);
 
   // State للحقول
   const [formData, setFormData] = useState({
@@ -41,10 +46,15 @@ export default function FillEvidence() {
   // تحميل البيانات الافتراضية من القالب
   useEffect(() => {
     if (template) {
+      console.log('=== TEMPLATE DATA ===');
+      console.log('template.page2Boxes:', template.page2Boxes);
+      console.log('template keys:', Object.keys(template));
+      
       // Parse page2Boxes
       let boxes: Box[] = [];
       try {
         boxes = JSON.parse(template.page2Boxes || "[]");
+        console.log('Parsed boxes:', boxes);
       } catch (e) {
         console.error("Error parsing page2Boxes:", e);
       }
@@ -56,6 +66,8 @@ export default function FillEvidence() {
           const parsed = JSON.parse(savedData);
           setFormData({
             ...parsed,
+            // دمج page2BoxesData من template إذا لم تكن موجودة في المسودة
+            page2BoxesData: parsed.page2BoxesData && parsed.page2BoxesData.length > 0 ? parsed.page2BoxesData : boxes,
             image1: null,
             image2: null,
             image1Preview: parsed.image1Preview || template.defaultImageUrl || "",
@@ -148,9 +160,15 @@ export default function FillEvidence() {
       image2Preview: formData.image2Preview,
     };
     
-    localStorage.setItem(`evidence_preview_${template.id}`, JSON.stringify(previewData));
+    const key = `evidence_preview_${template.id}`;
+    localStorage.setItem(key, JSON.stringify(previewData));
     
-    // فتح صورة معاينة الثيمات في تبويب جديد
+    // التحقق من الحفظ
+    const saved = localStorage.getItem(key);
+    console.log('Preview data saved:', key, saved ? 'SUCCESS' : 'FAILED');
+    console.log('Preview data:', previewData);
+    
+    // فتح صفحة معاينة الثيمات في تبويب جديد
     window.open(`/preview-themes?templateId=${template.id}`, '_blank');
   };
 

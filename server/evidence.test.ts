@@ -154,3 +154,33 @@ describe("teacherProfile router", () => {
     }
   });
 });
+
+describe('evidenceTemplates router', () => {
+  it('should get evidence template with page2Boxes', async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+
+    const result = await caller.evidenceTemplates.get({ id: 11 });
+
+    console.log('=== TEST RESULT ===');
+    console.log('result:', result);
+    console.log('title:', result?.title);
+    console.log('page2Boxes:', result?.page2Boxes?.substring(0, 100));
+
+    expect(result).toBeDefined();
+    expect(result).not.toBeNull();
+    expect(result?.title).toBeDefined();
+    expect(result?.page2Boxes).toBeDefined();
+
+    if (result?.page2Boxes) {
+      const boxes = JSON.parse(result.page2Boxes);
+      console.log('Boxes count:', boxes.length);
+      console.log('First box:', boxes[0]);
+
+      expect(boxes).toBeInstanceOf(Array);
+      expect(boxes.length).toBe(6);
+      expect(boxes[0]).toHaveProperty('title');
+      expect(boxes[0]).toHaveProperty('content');
+    }
+  });
+});
