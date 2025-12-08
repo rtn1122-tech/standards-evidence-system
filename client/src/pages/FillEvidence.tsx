@@ -168,8 +168,8 @@ export default function FillEvidence() {
     console.log('Preview data saved:', key, saved ? 'SUCCESS' : 'FAILED');
     console.log('Preview data:', previewData);
     
-    // فتح صفحة معاينة الثيمات في تبويب جديد
-    window.open(`/preview-themes?templateId=${template.id}`, '_blank');
+    // فتح صفحة معاينة الثيمات في نفس التبويب
+    window.location.href = `/preview-themes?templateId=${template.id}`;
   };
 
   const updateBoxContent = (index: number, content: string) => {

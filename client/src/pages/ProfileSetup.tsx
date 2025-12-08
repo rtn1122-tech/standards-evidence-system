@@ -389,6 +389,7 @@ export default function ProfileSetup() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="white">ورقة بيضاء (الافتراضي)</SelectItem>
+                        <SelectItem value="theme1">ثيم الشواهد 1</SelectItem>
                         <SelectItem value="theme2">ثيم الشواهد 2</SelectItem>
                       </SelectContent>
                     </Select>
