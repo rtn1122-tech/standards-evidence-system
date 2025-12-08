@@ -103,26 +103,37 @@ export default function Home() {
           
           {profile && (
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
-                <div>
-                  <p className="text-gray-500">الاسم</p>
-                  <p className="font-medium">{profile.teacherName || "غير محدد"}</p>
+              <div className="space-y-4">
+                {/* الصف الأول: الاسم | البريد الإلكتروني | رقم الجوال */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <p className="text-gray-500">الاسم</p>
+                    <p className="font-medium">{profile.teacherName || "غير محدد"}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">البريد الإلكتروني</p>
+                    <p className="font-medium">{profile.email || "غير محدد"}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">رقم الجوال</p>
+                    <p className="font-medium">{profile.phoneNumber || "غير محدد"}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-gray-500">رقم الجوال</p>
-                  <p className="font-medium">{profile.phoneNumber || "غير محدد"}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">المدرسة</p>
-                  <p className="font-medium">{profile.schoolName || "غير محدد"}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">إدارة التعليم</p>
-                  <p className="font-medium">{profile.educationDepartment || "غير محدد"}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">رقم الرخصة</p>
-                  <p className="font-medium">{profile.professionalLicenseNumber || "غير محدد"}</p>
+                
+                {/* الصف الثاني: المدرسة | إدارة التعليم | رقم الرخصة */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <p className="text-gray-500">المدرسة</p>
+                    <p className="font-medium">{profile.schoolName || "غير محدد"}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">إدارة التعليم</p>
+                    <p className="font-medium">{profile.educationDepartment || "غير محدد"}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">رقم الرخصة</p>
+                    <p className="font-medium">{profile.professionalLicenseNumber || "غير محدد"}</p>
+                  </div>
                 </div>
               </div>
               
