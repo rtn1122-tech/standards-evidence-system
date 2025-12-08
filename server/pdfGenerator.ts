@@ -29,42 +29,81 @@ function formatTextWithBullets(text: string): string {
   // Split text into lines
   const lines = text.split('\n');
   let html = '';
-  let inList = false;
+  let inBulletList = false;
+  let inNumberedList = false;
   
   for (const line of lines) {
     const trimmedLine = line.trim();
     
+    // Check if line starts with numbered list (1. 2. 3. etc.)
+    const numberedMatch = trimmedLine.match(/^(\d+)\.\s+(.+)$/);
+    
     // Check if line starts with bullet point markers
-    if (trimmedLine.startsWith('-') || trimmedLine.startsWith('•') || trimmedLine.startsWith('*')) {
-      // Remove the bullet marker and trim
+    const isBullet = trimmedLine.startsWith('-') || trimmedLine.startsWith('•') || trimmedLine.startsWith('*');
+    
+    if (numberedMatch) {
+      // Numbered list item
+      const content = numberedMatch[2];
+      
+      // Close bullet list if switching from bullets to numbers
+      if (inBulletList) {
+        html += '</ul>';
+        inBulletList = false;
+      }
+      
+      if (!inNumberedList) {
+        html += '<ol>';
+        inNumberedList = true;
+      }
+      
+      html += `<li>${content}</li>`;
+    } else if (isBullet) {
+      // Bullet list item
       const content = trimmedLine.substring(1).trim();
       
-      if (!inList) {
+      // Close numbered list if switching from numbers to bullets
+      if (inNumberedList) {
+        html += '</ol>';
+        inNumberedList = false;
+      }
+      
+      if (!inBulletList) {
         html += '<ul>';
-        inList = true;
+        inBulletList = true;
       }
       
       html += `<li>${content}</li>`;
     } else if (trimmedLine === '') {
-      // Empty line - close list if open
-      if (inList) {
+      // Empty line - close any open list
+      if (inBulletList) {
         html += '</ul>';
-        inList = false;
+        inBulletList = false;
+      }
+      if (inNumberedList) {
+        html += '</ol>';
+        inNumberedList = false;
       }
       html += '<br/>';
     } else {
-      // Regular text - close list if open
-      if (inList) {
+      // Regular text - close any open list
+      if (inBulletList) {
         html += '</ul>';
-        inList = false;
+        inBulletList = false;
+      }
+      if (inNumberedList) {
+        html += '</ol>';
+        inNumberedList = false;
       }
       html += `<p>${trimmedLine}</p>`;
     }
   }
   
-  // Close list if still open at end
-  if (inList) {
+  // Close any open list at end
+  if (inBulletList) {
     html += '</ul>';
+  }
+  if (inNumberedList) {
+    html += '</ol>';
   }
   
   return html;
@@ -207,6 +246,16 @@ function generateHTML(data: PDFData): string {
       color: #1e293b;
       margin-bottom: 8px;
       line-height: 1.8;
+    }
+    .detail-box ol {
+      margin: 10px 0;
+      padding-right: 25px;
+      list-style-type: decimal;
+    }
+    .description-box ol {
+      margin: 10px 0;
+      padding-right: 25px;
+      list-style-type: decimal;
     }
   </style>
 </head>

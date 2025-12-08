@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE evidences \nSET \n  box1Content = REPLACE(box1Content, ';', ''),\n  box2Content = REPLACE(box2Content, ';', ''),\n  box3Content = REPLACE(box3Content, ';', ''),\n  box4Content = REPLACE(box4Content, ';', ''),\n  box5Content = REPLACE(box5Content, ';', ''),\n  box6Content = REPLACE(box6Content, ';', '')\nWHERE \n  box1Content LIKE '%;%' \n  OR box2Content LIKE '%;%'\n  OR box3Content LIKE '%;%'\n  OR box4Content LIKE '%;%'\n  OR box5Content LIKE '%;%'\n  OR box6Content LIKE '%;%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute UPDATE evidences \nSET \n  box1Content = REPLACE(box1Content, ';', ''),\n  box2Content = REPLACE(box2Content, ';', ''),\n  box3Content = REPLACE(box3Content, ';', ''),\n  box4Content = REPLACE(box4Content, ';', ''),\n  box5Content = REPLACE(box5Content, ';', ''),\n  box6Content = REPLACE(box6Content, ';', '')\nWHERE \n  box1Content LIKE '%;%' \n  OR box2Content LIKE '%;%'\n  OR box3Content LIKE '%;%'\n  OR box4Content LIKE '%;%'\n  OR box5Content LIKE '%;%'\n  OR box6Content LIKE '%;%';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1647
+}
