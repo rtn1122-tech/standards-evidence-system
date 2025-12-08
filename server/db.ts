@@ -123,11 +123,15 @@ export async function listEvidenceTemplates(filters?: {
   subject?: string;
   stage?: string;
 }) {
-  // قراءة من جدول evidences (الشواهد الجاهزة)
-  let query = 'SELECT * FROM evidences WHERE 1=1';
+  // قراءة من جدول evidenceTemplates (الشواهد الجاهزة)
+  let query = 'SELECT * FROM evidenceTemplates WHERE 1=1';
   
   if (filters?.standardId) {
     query += ` AND standardId = ${filters.standardId}`;
+  }
+  
+  if (filters?.subject) {
+    query += ` AND (subject = '${filters.subject}' OR subject IS NULL)`;
   }
   
   if (filters?.stage) {
@@ -141,48 +145,12 @@ export async function listEvidenceTemplates(filters?: {
 }
 
 export async function getEvidenceTemplate(id: number) {
-  // قراءة من جدول evidences (الشواهد الجاهزة) باستخدام raw SQL
-  const result: any = await db.execute(sql.raw(`SELECT * FROM evidences WHERE id = ${id} LIMIT 1`));
-  const evidence = result[0]?.[0];
-  if (!evidence) return null;
+  // قراءة من جدول evidenceTemplates (الشواهد الجاهزة)
+  const result: any = await db.execute(sql.raw(`SELECT * FROM evidenceTemplates WHERE id = ${id} LIMIT 1`));
+  const template = result[0]?.[0];
+  if (!template) return null;
   
-  // تحويل box1-box6 إلى page2Boxes JSON array
-  const page2Boxes = [
-    { title: evidence.box1Title || 'المربع الأول', content: evidence.box1Content || '' },
-    { title: evidence.box2Title || 'المربع الثاني', content: evidence.box2Content || '' },
-    { title: evidence.box3Title || 'المربع الثالث', content: evidence.box3Content || '' },
-    { title: evidence.box4Title || 'المربع الرابع', content: evidence.box4Content || '' },
-    { title: evidence.box5Title || 'المربع الخامس', content: evidence.box5Content || '' },
-    { title: evidence.box6Title || 'المربع السادس', content: evidence.box6Content || '' },
-  ];
-  
-  // تحويل field1-field6 إلى userFields JSON array
-  const userFields = [];
-  if (evidence.field1Label) {
-    userFields.push({ name: evidence.field1Label, value: evidence.field1Value || '', type: 'text' });
-  }
-  if (evidence.field2Label) {
-    userFields.push({ name: evidence.field2Label, value: evidence.field2Value || '', type: 'text' });
-  }
-  if (evidence.field3Label) {
-    userFields.push({ name: evidence.field3Label, value: evidence.field3Value || '', type: 'text' });
-  }
-  if (evidence.field4Label) {
-    userFields.push({ name: evidence.field4Label, value: evidence.field4Value || '', type: 'text' });
-  }
-  if (evidence.field5Label) {
-    userFields.push({ name: evidence.field5Label, value: evidence.field5Value || '', type: 'text' });
-  }
-  if (evidence.field6Label) {
-    userFields.push({ name: evidence.field6Label, value: evidence.field6Value || '', type: 'text' });
-  }
-  
-  return {
-    ...evidence,
-    evidenceName: evidence.title,
-    page2Boxes: JSON.stringify(page2Boxes),
-    userFields: JSON.stringify(userFields),
-  };
+  return template;
 }
 
 export async function createEvidenceTemplate(data: schema.InsertEvidenceTemplate) {
