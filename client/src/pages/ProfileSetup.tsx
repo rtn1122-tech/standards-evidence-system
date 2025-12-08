@@ -413,10 +413,12 @@ export default function ProfileSetup() {
                         </div>
                       </div>
                       <Button
+                        type="button"
                         size="sm"
                         variant="secondary"
                         className="absolute bottom-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
                           setPreviewTheme({ type: 'evidence', value: 'white', name: 'ورقة بيضاء', image: null });
                         }}
@@ -456,10 +458,12 @@ export default function ProfileSetup() {
                         </div>
                       </div>
                       <Button
+                        type="button"
                         size="sm"
                         variant="secondary"
                         className="absolute bottom-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
                           setPreviewTheme({ type: 'evidence', value: 'theme1', name: 'ثيم الشواهد 1', image: '/themes/evidences/evidence-theme1.png' });
                         }}
@@ -499,10 +503,12 @@ export default function ProfileSetup() {
                         </div>
                       </div>
                       <Button
+                        type="button"
                         size="sm"
                         variant="secondary"
                         className="absolute bottom-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
                           setPreviewTheme({ type: 'evidence', value: 'theme2', name: 'ثيم الشواهد 2', image: '/themes/evidences/evidence-theme2.png' });
                         }}
@@ -548,10 +554,12 @@ export default function ProfileSetup() {
                         </div>
                       </div>
                       <Button
+                        type="button"
                         size="sm"
                         variant="secondary"
                         className="absolute bottom-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
                           setPreviewTheme({ type: 'cover', value: 'theme1', name: 'ثيم الغلاف 1', image: '/themes/covers/cover-theme1.png' });
                         }}
@@ -591,10 +599,12 @@ export default function ProfileSetup() {
                         </div>
                       </div>
                       <Button
+                        type="button"
                         size="sm"
                         variant="secondary"
                         className="absolute bottom-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
                           setPreviewTheme({ type: 'cover', value: 'theme2', name: 'ثيم الغلاف 2', image: '/themes/covers/cover-theme2.png' });
                         }}
@@ -634,10 +644,12 @@ export default function ProfileSetup() {
                         </div>
                       </div>
                       <Button
+                        type="button"
                         size="sm"
                         variant="secondary"
                         className="absolute bottom-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
                           setPreviewTheme({ type: 'cover', value: 'theme3', name: 'ثيم الغلاف 3', image: '/themes/covers/cover-theme3.png' });
                         }}
@@ -670,27 +682,36 @@ export default function ProfileSetup() {
 
       {/* Dialog للمعاينة المكبرة */}
       <Dialog open={previewTheme !== null} onOpenChange={() => setPreviewTheme(null)}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl text-right">{previewTheme?.name}</DialogTitle>
-            <DialogDescription className="text-right">
-              معاينة الثيم بحجم أكبر
+            <DialogTitle className="text-3xl text-right font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{previewTheme?.name}</DialogTitle>
+            <DialogDescription className="text-right text-lg">
+              معاينة مفصلة للثيم - اضغط على الصورة للتكبير
             </DialogDescription>
           </DialogHeader>
-          <div className="mt-4">
+          <div className="mt-6 bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-xl">
             {previewTheme?.image ? (
               <img
                 src={previewTheme.image}
                 alt={previewTheme.name}
-                className="w-full rounded-lg shadow-lg"
+                className="w-full rounded-xl shadow-2xl border-4 border-white hover:scale-105 transition-transform duration-300 cursor-zoom-in"
+                onClick={(e) => {
+                  if (previewTheme?.image) {
+                    window.open(previewTheme.image, '_blank');
+                  }
+                }}
               />
             ) : (
-              <div className="w-full aspect-[3/4] bg-white border-2 border-gray-300 rounded-lg flex items-center justify-center">
-                <span className="text-gray-400 text-2xl">ورقة بيضاء</span>
+              <div className="w-full aspect-[3/4] bg-white border-4 border-dashed border-gray-300 rounded-xl flex items-center justify-center">
+                <div className="text-center">
+                  <span className="text-gray-400 text-4xl block mb-2">📄</span>
+                  <span className="text-gray-500 text-2xl font-medium">ورقة بيضاء</span>
+                  <p className="text-gray-400 text-sm mt-2">الثيم الافتراضي</p>
+                </div>
               </div>
             )}
           </div>
-          <div className="flex gap-3 mt-4">
+          <div className="flex gap-3 mt-6">
             <Button
               onClick={() => {
                 if (previewTheme) {
@@ -702,16 +723,16 @@ export default function ProfileSetup() {
                 }
                 setPreviewTheme(null);
               }}
-              className="flex-1"
+              className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-6 text-lg"
             >
-              اختيار هذا الثيم
+              ✅ اختيار هذا الثيم
             </Button>
             <Button
               variant="outline"
               onClick={() => setPreviewTheme(null)}
-              className="flex-1"
+              className="flex-1 border-2 font-semibold py-6 text-lg hover:bg-gray-100"
             >
-              إغلاق
+              ✖️ إغلاق
             </Button>
           </div>
         </DialogContent>
