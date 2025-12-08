@@ -6,10 +6,11 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Upload, User } from "lucide-react";
+import { Upload, User, ZoomIn } from "lucide-react";
 
 import { STAGES, getSubjectsForGrades } from "../../../shared/constants";
 
@@ -46,6 +47,7 @@ export default function ProfileSetup() {
   });
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [previewTheme, setPreviewTheme] = useState<{ type: 'evidence' | 'cover', value: string, name: string, image: string | null } | null>(null);
 
   useEffect(() => {
     if (profile) {
@@ -384,88 +386,130 @@ export default function ProfileSetup() {
                   <Label className="text-lg font-semibold">ثيم الشواهد</Label>
                   <div className="grid grid-cols-3 gap-4">
                     {/* ورقة بيضاء */}
-                    <div
-                      onClick={() => setFormData({ ...formData, preferredTheme: 'white' })}
-                      className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
-                        formData.preferredTheme === 'white'
-                          ? 'border-green-500 shadow-xl'
-                          : 'border-gray-200 hover:border-blue-300'
-                      }`}
-                    >
-                      <div className="relative">
-                        <div className="aspect-[3/4] bg-white flex items-center justify-center border border-gray-300">
-                          <span className="text-gray-400 text-sm">ورقة بيضاء</span>
-                        </div>
-                        {formData.preferredTheme === 'white' && (
-                          <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
+                    <div className="relative group">
+                      <div
+                        onClick={() => setFormData({ ...formData, preferredTheme: 'white' })}
+                        className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
+                          formData.preferredTheme === 'white'
+                            ? 'border-green-500 shadow-xl'
+                            : 'border-gray-200 hover:border-blue-300'
+                        }`}
+                      >
+                        <div className="relative">
+                          <div className="aspect-[3/4] bg-white flex items-center justify-center border border-gray-300">
+                            <span className="text-gray-400 text-sm">ورقة بيضاء</span>
                           </div>
-                        )}
+                          {formData.preferredTheme === 'white' && (
+                            <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-2 bg-gray-50 text-center">
+                          <p className="text-sm font-medium">ورقة بيضاء</p>
+                          <p className="text-xs text-gray-500">الافتراضي</p>
+                        </div>
                       </div>
-                      <div className="p-2 bg-gray-50 text-center">
-                        <p className="text-sm font-medium">ورقة بيضاء</p>
-                        <p className="text-xs text-gray-500">الافتراضي</p>
-                      </div>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="absolute bottom-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPreviewTheme({ type: 'evidence', value: 'white', name: 'ورقة بيضاء', image: null });
+                        }}
+                      >
+                        <ZoomIn className="w-4 h-4 ml-1" />
+                        معاينة
+                      </Button>
                     </div>
 
                     {/* ثيم 1 */}
-                    <div
-                      onClick={() => setFormData({ ...formData, preferredTheme: 'theme1' })}
-                      className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
-                        formData.preferredTheme === 'theme1'
-                          ? 'border-green-500 shadow-xl'
-                          : 'border-gray-200 hover:border-blue-300'
-                      }`}
-                    >
-                      <div className="relative">
-                        <img
-                          src="/themes/evidences/evidence-theme1.png"
-                          alt="ثيم الشواهد 1"
-                          className="w-full aspect-[3/4] object-cover"
-                        />
-                        {formData.preferredTheme === 'theme1' && (
-                          <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                        )}
+                    <div className="relative group">
+                      <div
+                        onClick={() => setFormData({ ...formData, preferredTheme: 'theme1' })}
+                        className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
+                          formData.preferredTheme === 'theme1'
+                            ? 'border-green-500 shadow-xl'
+                            : 'border-gray-200 hover:border-blue-300'
+                        }`}
+                      >
+                        <div className="relative">
+                          <img
+                            src="/themes/evidences/evidence-theme1.png"
+                            alt="ثيم الشواهد 1"
+                            className="w-full aspect-[3/4] object-cover"
+                          />
+                          {formData.preferredTheme === 'theme1' && (
+                            <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-2 bg-gray-50 text-center">
+                          <p className="text-sm font-medium">ثيم الشواهد 1</p>
+                          <p className="text-xs text-gray-500">كلاسيكي</p>
+                        </div>
                       </div>
-                      <div className="p-2 bg-gray-50 text-center">
-                        <p className="text-sm font-medium">ثيم الشواهد 1</p>
-                        <p className="text-xs text-gray-500">كلاسيكي</p>
-                      </div>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="absolute bottom-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPreviewTheme({ type: 'evidence', value: 'theme1', name: 'ثيم الشواهد 1', image: '/themes/evidences/evidence-theme1.png' });
+                        }}
+                      >
+                        <ZoomIn className="w-4 h-4 ml-1" />
+                        معاينة
+                      </Button>
                     </div>
 
                     {/* ثيم 2 */}
-                    <div
-                      onClick={() => setFormData({ ...formData, preferredTheme: 'theme2' })}
-                      className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
-                        formData.preferredTheme === 'theme2'
-                          ? 'border-green-500 shadow-xl'
-                          : 'border-gray-200 hover:border-blue-300'
-                      }`}
-                    >
-                      <div className="relative">
-                        <img
-                          src="/themes/evidences/evidence-theme2.png"
-                          alt="ثيم الشواهد 2"
-                          className="w-full aspect-[3/4] object-cover"
-                        />
-                        {formData.preferredTheme === 'theme2' && (
-                          <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                        )}
+                    <div className="relative group">
+                      <div
+                        onClick={() => setFormData({ ...formData, preferredTheme: 'theme2' })}
+                        className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
+                          formData.preferredTheme === 'theme2'
+                            ? 'border-green-500 shadow-xl'
+                            : 'border-gray-200 hover:border-blue-300'
+                        }`}
+                      >
+                        <div className="relative">
+                          <img
+                            src="/themes/evidences/evidence-theme2.png"
+                            alt="ثيم الشواهد 2"
+                            className="w-full aspect-[3/4] object-cover"
+                          />
+                          {formData.preferredTheme === 'theme2' && (
+                            <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-2 bg-gray-50 text-center">
+                          <p className="text-sm font-medium">ثيم الشواهد 2</p>
+                          <p className="text-xs text-gray-500">حديث</p>
+                        </div>
                       </div>
-                      <div className="p-2 bg-gray-50 text-center">
-                        <p className="text-sm font-medium">ثيم الشواهد 2</p>
-                        <p className="text-xs text-gray-500">حديث</p>
-                      </div>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="absolute bottom-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPreviewTheme({ type: 'evidence', value: 'theme2', name: 'ثيم الشواهد 2', image: '/themes/evidences/evidence-theme2.png' });
+                        }}
+                      >
+                        <ZoomIn className="w-4 h-4 ml-1" />
+                        معاينة
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -475,90 +519,132 @@ export default function ProfileSetup() {
                   <Label className="text-lg font-semibold">ثيم الغلاف</Label>
                   <div className="grid grid-cols-3 gap-4">
                     {/* ثيم غلاف 1 */}
-                    <div
-                      onClick={() => setFormData({ ...formData, preferredCoverTheme: 'theme1' })}
-                      className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
-                        formData.preferredCoverTheme === 'theme1'
-                          ? 'border-green-500 shadow-xl'
-                          : 'border-gray-200 hover:border-blue-300'
-                      }`}
-                    >
-                      <div className="relative">
-                        <img
-                          src="/themes/covers/cover-theme1.png"
-                          alt="ثيم الغلاف 1"
-                          className="w-full aspect-[3/4] object-cover"
-                        />
-                        {formData.preferredCoverTheme === 'theme1' && (
-                          <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                        )}
+                    <div className="relative group">
+                      <div
+                        onClick={() => setFormData({ ...formData, preferredCoverTheme: 'theme1' })}
+                        className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
+                          formData.preferredCoverTheme === 'theme1'
+                            ? 'border-green-500 shadow-xl'
+                            : 'border-gray-200 hover:border-blue-300'
+                        }`}
+                      >
+                        <div className="relative">
+                          <img
+                            src="/themes/covers/cover-theme1.png"
+                            alt="ثيم الغلاف 1"
+                            className="w-full aspect-[3/4] object-cover"
+                          />
+                          {formData.preferredCoverTheme === 'theme1' && (
+                            <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-2 bg-gray-50 text-center">
+                          <p className="text-sm font-medium">ثيم الغلاف 1</p>
+                          <p className="text-xs text-gray-500">رسمي</p>
+                        </div>
                       </div>
-                      <div className="p-2 bg-gray-50 text-center">
-                        <p className="text-sm font-medium">ثيم الغلاف 1</p>
-                        <p className="text-xs text-gray-500">رسمي</p>
-                      </div>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="absolute bottom-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPreviewTheme({ type: 'cover', value: 'theme1', name: 'ثيم الغلاف 1', image: '/themes/covers/cover-theme1.png' });
+                        }}
+                      >
+                        <ZoomIn className="w-4 h-4 ml-1" />
+                        معاينة
+                      </Button>
                     </div>
 
                     {/* ثيم غلاف 2 */}
-                    <div
-                      onClick={() => setFormData({ ...formData, preferredCoverTheme: 'theme2' })}
-                      className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
-                        formData.preferredCoverTheme === 'theme2'
-                          ? 'border-green-500 shadow-xl'
-                          : 'border-gray-200 hover:border-blue-300'
-                      }`}
-                    >
-                      <div className="relative">
-                        <img
-                          src="/themes/covers/cover-theme2.png"
-                          alt="ثيم الغلاف 2"
-                          className="w-full aspect-[3/4] object-cover"
-                        />
-                        {formData.preferredCoverTheme === 'theme2' && (
-                          <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                        )}
+                    <div className="relative group">
+                      <div
+                        onClick={() => setFormData({ ...formData, preferredCoverTheme: 'theme2' })}
+                        className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
+                          formData.preferredCoverTheme === 'theme2'
+                            ? 'border-green-500 shadow-xl'
+                            : 'border-gray-200 hover:border-blue-300'
+                        }`}
+                      >
+                        <div className="relative">
+                          <img
+                            src="/themes/covers/cover-theme2.png"
+                            alt="ثيم الغلاف 2"
+                            className="w-full aspect-[3/4] object-cover"
+                          />
+                          {formData.preferredCoverTheme === 'theme2' && (
+                            <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-2 bg-gray-50 text-center">
+                          <p className="text-sm font-medium">ثيم الغلاف 2</p>
+                          <p className="text-xs text-gray-500">أنيق</p>
+                        </div>
                       </div>
-                      <div className="p-2 bg-gray-50 text-center">
-                        <p className="text-sm font-medium">ثيم الغلاف 2</p>
-                        <p className="text-xs text-gray-500">أنيق</p>
-                      </div>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="absolute bottom-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPreviewTheme({ type: 'cover', value: 'theme2', name: 'ثيم الغلاف 2', image: '/themes/covers/cover-theme2.png' });
+                        }}
+                      >
+                        <ZoomIn className="w-4 h-4 ml-1" />
+                        معاينة
+                      </Button>
                     </div>
 
                     {/* ثيم غلاف 3 */}
-                    <div
-                      onClick={() => setFormData({ ...formData, preferredCoverTheme: 'theme3' })}
-                      className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
-                        formData.preferredCoverTheme === 'theme3'
-                          ? 'border-green-500 shadow-xl'
-                          : 'border-gray-200 hover:border-blue-300'
-                      }`}
-                    >
-                      <div className="relative">
-                        <img
-                          src="/themes/covers/cover-theme3.png"
-                          alt="ثيم الغلاف 3"
-                          className="w-full aspect-[3/4] object-cover"
-                        />
-                        {formData.preferredCoverTheme === 'theme3' && (
-                          <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                        )}
+                    <div className="relative group">
+                      <div
+                        onClick={() => setFormData({ ...formData, preferredCoverTheme: 'theme3' })}
+                        className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
+                          formData.preferredCoverTheme === 'theme3'
+                            ? 'border-green-500 shadow-xl'
+                            : 'border-gray-200 hover:border-blue-300'
+                        }`}
+                      >
+                        <div className="relative">
+                          <img
+                            src="/themes/covers/cover-theme3.png"
+                            alt="ثيم الغلاف 3"
+                            className="w-full aspect-[3/4] object-cover"
+                          />
+                          {formData.preferredCoverTheme === 'theme3' && (
+                            <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-2 bg-gray-50 text-center">
+                          <p className="text-sm font-medium">ثيم الغلاف 3</p>
+                          <p className="text-xs text-gray-500">عصري</p>
+                        </div>
                       </div>
-                      <div className="p-2 bg-gray-50 text-center">
-                        <p className="text-sm font-medium">ثيم الغلاف 3</p>
-                        <p className="text-xs text-gray-500">عصري</p>
-                      </div>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="absolute bottom-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPreviewTheme({ type: 'cover', value: 'theme3', name: 'ثيم الغلاف 3', image: '/themes/covers/cover-theme3.png' });
+                        }}
+                      >
+                        <ZoomIn className="w-4 h-4 ml-1" />
+                        معاينة
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -581,6 +667,55 @@ export default function ProfileSetup() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Dialog للمعاينة المكبرة */}
+      <Dialog open={previewTheme !== null} onOpenChange={() => setPreviewTheme(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl text-right">{previewTheme?.name}</DialogTitle>
+            <DialogDescription className="text-right">
+              معاينة الثيم بحجم أكبر
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4">
+            {previewTheme?.image ? (
+              <img
+                src={previewTheme.image}
+                alt={previewTheme.name}
+                className="w-full rounded-lg shadow-lg"
+              />
+            ) : (
+              <div className="w-full aspect-[3/4] bg-white border-2 border-gray-300 rounded-lg flex items-center justify-center">
+                <span className="text-gray-400 text-2xl">ورقة بيضاء</span>
+              </div>
+            )}
+          </div>
+          <div className="flex gap-3 mt-4">
+            <Button
+              onClick={() => {
+                if (previewTheme) {
+                  if (previewTheme.type === 'evidence') {
+                    setFormData({ ...formData, preferredTheme: previewTheme.value });
+                  } else {
+                    setFormData({ ...formData, preferredCoverTheme: previewTheme.value });
+                  }
+                }
+                setPreviewTheme(null);
+              }}
+              className="flex-1"
+            >
+              اختيار هذا الثيم
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setPreviewTheme(null)}
+              className="flex-1"
+            >
+              إغلاق
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

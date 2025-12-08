@@ -359,6 +359,25 @@ export function generateVisionMissionPage(): string {
 
 // 5. Kings Quotes Page
 export function generateKingsQuotesPage(): string {
+  // Load king images as base64
+  const fs = require('fs');
+  const path = require('path');
+  
+  const getImageBase64 = (filename: string): string => {
+    try {
+      const imagePath = path.join(__dirname, '..', 'client', 'public', 'images', 'kings', filename);
+      const imageBuffer = fs.readFileSync(imagePath);
+      const ext = filename.split('.').pop();
+      return `data:image/${ext === 'jpg' ? 'jpeg' : ext};base64,${imageBuffer.toString('base64')}`;
+    } catch (error) {
+      console.error(`Failed to load image: ${filename}`, error);
+      return '';
+    }
+  };
+  
+  const kingAbdulazizImg = getImageBase64('king-abdulaziz.jpg');
+  const kingSalmanImg = getImageBase64('king-salman.jpg');
+  const crownPrinceImg = getImageBase64('crown-prince.jpg');
   return `
     <!DOCTYPE html>
     <html>
@@ -405,12 +424,14 @@ export function generateKingsQuotesPage(): string {
           background: white;
           border-radius: 8px;
         }
-        .image-placeholder {
-          width: 80px;
-          height: 80px;
-          background: #e5e7eb;
+        .king-image {
+          width: 120px;
+          height: 120px;
           border-radius: 50%;
           margin: 0 auto 15px;
+          object-fit: cover;
+          border: 4px solid #f59e0b;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
       </style>
     </head>
@@ -418,7 +439,7 @@ export function generateKingsQuotesPage(): string {
       <div class="page-title">أقوال ملوك المملكة عن التعليم</div>
       
       <div class="quote-section">
-        <div class="image-placeholder"></div>
+        ${kingAbdulazizImg ? `<img src="${kingAbdulazizImg}" class="king-image" alt="الملك عبدالعزيز" />` : '<div class="king-image" style="background: #e5e7eb;"></div>'}
         <div class="king-name">الملك عبدالعزيز آل سعود</div>
         <div class="quote-text">
           "التعليم في المملكة هو الركيزة الأساسية لنحقق بها تطلعات شعبنا نحو التقدم والرقي في العلوم والمعارف"
@@ -426,7 +447,7 @@ export function generateKingsQuotesPage(): string {
       </div>
 
       <div class="quote-section">
-        <div class="image-placeholder"></div>
+        ${kingSalmanImg ? `<img src="${kingSalmanImg}" class="king-image" alt="الملك سلمان" />` : '<div class="king-image" style="background: #e5e7eb;"></div>'}
         <div class="king-name">الملك سلمان بن عبدالعزيز</div>
         <div class="quote-text">
           "لا شك في أن التعليم في هذه البلاد هو من أسّس التنمية، ومن الأسس التي تعتمد الدولة عليها في بناء هذه الدولة الفتية"
@@ -434,7 +455,7 @@ export function generateKingsQuotesPage(): string {
       </div>
 
       <div class="quote-section">
-        <div class="image-placeholder"></div>
+        ${crownPrinceImg ? `<img src="${crownPrinceImg}" class="king-image" alt="ولي العهد" />` : '<div class="king-image" style="background: #e5e7eb;"></div>'}
         <div class="king-name">الأمير محمد بن سلمان</div>
         <div class="quote-text">
           "طموحنا أن نكون ضمن أفضل 20 إلى 30 نظاماً تعليمياً ونملك كل شيء لتحقيق ذلك"
