@@ -1,8 +1,0 @@
-{
-  "query": "\nSELECT \n  description,\n  section1Title, section1Content,\n  section2Title, section2Content,\n  section3Title, section3Content,\n  section4Title, section4Content,\n  section5Title, section5Content,\n  section6Title, section6Content,\n  image1Url, image2Url\nFROM evidenceDetails\nWHERE id = 120002\nLIMIT 1;\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute \nSELECT \n  description,\n  section1Title, section1Content,\n  section2Title, section2Content,\n  section3Title, section3Content,\n  section4Title, section4Content,\n  section5Title, section5Content,\n  section6Title, section6Content,\n  image1Url, image2Url\nFROM evidenceDetails\nWHERE id = 120002\nLIMIT 1;\n",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1054 (42S22) at line 2: Unknown column 'description' in 'field list'"
-  ]
-}

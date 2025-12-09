@@ -1,1 +1,0 @@
-ALTER TABLE `teacherProfiles` ADD `preferredSortBy` enum('newest','oldest','priority') DEFAULT 'newest';

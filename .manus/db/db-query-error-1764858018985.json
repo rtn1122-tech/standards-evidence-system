@@ -1,8 +1,0 @@
-{
-  "query": "ALTER TABLE evidenceSubTemplates \nADD COLUMN targetAudience ENUM('all', 'stage', 'subject', 'stage_subject') DEFAULT 'all' NOT NULL AFTER orderIndex,\nADD COLUMN stages JSON AFTER targetAudience,\nADD COLUMN subjects JSON AFTER stages,\nADD COLUMN grades JSON AFTER subjects;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute ALTER TABLE evidenceSubTemplates \nADD COLUMN targetAudience ENUM('all', 'stage', 'subject', 'stage_subject') DEFAULT 'all' NOT NULL AFTER orderIndex,\nADD COLUMN stages JSON AFTER targetAudience,\nADD COLUMN subjects JSON AFTER stages,\nADD COLUMN grades JSON AFTER subjects;",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1054 (42S22) at line 1: Unknown column 'targetaudience' in 'evidenceSubTemplates'"
-  ]
-}

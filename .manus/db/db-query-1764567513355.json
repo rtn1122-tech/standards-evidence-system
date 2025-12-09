@@ -1,9 +1,0 @@
-{
-  "query": "ALTER TABLE evidenceSubTemplates \nADD COLUMN defaultSection1Title VARCHAR(100),\nADD COLUMN defaultSection1Content TEXT,\nADD COLUMN defaultSection2Title VARCHAR(100),\nADD COLUMN defaultSection2Content TEXT,\nADD COLUMN defaultSection3Title VARCHAR(100),\nADD COLUMN defaultSection3Content TEXT,\nADD COLUMN defaultSection4Title VARCHAR(100),\nADD COLUMN defaultSection4Content TEXT,\nADD COLUMN defaultSection5Title VARCHAR(100),\nADD COLUMN defaultSection5Content TEXT,\nADD COLUMN defaultSection6Title VARCHAR(100),\nADD COLUMN defaultSection6Content TEXT,\nADD COLUMN defaultSection7Title VARCHAR(100),\nADD COLUMN defaultSection7Content TEXT",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute ALTER TABLE evidenceSubTemplates \nADD COLUMN defaultSection1Title VARCHAR(100),\nADD COLUMN defaultSection1Content TEXT,\nADD COLUMN defaultSection2Title VARCHAR(100),\nADD COLUMN defaultSection2Content TEXT,\nADD COLUMN defaultSection3Title VARCHAR(100),\nADD COLUMN defaultSection3Content TEXT,\nADD COLUMN defaultSection4Title VARCHAR(100),\nADD COLUMN defaultSection4Content TEXT,\nADD COLUMN defaultSection5Title VARCHAR(100),\nADD COLUMN defaultSection5Content TEXT,\nADD COLUMN defaultSection6Title VARCHAR(100),\nADD COLUMN defaultSection6Content TEXT,\nADD COLUMN defaultSection7Title VARCHAR(100),\nADD COLUMN defaultSection7Content TEXT",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 5122
-}

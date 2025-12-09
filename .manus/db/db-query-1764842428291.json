@@ -1,9 +1,0 @@
-{
-  "query": "UPDATE evidenceSubTemplates \nSET \n  description = NULL,\n  section1Title = NULL,\n  section1Content = NULL,\n  section2Title = NULL,\n  section2Content = NULL,\n  section3Title = NULL,\n  section3Content = NULL,\n  section4Title = NULL,\n  section4Content = NULL,\n  section5Title = NULL,\n  section5Content = NULL,\n  section6Title = NULL,\n  section6Content = NULL,\n  defaultImage1Url = NULL,\n  defaultImage2Url = NULL\nWHERE id BETWEEN 101 AND 111;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute UPDATE evidenceSubTemplates \nSET \n  description = NULL,\n  section1Title = NULL,\n  section1Content = NULL,\n  section2Title = NULL,\n  section2Content = NULL,\n  section3Title = NULL,\n  section3Content = NULL,\n  section4Title = NULL,\n  section4Content = NULL,\n  section5Title = NULL,\n  section5Content = NULL,\n  section6Title = NULL,\n  section6Content = NULL,\n  defaultImage1Url = NULL,\n  defaultImage2Url = NULL\nWHERE id BETWEEN 101 AND 111;",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1601
-}

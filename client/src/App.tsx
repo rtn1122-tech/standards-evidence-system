@@ -1,59 +1,37 @@
-// import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
-import ProfileSetup from "./pages/ProfileSetup";
-import LandingPage from "./pages/LandingPage";
-import About from "./pages/About";
-import RequestCustomService from "./pages/RequestCustomService";
-import RequestPrint from "./pages/RequestPrint";
-import CreateCustomEvidence from "./pages/CreateCustomEvidence";
-import MyEvidences from "./pages/MyEvidences";
-import OwnerDashboard from "./pages/OwnerDashboard";
-import Standards from "./pages/Standards";
-import StandardDetail from "./pages/StandardDetail";
-import ProgressStats from "./pages/ProgressStats";
-import AdminPanel from "./pages/AdminPanel";
-import FillEvidence from "./pages/FillEvidence";
-import PreviewThemes from "./pages/PreviewThemes";
-import Statistics from "./pages/Statistics";
 
 function Router() {
+  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
-      <Route path={"/landing"} component={LandingPage} />
-      <Route path="/about" component={About} />
-      <Route path={"/profile-setup"} component={ProfileSetup} />
-      <Route path={"/request-custom-service"} component={RequestCustomService} />
-      <Route path={"/request-print"} component={RequestPrint} />
-      <Route path={"/create-custom-evidence"} component={CreateCustomEvidence} />
-      <Route path={"/my-evidences"} component={MyEvidences} />
-      <Route path={"/owner-dashboard"} component={OwnerDashboard} />
-      <Route path={"/admin"} component={AdminPanel} />
-      <Route path={"/standards"} component={Standards} />
-      <Route path={"/standard/:id"} component={StandardDetail} />
-      <Route path={"/progress"} component={ProgressStats} />
-      <Route path={"/statistics"} component={Statistics} />
-      <Route path="/evidence/fill/:id" component={FillEvidence} />
-      <Route path="/evidence/edit/:id" component={FillEvidence} />
-      <Route path={"/preview-themes"} component={PreviewThemes} />
-
       <Route path={"/404"} component={NotFound} />
+      {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>
   );
 }
 
+// NOTE: About Theme
+// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
+//   to keep consistent foreground/background color across components
+// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
+
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light">
+      <ThemeProvider
+        defaultTheme="light"
+        // switchable
+      >
         <TooltipProvider>
-          {/* <Toaster /> */}
+          <Toaster />
           <Router />
         </TooltipProvider>
       </ThemeProvider>
