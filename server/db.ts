@@ -1,526 +1,92 @@
+import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import mysql from "mysql2/promise";
-import { eq, and, or, sql } from "drizzle-orm";
-import * as schema from "../drizzle/schema";
+import { InsertUser, users } from "../drizzle/schema";
+import { ENV } from './_core/env';
 
-// Create connection pool with automatic reconnection
-const pool = mysql.createPool({
-  uri: process.env.DATABASE_URL!,
-  waitForConnections: true,
-  connectionLimit: 10,
-  maxIdle: 10,
-  idleTimeout: 60000,
-  queueLimit: 0,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 0,
-});
+let _db: ReturnType<typeof drizzle> | null = null;
 
-// Initialize Drizzle with the pool
-const db = drizzle(pool, { schema, mode: "default" });
-
-// Test connection on startup
-pool.getConnection()
-  .then((conn) => {
-    console.log('[DB] Connection pool initialized successfully');
-    conn.release();
-  })
-  .catch((err) => {
-    console.error('[DB] Failed to initialize connection pool:', err);
-  });
-
-export async function initDb() {
-  return db;
-}
-
-export { db };
-
-// ========================================
-// Teacher Profile
-// ========================================
-
-export async function getTeacherProfile(userId: number) {
-  const result = await db
-    .select()
-    .from(schema.teacherProfiles)
-    .where(eq(schema.teacherProfiles.userId, userId))
-    .limit(1);
-  return result[0] || null;
-}
-
-export async function upsertTeacherProfile(data: any) {
-  const existing = await getTeacherProfile(data.userId);
-  
-  // تحويل الحقول إلى أسماء الأعمدة الصحيحة
-  const profileData: any = {
-    userId: data.userId,
-    educationDepartment: data.educationDepartment,
-    schoolName: data.schoolName,
-    teacherName: data.teacherName,
-    principalName: data.principalName,
-    gender: data.gender,
-    stage: data.stage, // JSON string للصفوف الدراسية
-    subjects: data.subjects, // JSON string
-    email: data.email,
-    phoneNumber: data.phone, // phone -> phoneNumber
-    professionalLicenseNumber: data.licenseNumber, // licenseNumber -> professionalLicenseNumber
-    licenseStartDate: data.licenseIssueDate, // licenseIssueDate -> licenseStartDate
-    licenseEndDate: data.licenseExpiryDate, // licenseExpiryDate -> licenseEndDate
-    employeeNumber: data.employeeNumber,
-    jobTitle: data.teacherLevel, // teacherLevel -> jobTitle
-    profileImage: data.profileImage,
-    preferredTheme: data.preferredTheme,
-    preferredCoverTheme: data.preferredCoverTheme,
-  };
-  
-  // حذف الحقول undefined
-  Object.keys(profileData).forEach(key => {
-    if (profileData[key] === undefined) {
-      delete profileData[key];
+// Lazily create the drizzle instance so local tooling can run without a DB.
+export async function getDb() {
+  if (!_db && process.env.DATABASE_URL) {
+    try {
+      _db = drizzle(process.env.DATABASE_URL);
+    } catch (error) {
+      console.warn("[Database] Failed to connect:", error);
+      _db = null;
     }
-  });
-  
-  if (existing) {
-    // Update existing profile
-    await db
-      .update(schema.teacherProfiles)
-      .set(profileData)
-      .where(eq(schema.teacherProfiles.userId, data.userId));
-    
-    return { ...existing, ...profileData };
-  } else {
-    // Insert new profile
-    await db.insert(schema.teacherProfiles).values(profileData);
-    return profileData;
+  }
+  return _db;
+}
+
+export async function upsertUser(user: InsertUser): Promise<void> {
+  if (!user.openId) {
+    throw new Error("User openId is required for upsert");
+  }
+
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot upsert user: database not available");
+    return;
+  }
+
+  try {
+    const values: InsertUser = {
+      openId: user.openId,
+    };
+    const updateSet: Record<string, unknown> = {};
+
+    const textFields = ["name", "email", "loginMethod"] as const;
+    type TextField = (typeof textFields)[number];
+
+    const assignNullable = (field: TextField) => {
+      const value = user[field];
+      if (value === undefined) return;
+      const normalized = value ?? null;
+      values[field] = normalized;
+      updateSet[field] = normalized;
+    };
+
+    textFields.forEach(assignNullable);
+
+    if (user.lastSignedIn !== undefined) {
+      values.lastSignedIn = user.lastSignedIn;
+      updateSet.lastSignedIn = user.lastSignedIn;
+    }
+    if (user.role !== undefined) {
+      values.role = user.role;
+      updateSet.role = user.role;
+    } else if (user.openId === ENV.ownerOpenId) {
+      values.role = 'admin';
+      updateSet.role = 'admin';
+    }
+
+    if (!values.lastSignedIn) {
+      values.lastSignedIn = new Date();
+    }
+
+    if (Object.keys(updateSet).length === 0) {
+      updateSet.lastSignedIn = new Date();
+    }
+
+    await db.insert(users).values(values).onDuplicateKeyUpdate({
+      set: updateSet,
+    });
+  } catch (error) {
+    console.error("[Database] Failed to upsert user:", error);
+    throw error;
   }
 }
-
-// ========================================
-// Standards
-// ========================================
-
-export async function listStandards() {
-  return await db
-    .select()
-    .from(schema.standards)
-    .orderBy(schema.standards.orderIndex);
-}
-
-export async function getStandard(id: number) {
-  const result = await db
-    .select()
-    .from(schema.standards)
-    .where(eq(schema.standards.id, id))
-    .limit(1);
-  return result[0] || null;
-}
-
-// ========================================
-// Evidence Templates
-// ========================================
-
-export async function listEvidenceTemplates(filters?: {
-  standardId?: number;
-  subject?: string;
-  stage?: string;
-}) {
-  // قراءة من جدول evidenceTemplates (الشواهد الجاهزة)
-  let query = 'SELECT * FROM evidenceTemplates WHERE 1=1';
-  
-  if (filters?.standardId) {
-    query += ` AND standardId = ${filters.standardId}`;
-  }
-  
-  if (filters?.subject) {
-    query += ` AND (subject = '${filters.subject}' OR subject IS NULL)`;
-  }
-  
-  if (filters?.stage) {
-    query += ` AND (stage = '${filters.stage}' OR stage = 'all')`;
-  }
-  
-  query += ' ORDER BY id';
-  
-  const result: any = await db.execute(sql.raw(query));
-  return result[0] || [];
-}
-
-export async function getEvidenceTemplate(id: number) {
-  // قراءة من جدول evidenceTemplates (الشواهد الجاهزة)
-  const result: any = await db.execute(sql.raw(`SELECT * FROM evidenceTemplates WHERE id = ${id} LIMIT 1`));
-  const template = result[0]?.[0];
-  if (!template) return null;
-  
-  return template;
-}
-
-export async function createEvidenceTemplate(data: schema.InsertEvidenceTemplate) {
-  const result = await db.insert(schema.evidenceTemplates).values(data);
-  return { id: Number(result[0].insertId), ...data };
-}
-
-export async function updateEvidenceTemplate(id: number, data: Partial<schema.InsertEvidenceTemplate>) {
-  await db
-    .update(schema.evidenceTemplates)
-    .set(data)
-    .where(eq(schema.evidenceTemplates.id, id));
-}
-
-export async function deleteEvidenceTemplate(id: number) {
-  await db
-    .delete(schema.evidenceTemplates)
-    .where(eq(schema.evidenceTemplates.id, id));
-}
-
-export async function incrementTemplateUsage(templateId: number) {
-  await db.execute(
-    sql`UPDATE evidenceTemplates SET usageCount = usageCount + 1 WHERE id = ${templateId}`
-  );
-}
-
-// ========================================
-// User Evidences
-// ========================================
-
-export async function listUserEvidences(userId: number) {
-  const result: any = await db.execute(
-    sql`SELECT * FROM userEvidences WHERE userId = ${userId} ORDER BY createdAt DESC`
-  );
-  return result[0] || [];
-}
-
-export async function getUserEvidence(id: number) {
-  const result: any = await db.execute(
-    sql`SELECT * FROM userEvidences WHERE id = ${id} LIMIT 1`
-  );
-  return result[0]?.[0] || null;
-}
-
-export async function createUserEvidence(data: any) {
-  const result: any = await db.execute(
-    sql`INSERT INTO userEvidences (userId, templateId, userData, customImageUrl, themeId, coverThemeId) VALUES (${data.userId}, ${data.templateId}, ${data.userData}, ${data.customImageUrl || null}, ${data.themeId || null}, ${data.coverThemeId || null})`
-  );
-  return { id: Number(result[0].insertId), ...data };
-}
-
-export async function updateUserEvidence(id: number, data: any) {
-  const fields = [];
-  if (data.userData !== undefined) fields.push(`userData = ${sql.raw(`'${data.userData}'`)}`);
-  if (data.customImageUrl !== undefined) fields.push(`customImageUrl = ${sql.raw(`'${data.customImageUrl}'`)}`);
-  if (data.themeId !== undefined) fields.push(`themeId = ${data.themeId}`);
-  if (data.coverThemeId !== undefined) fields.push(`coverThemeId = ${data.coverThemeId}`);
-  if (data.pdfUrl !== undefined) fields.push(`pdfUrl = ${sql.raw(`'${data.pdfUrl}'`)}`);
-  
-  if (fields.length > 0) {
-    await db.execute(sql.raw(`UPDATE userEvidences SET ${fields.join(', ')} WHERE id = ${id}`));
-  }
-}
-
-export async function deleteUserEvidence(id: number) {
-  await db.execute(sql`DELETE FROM userEvidences WHERE id = ${id}`);
-}
-
-// ========================================
-// Themes
-// ========================================
-
-export async function listThemes(type?: 'full' | 'cover') {
-  let query = 'SELECT * FROM themes WHERE isActive = TRUE';
-  if (type) {
-    query += ` AND type = '${type}'`;
-  }
-  query += ' ORDER BY id';
-  
-  const result: any = await db.execute(sql.raw(query));
-  return result[0] || [];
-}
-
-export async function getTheme(id: number) {
-  const result: any = await db.execute(
-    sql`SELECT * FROM themes WHERE id = ${id} LIMIT 1`
-  );
-  return result[0]?.[0] || null;
-}
-
-// ========================================
-// Activation Codes
-// ========================================
-
-export async function getActivationCode(code: string) {
-  const result: any = await db.execute(
-    sql`SELECT * FROM activationCodes WHERE code = ${code} LIMIT 1`
-  );
-  return result[0]?.[0] || null;
-}
-
-export async function useActivationCode(code: string, userId: number) {
-  await db.execute(
-    sql`UPDATE activationCodes SET isUsed = TRUE, usedByUserId = ${userId}, usedAt = NOW() WHERE code = ${code}`
-  );
-}
-
-// ========================================
-// Users
-// ========================================
-
-export async function updateUserSubscription(userId: number, data: {
-  activationCode: string;
-  subscriptionStart: Date;
-  subscriptionEnd: Date;
-  isActive: boolean;
-}) {
-  await db.execute(
-    sql`UPDATE users SET activationCode = ${data.activationCode}, subscriptionStart = ${data.subscriptionStart}, subscriptionEnd = ${data.subscriptionEnd}, isActive = ${data.isActive} WHERE id = ${userId}`
-  );
-}
-
-// ========================================
-// Users (Auth)
-// ========================================
 
 export async function getUserByOpenId(openId: string) {
-  const result: any = await db.execute(
-    sql`SELECT * FROM users WHERE openId = ${openId} LIMIT 1`
-  );
-  return result[0]?.[0] || null;
-}
-
-export async function upsertUser(data: any) {
-  const existing = await getUserByOpenId(data.openId);
-  
-  if (existing) {
-    await db.execute(
-      sql`UPDATE users SET lastSignedIn = ${data.lastSignedIn || new Date()} WHERE openId = ${data.openId}`
-    );
-    return existing;
-  } else {
-    const result: any = await db.execute(
-      sql`INSERT INTO users (openId, name, email, loginMethod, lastSignedIn) VALUES (${data.openId}, ${data.name || null}, ${data.email || null}, ${data.loginMethod || null}, ${data.lastSignedIn || new Date()})`
-    );
-    return { id: Number(result[0].insertId), ...data };
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get user: database not available");
+    return undefined;
   }
+
+  const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
 }
 
-
-// ========================================
-// Custom Service
-// ========================================
-
-export async function createCustomServiceRequest(data: {
-  userId: number;
-  templateIds: number[];
-  imageUrls: string[];
-  notes?: string;
-}) {
-  // Create the request
-  const requestResult: any = await db.execute(
-    sql`INSERT INTO customServiceRequests (userId, requestedTemplateIds, notes, status)
-        VALUES (${data.userId}, ${JSON.stringify(data.templateIds)}, ${data.notes || null}, 'pending')`
-  );
-  
-  const requestId = Number(requestResult[0].insertId);
-  
-  // Insert images
-  for (const imageUrl of data.imageUrls) {
-    await db.execute(
-      sql`INSERT INTO customServiceImages (requestId, imageUrl, originalFilename)
-          VALUES (${requestId}, ${imageUrl}, ${imageUrl.split('/').pop() || 'image'})`
-    );
-  }
-  
-  return { id: requestId, status: "pending" };
-}
-
-export async function listCustomServiceRequests(userId: number) {
-  const result: any = await db.execute(
-    sql`SELECT * FROM customServiceRequests WHERE userId = ${userId} ORDER BY createdAt DESC`
-  );
-  
-  return result[0] || [];
-}
-
-export async function getCustomServiceRequest(requestId: number, userId: number) {
-  const requestResult: any = await db.execute(
-    sql`SELECT * FROM customServiceRequests WHERE id = ${requestId} AND userId = ${userId} LIMIT 1`
-  );
-  
-  const request = requestResult[0]?.[0];
-  if (!request) {
-    return null;
-  }
-  
-  // Get images
-  const imagesResult: any = await db.execute(
-    sql`SELECT * FROM customServiceImages WHERE requestId = ${requestId}`
-  );
-  
-  return {
-    ...request,
-    images: imagesResult[0] || [],
-  };
-}
-
-
-// ========================================
-// Print Orders
-// ========================================
-
-export async function createPrintOrder(data: {
-  userId: number;
-  evidenceIds: number[];
-  paperType: string;
-  bindingType: string;
-  copies: number;
-  price: number;
-  shippingAddress: string;
-  notes?: string;
-}) {
-  const result: any = await db.execute(
-    sql`INSERT INTO printOrders (userId, evidenceIds, paperType, bindingType, copies, price, shippingAddress, notes, status)
-        VALUES (${data.userId}, ${JSON.stringify(data.evidenceIds)}, ${data.paperType}, ${data.bindingType}, ${data.copies}, ${data.price}, ${data.shippingAddress}, ${data.notes || null}, 'pending')`
-  );
-  
-  return { id: Number(result[0].insertId) };
-}
-
-export async function listPrintOrders(userId: number) {
-  const result: any = await db.execute(
-    sql`SELECT * FROM printOrders WHERE userId = ${userId} ORDER BY createdAt DESC`
-  );
-  
-  return result[0] || [];
-}
-
-export async function getPrintOrder(orderId: number, userId: number) {
-  const result: any = await db.execute(
-    sql`SELECT * FROM printOrders WHERE id = ${orderId} AND userId = ${userId} LIMIT 1`
-  );
-  
-  return result[0]?.[0] || null;
-}
-
-// ========================================
-// Custom Evidences
-// ========================================
-
-export async function createCustomEvidence(data: {
-  userId: number;
-  standardId: number;
-  evidenceName: string;
-  description: string;
-  grades: string[]; // Array of grade names
-  subject?: string;
-  customFields?: any[];
-}) {
-  const result: any = await db.execute(
-    sql`INSERT INTO customEvidences (userId, standardId, evidenceName, description, grades, subject, customFields, status)
-        VALUES (${data.userId}, ${data.standardId}, ${data.evidenceName}, ${data.description}, ${JSON.stringify(data.grades)}, ${data.subject || null}, ${JSON.stringify(data.customFields || [])}, 'pending')`
-  );
-  
-  return { id: Number(result[0].insertId), status: "pending" };
-}
-
-export async function listCustomEvidences(userId: number) {
-  const result: any = await db.execute(
-    sql`SELECT * FROM customEvidences WHERE userId = ${userId} ORDER BY createdAt DESC`
-  );
-  
-  return result[0] || [];
-}
-
-export async function listAllCustomEvidences() {
-  const result: any = await db.execute(
-    sql`SELECT ce.*, u.name as userName, u.email as userEmail 
-        FROM customEvidences ce 
-        LEFT JOIN users u ON ce.userId = u.id 
-        ORDER BY ce.createdAt DESC`
-  );
-  
-  return result[0] || [];
-}
-
-export async function listPublicCustomEvidences() {
-  const result: any = await db.execute(
-    sql`SELECT * FROM customEvidences WHERE isPublic = TRUE ORDER BY createdAt DESC`
-  );
-  
-  return result[0] || [];
-}
-
-export async function makeCustomEvidencePublic(id: number, ownerNotes?: string) {
-  await db.execute(
-    sql`UPDATE customEvidences 
-        SET isPublic = TRUE, ownerNotes = ${ownerNotes || null}, reviewedAt = NOW() 
-        WHERE id = ${id}`
-  );
-}
-
-
-
-export async function getCustomEvidence(id: number) {
-  const result: any = await db.execute(
-    sql`SELECT * FROM customEvidences WHERE id = ${id} LIMIT 1`
-  );
-  
-  return result[0]?.[0] || null;
-}
-
-
-// ========================================
-// Admin Functions
-// ========================================
-
-export async function getAllUsers() {
-  const result: any = await db.execute(
-    sql`SELECT 
-          u.id, 
-          u.name, 
-          u.email, 
-          u.role,
-          u.createdAt,
-          tp.teacherName,
-          tp.schoolName,
-          tp.educationDepartment,
-          tp.licenseNumber
-        FROM users u
-        LEFT JOIN teacherProfiles tp ON u.id = tp.userId
-        ORDER BY u.createdAt DESC`
-  );
-  
-  return result[0] || [];
-}
-
-export async function getUserStatistics(userId: number) {
-  // عدد الشواهد العادية
-  const evidencesResult: any = await db.execute(
-    sql`SELECT COUNT(*) as count FROM userEvidences WHERE userId = ${userId}`
-  );
-  const evidencesCount = evidencesResult[0]?.[0]?.count || 0;
-
-  // عدد الشواهد الخاصة
-  const customEvidencesResult: any = await db.execute(
-    sql`SELECT COUNT(*) as count FROM customEvidences WHERE userId = ${userId}`
-  );
-  const customEvidencesCount = customEvidencesResult[0]?.[0]?.count || 0;
-
-  // التقدم حسب المعيار
-  const progressResult: any = await db.execute(
-    sql`SELECT 
-          s.id as standardId,
-          s.title as standardTitle,
-          COUNT(DISTINCT ue.templateId) as completedCount,
-          (SELECT COUNT(*) FROM evidenceTemplates WHERE standardId = s.id) as totalCount
-        FROM standards s
-        LEFT JOIN evidenceTemplates et ON s.id = et.standardId
-        LEFT JOIN userEvidences ue ON et.id = ue.templateId AND ue.userId = ${userId}
-        GROUP BY s.id, s.title
-        ORDER BY s.orderIndex`
-  );
-
-  return {
-    userId,
-    evidencesCount,
-    customEvidencesCount,
-    totalCount: evidencesCount + customEvidencesCount,
-    progressByStandard: progressResult[0] || [],
-  };
-}
+// TODO: add feature queries here as your schema grows.

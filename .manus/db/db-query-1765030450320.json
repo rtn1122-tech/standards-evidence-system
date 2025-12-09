@@ -1,9 +1,0 @@
-{
-  "query": "ALTER TABLE users\nADD COLUMN IF NOT EXISTS phone VARCHAR(50),\nADD COLUMN IF NOT EXISTS profileImage TEXT,\nADD COLUMN IF NOT EXISTS educationLevel ENUM('elementary', 'middle', 'high') DEFAULT 'elementary',\nADD COLUMN IF NOT EXISTS subjects TEXT,\nADD COLUMN IF NOT EXISTS licenseIssueDate DATE,\nADD COLUMN IF NOT EXISTS licenseExpiryDate DATE,\nADD COLUMN IF NOT EXISTS teacherLevel ENUM('practitioner', 'advanced', 'expert') DEFAULT 'practitioner',\nADD COLUMN IF NOT EXISTS preferredTheme VARCHAR(100) DEFAULT 'modern',\nADD COLUMN IF NOT EXISTS preferredCoverTheme VARCHAR(100) DEFAULT 'classic'",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute ALTER TABLE users\nADD COLUMN IF NOT EXISTS phone VARCHAR(50),\nADD COLUMN IF NOT EXISTS profileImage TEXT,\nADD COLUMN IF NOT EXISTS educationLevel ENUM('elementary', 'middle', 'high') DEFAULT 'elementary',\nADD COLUMN IF NOT EXISTS subjects TEXT,\nADD COLUMN IF NOT EXISTS licenseIssueDate DATE,\nADD COLUMN IF NOT EXISTS licenseExpiryDate DATE,\nADD COLUMN IF NOT EXISTS teacherLevel ENUM('practitioner', 'advanced', 'expert') DEFAULT 'practitioner',\nADD COLUMN IF NOT EXISTS preferredTheme VARCHAR(100) DEFAULT 'modern',\nADD COLUMN IF NOT EXISTS preferredCoverTheme VARCHAR(100) DEFAULT 'classic'",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 3795
-}

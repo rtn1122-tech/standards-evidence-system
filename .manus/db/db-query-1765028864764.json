@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS customServiceImages (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  requestId INT NOT NULL,\n  imageUrl TEXT NOT NULL,\n  originalFilename VARCHAR(255),\n  fileSize INT,\n  mimeType VARCHAR(100),\n  uploadedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n)",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute CREATE TABLE IF NOT EXISTS customServiceImages (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  requestId INT NOT NULL,\n  imageUrl TEXT NOT NULL,\n  originalFilename VARCHAR(255),\n  fileSize INT,\n  mimeType VARCHAR(100),\n  uploadedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n)",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1752
-}

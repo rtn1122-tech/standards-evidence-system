@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS printOrders (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  userId INT NOT NULL,\n  status ENUM('pending', 'paid', 'printing', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending' NOT NULL,\n  paperType ENUM('standard', 'premium', 'vip') DEFAULT 'standard' NOT NULL,\n  bindingType ENUM('spiral', 'thermal', 'luxury') DEFAULT 'spiral' NOT NULL,\n  copies INT DEFAULT 1 NOT NULL,\n  price DECIMAL(10,2) NOT NULL,\n  evidenceIds TEXT NOT NULL,\n  shippingAddress TEXT,\n  trackingNumber VARCHAR(255),\n  notes TEXT,\n  sallaOrderId VARCHAR(255),\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  paidAt TIMESTAMP NULL,\n  shippedAt TIMESTAMP NULL,\n  deliveredAt TIMESTAMP NULL\n)",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute CREATE TABLE IF NOT EXISTS printOrders (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  userId INT NOT NULL,\n  status ENUM('pending', 'paid', 'printing', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending' NOT NULL,\n  paperType ENUM('standard', 'premium', 'vip') DEFAULT 'standard' NOT NULL,\n  bindingType ENUM('spiral', 'thermal', 'luxury') DEFAULT 'spiral' NOT NULL,\n  copies INT DEFAULT 1 NOT NULL,\n  price DECIMAL(10,2) NOT NULL,\n  evidenceIds TEXT NOT NULL,\n  shippingAddress TEXT,\n  trackingNumber VARCHAR(255),\n  notes TEXT,\n  sallaOrderId VARCHAR(255),\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  paidAt TIMESTAMP NULL,\n  shippedAt TIMESTAMP NULL,\n  deliveredAt TIMESTAMP NULL\n)",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1702
-}
