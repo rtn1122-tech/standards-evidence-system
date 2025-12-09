@@ -321,7 +321,7 @@ export default function ProfileSetup() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="licenseNumber">رقم الرخصة المهنية (اختياري)</Label>
+                    <Label htmlFor="licenseNumber">📝 رقم الرخصة المهنية (اختياري)</Label>
                     <Input
                       id="licenseNumber"
                       value={formData.licenseNumber}
@@ -331,7 +331,7 @@ export default function ProfileSetup() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="teacherLevel">الرتبة (اختياري)</Label>
+                    <Label htmlFor="teacherLevel">📝 الرتبة (اختياري)</Label>
                     <Select
                       value={formData.teacherLevel}
                       onValueChange={(value) => setFormData({ ...formData, teacherLevel: value as any })}
@@ -348,7 +348,7 @@ export default function ProfileSetup() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="licenseIssueDate">تاريخ إصدار الرخصة (اختياري)</Label>
+                    <Label htmlFor="licenseIssueDate">📝 تاريخ إصدار الرخصة (اختياري)</Label>
                     <Input
                       id="licenseIssueDate"
                       type="date"
@@ -358,7 +358,7 @@ export default function ProfileSetup() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="licenseExpiryDate">تاريخ انتهاء الرخصة (اختياري)</Label>
+                    <Label htmlFor="licenseExpiryDate">📝 تاريخ انتهاء الرخصة (اختياري)</Label>
                     <Input
                       id="licenseExpiryDate"
                       type="date"

@@ -18,8 +18,19 @@ export default function StandardDetail() {
   // جلب بيانات المعيار
   const { data: standard, isLoading: loadingStandard } = trpc.standards.get.useQuery({ id: standardId });
 
+  // تحويل المرحلة من العربي إلى الإنجليزي
+  const convertStageToEnglish = (arabicStage: string) => {
+    const stageMap: Record<string, string> = {
+      'ابتدائي': 'primary',
+      'متوسط': 'middle',
+      'ثانوي': 'high'
+    };
+    return stageMap[arabicStage] || arabicStage;
+  };
+
   // استخراج المرحلة والمادة من بيانات المعلم
-  const stage = profile?.stage ? (typeof profile.stage === 'string' && profile.stage.startsWith('[') ? JSON.parse(profile.stage)[0] : profile.stage) : undefined;
+  const stageArabic = profile?.stage ? (typeof profile.stage === 'string' && profile.stage.startsWith('[') ? JSON.parse(profile.stage)[0] : profile.stage) : undefined;
+  const stage = stageArabic ? convertStageToEnglish(stageArabic) : undefined;
   const subjects = profile?.subjects ? JSON.parse(profile.subjects) : [];
   const subject = subjects[0]; // نأخذ أول مادة
 
