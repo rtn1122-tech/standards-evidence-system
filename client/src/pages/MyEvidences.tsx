@@ -44,14 +44,8 @@ export default function MyEvidences() {
     try {
       const result = await generatePDFMutation.mutateAsync({ id: evidenceId });
       
-      // تحميل الملف
-      const link = document.createElement('a');
-      link.href = result.url;
-      link.download = `evidence-${evidenceId}.pdf`;
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // فتح PDF مباشرة في تاب جديد
+      window.open(result.url, '_blank');
     } catch (error) {
       console.error('خطأ في توليد PDF:', error);
       alert('حدث خطأ أثناء توليد PDF');
