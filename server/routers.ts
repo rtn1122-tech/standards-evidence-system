@@ -300,6 +300,54 @@ export const appRouter = router({
         return { url: result.url, key: fileKey };
       }),
 
+    // توليد PDF لشاهد موجود
+    generatePDFForEvidence: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        // جلب بيانات الشاهد
+        const evidence = await db.getUserEvidence(input.id);
+        if (!evidence) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'الشاهد غير موجود' });
+        }
+
+        // جلب القالب
+        const template = await db.getEvidenceTemplate(evidence.templateId);
+        if (!template) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'القالب غير موجود' });
+        }
+
+        // جلب بيانات المعلم
+        const profile = await db.getTeacherProfile(ctx.user.id);
+
+        // تحليل userData
+        const userData = JSON.parse(evidence.userData);
+
+        // تجهيز بيانات PDF
+        const pdfData = {
+          evidenceName: template.evidenceName,
+          subEvidenceName: template.subEvidenceName || undefined,
+          description: userData.description || template.description,
+          userFieldsData: userData.userFieldsData || {},
+          page2BoxesData: userData.page2BoxesData || [],
+          image1Url: evidence.customImageUrl || null,
+          image2Url: null,
+          selectedTheme: evidence.selectedTheme || profile?.preferredTheme || 'white',
+        };
+
+        // توليد PDF
+        const pdfBuffer = await generatePDF(pdfData);
+
+        // رفع PDF إلى S3
+        const randomSuffix = crypto.randomBytes(8).toString('hex');
+        const fileKey = `evidence-pdfs/${ctx.user.id}/${Date.now()}-${randomSuffix}.pdf`;
+        const result = await storagePut(fileKey, pdfBuffer, 'application/pdf');
+
+        // تحديث pdfUrl في قاعدة البيانات
+        await db.updateUserEvidence(input.id, { pdfUrl: result.url });
+
+        return { url: result.url, key: fileKey };
+      }),
+
     create: protectedProcedure
       .input(
         z.object({

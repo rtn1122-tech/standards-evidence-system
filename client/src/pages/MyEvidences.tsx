@@ -37,6 +37,27 @@ export default function MyEvidences() {
     },
   });
 
+  const generatePDFMutation = trpc.userEvidences.generatePDFForEvidence.useMutation();
+
+  // دالة تحميل PDF لشاهد واحد
+  const handleDownloadSinglePDF = async (evidenceId: number) => {
+    try {
+      const result = await generatePDFMutation.mutateAsync({ id: evidenceId });
+      
+      // تحميل الملف
+      const link = document.createElement('a');
+      link.href = result.url;
+      link.download = `evidence-${evidenceId}.pdf`;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('خطأ في توليد PDF:', error);
+      alert('حدث خطأ أثناء توليد PDF');
+    }
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -321,15 +342,15 @@ export default function MyEvidences() {
                         عرض
                       </Button>
                       {/* زر تحميل PDF */}
-                      {evidence.pdfUrl && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => window.open(evidence.pdfUrl, '_blank')}
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDownloadSinglePDF(evidence.id)}
+                        disabled={generatePDFMutation.isPending}
+                        title="تحميل PDF"
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
                       
                       {/* زر تعديل */}
                       <Button
