@@ -53,7 +53,7 @@ export default function StandardDetail() {
   );
 
   // جلب الشواهد المحفوظة للمستخدم
-  const { data: userEvidences } = trpc.evidences.list.useQuery(undefined, { enabled: !!user });
+  const { data: userEvidences } = trpc.userEvidences.list.useQuery(undefined, { enabled: !!user });
 
   // التحقق من الشواهد المكتملة
   const completedTemplateIds = new Set(
@@ -119,7 +119,7 @@ export default function StandardDetail() {
                 <div className="flex flex-col items-center gap-2">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-blue-600">
-                      {progress.completed} / {progress.total}
+                      {progress.completedCount} / {progress.totalCount}
                     </div>
                     <div className="text-sm text-gray-600">شاهد مكتمل</div>
                   </div>

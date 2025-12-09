@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, ArrowLeft, FileText, CheckCircle2, Sparkles } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 export default function StandardDetail() {
   const params = useParams<{ id: string }>();
@@ -25,7 +25,7 @@ export default function StandardDetail() {
   );
 
   // جلب الشواهد المحفوظة للمستخدم
-  const { data: userEvidences } = trpc.evidences.list.useQuery(undefined, { enabled: !!user });
+  const { data: userEvidences } = trpc.userEvidences.list.useQuery(undefined, { enabled: !!user });
 
   // التحقق من الشواهد المكتملة
   const completedTemplateIds = new Set(
@@ -91,7 +91,7 @@ export default function StandardDetail() {
                 <div className="flex flex-col items-center gap-2">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-blue-600">
-                      {progress.completed} / {progress.total}
+                      {progress.completedCount} / {progress.totalCount}
                     </div>
                     <div className="text-sm text-gray-600">شاهد مكتمل</div>
                   </div>
