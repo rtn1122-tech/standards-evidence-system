@@ -150,7 +150,7 @@ export const evidenceTemplates = mysqlTable("evidenceTemplates", {
   
   // Filtering criteria
   subject: varchar("subject", { length: 100 }), // المادة (رياضيات، علوم، عام)
-  stage: mysqlEnum("stage", ["primary", "middle", "high", "all"]).default("all").notNull(), // المرحلة
+  stage: mysqlEnum("stage", ["kindergarten", "primary", "middle", "high", "all"]).default("all").notNull(), // المرحلة
   
   isActive: boolean("isActive").default(true).notNull(),
   usageCount: int("usageCount").default(0).notNull(), // عدد مرات الاستخدام
