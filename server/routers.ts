@@ -7,6 +7,7 @@ import { TRPCError } from "@trpc/server";
 import { storagePut } from "./storage";
 import crypto from "crypto";
 import { generatePDF } from "./pdfGenerator";
+import { PDFDocument } from 'pdf-lib';
 
 export const appRouter = router({
   // ========================================
@@ -415,6 +416,65 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         await db.deleteUserEvidence(input.id);
         return { success: true };
+      }),
+
+    // توليد PDF شامل لجميع الشواهد
+    generateAllPDF: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        // جلب جميع شواهد المعلم
+        const evidences = await db.listUserEvidences(ctx.user.id);
+        
+        if (!evidences || evidences.length === 0) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'لا توجد شواهد لتحميلها' });
+        }
+
+        // جلب بيانات المعلم
+        const profile = await db.getTeacherProfile(ctx.user.id);
+        if (!profile) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'يرجى إكمال البيانات الأساسية أولاً' });
+        }
+
+        // توليد PDF لكل شاهد
+        const pdfBuffers: Buffer[] = [];
+        
+        for (const evidence of evidences) {
+          const template = await db.getEvidenceTemplate(evidence.templateId);
+          if (!template) continue;
+
+          const userData = JSON.parse(evidence.userData);
+          
+          const pdfData = {
+            evidenceName: template.evidenceName,
+            subEvidenceName: template.subEvidenceName || undefined,
+            description: userData.description || template.description,
+            userFieldsData: userData.userFieldsData || {},
+            page2BoxesData: userData.page2BoxesData || [],
+            image1Url: evidence.customImageUrl || null,
+            image2Url: null,
+            selectedTheme: evidence.selectedTheme || profile.preferredTheme || 'white',
+          };
+
+          const pdfBuffer = await generatePDF(pdfData);
+          pdfBuffers.push(pdfBuffer);
+        }
+
+        // دمج جميع PDFs في ملف واحد باستخدام pdf-lib
+        const mergedPdf = await PDFDocument.create();
+        
+        for (const pdfBuffer of pdfBuffers) {
+          const pdf = await PDFDocument.load(pdfBuffer);
+          const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+          copiedPages.forEach((page) => mergedPdf.addPage(page));
+        }
+        
+        const finalBuffer = Buffer.from(await mergedPdf.save());
+
+        // رفع PDF النهائي إلى S3
+        const randomSuffix = crypto.randomBytes(8).toString('hex');
+        const fileKey = `evidence-pdfs/${ctx.user.id}/all-evidences-${Date.now()}-${randomSuffix}.pdf`;
+        const result = await storagePut(fileKey, finalBuffer, 'application/pdf');
+
+        return { url: result.url, key: fileKey, count: evidences.length };
       }),
   }),
 

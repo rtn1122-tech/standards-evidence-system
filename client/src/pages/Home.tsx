@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
-import { User, Save, X, ArrowLeft, BookOpen, FileText, Sparkles, Printer, Palette, TrendingUp, Shield } from "lucide-react";
+import { User, Save, X, ArrowLeft, BookOpen, FileText, Sparkles, Printer, Palette, TrendingUp, Shield, Bell } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
@@ -26,6 +26,28 @@ export default function Home() {
       enabled: !!user && !!profile,
     }
   );
+
+  // جلب إحصائيات التقدم للإشعارات
+  const { data: progressStats } = trpc.statistics.getAllProgress.useQuery(undefined, {
+    enabled: !!user,
+  });
+
+  // حساب نسبة التقدم الكلية
+  const totalProgress = progressStats ? Math.round(
+    (progressStats.reduce((sum: number, stat: any) => sum + stat.percentage, 0) / progressStats.length)
+  ) : 0;
+
+  // تحديد رسالة الإشعار
+  const getProgressMessage = () => {
+    if (totalProgress === 0) return null;
+    if (totalProgress >= 100) return "🎉 مبروك! لقد أكملت جميع المعايير!";
+    if (totalProgress >= 75) return "🔥 رائع! أنت قريب من الإنجاز الكامل!";
+    if (totalProgress >= 50) return "💪 ممتاز! أنت في منتصف الطريق!";
+    if (totalProgress >= 25) return "✨ بداية قوية! استمر في التقدم!";
+    return null;
+  };
+
+  const progressMessage = getProgressMessage();
 
   if (!user) {
     return (
@@ -164,6 +186,26 @@ export default function Home() {
             </CardContent>
           )}
         </Card>
+
+        {/* إشعار التقدم */}
+        {progressMessage && (
+          <Card className="shadow-lg border-2 border-green-300 bg-gradient-to-r from-green-50 to-emerald-50">
+            <CardContent className="py-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
+                  <Bell className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-lg font-bold text-green-800">{progressMessage}</p>
+                  <p className="text-sm text-green-600">نسبة التقدم الكلي: {totalProgress}%</p>
+                </div>
+                <Badge className="bg-green-600 text-white text-lg px-4 py-2">
+                  {totalProgress}%
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* العنوان الرئيسي */}
         <div className="text-center">

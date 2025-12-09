@@ -85,6 +85,8 @@ export default function MyEvidences() {
 
   const totalCount = (filteredUserEvidences?.length || 0) + (customEvidences?.length || 0);
 
+  const generateAllPDFMutation = trpc.userEvidences.generateAllPDF.useMutation();
+
   // دالة تحميل جميع الشواهد PDF
   const handleDownloadAllPDF = async () => {
     if (!userEvidences || userEvidences.length === 0) {
@@ -96,7 +98,7 @@ export default function MyEvidences() {
     setPdfProgress(0);
 
     try {
-      // محاكاة التقدم (في الواقع يجب استدعاء API)
+      // محاكاة التقدم
       const interval = setInterval(() => {
         setPdfProgress(prev => {
           if (prev >= 90) {
@@ -107,17 +109,14 @@ export default function MyEvidences() {
         });
       }, 500);
 
-      // TODO: استدعاء API لتوليد PDF لجميع الشواهد
-      // const result = await trpc.userEvidences.generateAllPDF.mutate();
-      
-      // محاكاة التحميل (استبدل هذا باستدعاء حقيقي)
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      // استدعاء API لتوليد PDF لجميع الشواهد
+      const result = await generateAllPDFMutation.mutateAsync();
       
       clearInterval(interval);
       setPdfProgress(100);
       
-      // TODO: تحميل الملف
-      alert("تم توليد PDF بنجاح! (ميزة قيد التطوير)");
+      // فتح PDF مباشرة في تاب جديد
+      window.open(result.url, '_blank');
       
       setTimeout(() => {
         setIsGeneratingPDF(false);
