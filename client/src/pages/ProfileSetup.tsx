@@ -331,7 +331,7 @@ export default function ProfileSetup() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="teacherLevel">مستوى المعلم (اختياري)</Label>
+                    <Label htmlFor="teacherLevel">الرتبة (اختياري)</Label>
                     <Select
                       value={formData.teacherLevel}
                       onValueChange={(value) => setFormData({ ...formData, teacherLevel: value as any })}
