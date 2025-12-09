@@ -12,11 +12,23 @@ export default function StandardDetail() {
   const standardId = parseInt(params.id || "0");
   const { user } = useAuth();
 
+  // جلب بيانات المعلم
+  const { data: profile } = trpc.teacherProfile.get.useQuery(undefined, { enabled: !!user });
+
   // جلب بيانات المعيار
   const { data: standard, isLoading: loadingStandard } = trpc.standards.get.useQuery({ id: standardId });
 
-  // جلب الشواهد المتاحة للمعيار
-  const { data: templates, isLoading: loadingTemplates } = trpc.evidenceTemplates.list.useQuery({ standardId });
+  // استخراج المرحلة والمادة من بيانات المعلم
+  const stage = profile?.stage ? (typeof profile.stage === 'string' && profile.stage.startsWith('[') ? JSON.parse(profile.stage)[0] : profile.stage) : undefined;
+  const subjects = profile?.subjects ? JSON.parse(profile.subjects) : [];
+  const subject = subjects[0]; // نأخذ أول مادة
+
+  // جلب الشواهد المتاحة للمعيار مع الفلترة حسب المرحلة والمادة
+  const { data: templates, isLoading: loadingTemplates } = trpc.evidenceTemplates.list.useQuery({ 
+    standardId,
+    stage,
+    subject
+  });
 
   // جلب تقدم الشواهد
   const { data: progress } = trpc.standards.getProgress.useQuery(
