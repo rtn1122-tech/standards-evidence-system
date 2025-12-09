@@ -94,14 +94,14 @@ export default function Standards() {
                       {/* مؤشر دائري للتقدم */}
                       {user && allProgress && allProgress[standard.id] !== undefined && (
                         <div 
-                          className={`absolute -top-1 -right-1 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-bold ${
-                            allProgress[standard.id] === 0 ? 'bg-red-500 text-white' :
-                            allProgress[standard.id] === 100 ? 'bg-green-500 text-white' :
+                          className={`absolute -top-1 -left-1 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-bold ${
+                            allProgress[standard.id].percentage === 0 ? 'bg-red-500 text-white' :
+                            allProgress[standard.id].percentage === 100 ? 'bg-green-500 text-white' :
                             'bg-orange-500 text-white'
                           }`}
-                          title={`${allProgress[standard.id]}% مكتمل`}
+                          title={`${allProgress[standard.id].completed} من ${allProgress[standard.id].total} شاهد (${allProgress[standard.id].percentage}%)`}
                         >
-                          {allProgress[standard.id] === 100 ? '✓' : allProgress[standard.id]}
+                          {allProgress[standard.id].percentage === 100 ? '✓' : allProgress[standard.id].percentage}
                         </div>
                       )}
                     </div>
@@ -111,6 +111,15 @@ export default function Standards() {
                     <CardDescription className="text-sm">
                       الوزن النسبي: {standard.weight}%
                     </CardDescription>
+                    {/* عداد الشواهد */}
+                    {user && allProgress && allProgress[standard.id] !== undefined && (
+                      <div className="text-xs text-gray-600 mt-1">
+                        <span className="font-semibold text-blue-600">{allProgress[standard.id].completed}</span>
+                        <span> من </span>
+                        <span className="font-semibold">{allProgress[standard.id].total}</span>
+                        <span> شاهد</span>
+                      </div>
+                    )}
                   </div>
                   <ArrowLeft className="w-5 h-5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
                 </div>

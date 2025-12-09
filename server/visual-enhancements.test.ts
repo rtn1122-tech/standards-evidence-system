@@ -33,7 +33,7 @@ describe('Visual Enhancements - Progress Indicators', () => {
   });
 
   describe('getAllProgress Procedure', () => {
-    it('يجب أن يعيد تقدم جميع المعايير كـ Record<number, number>', async () => {
+    it('يجب أن يعيد تقدم جميع المعايير مع عدد الشواهد', async () => {
       const result = await caller.standards.getAllProgress();
 
       // التحقق من أن النتيجة object
@@ -44,30 +44,42 @@ describe('Visual Enhancements - Progress Indicators', () => {
       const standardIds = Object.keys(result).map(Number);
       expect(standardIds.length).toBeGreaterThanOrEqual(11);
 
-      // التحقق من أن جميع القيم نسب مئوية صحيحة (0-100)
-      Object.values(result).forEach((percentage) => {
-        expect(percentage).toBeGreaterThanOrEqual(0);
-        expect(percentage).toBeLessThanOrEqual(100);
-        expect(Number.isInteger(percentage)).toBe(true);
+      // التحقق من أن كل معيار لديه percentage, completed, total
+      Object.values(result).forEach((progress: any) => {
+        expect(progress).toHaveProperty('percentage');
+        expect(progress).toHaveProperty('completed');
+        expect(progress).toHaveProperty('total');
+        expect(progress.percentage).toBeGreaterThanOrEqual(0);
+        expect(progress.percentage).toBeLessThanOrEqual(100);
+        expect(Number.isInteger(progress.percentage)).toBe(true);
+        expect(progress.completed).toBeGreaterThanOrEqual(0);
+        expect(progress.completed).toBeLessThanOrEqual(progress.total);
       });
     });
 
-    it('يجب أن يحسب النسبة المئوية بشكل صحيح', async () => {
+    it('يجب أن يحسب النسبة المئوية وعدد الشواهد بشكل صحيح', async () => {
       const result = await caller.standards.getAllProgress();
 
-      // التحقق من أن كل معيار له نسبة محسوبة
-      Object.entries(result).forEach(([standardId, percentage]) => {
-        expect(typeof percentage).toBe('number');
-        expect(percentage).toBeGreaterThanOrEqual(0);
-        expect(percentage).toBeLessThanOrEqual(100);
+      // التحقق من أن كل معيار له نسبة وعدد محسوب
+      Object.entries(result).forEach(([standardId, progress]: [string, any]) => {
+        expect(typeof progress.percentage).toBe('number');
+        expect(progress.percentage).toBeGreaterThanOrEqual(0);
+        expect(progress.percentage).toBeLessThanOrEqual(100);
+        expect(typeof progress.completed).toBe('number');
+        expect(typeof progress.total).toBe('number');
+        // التحقق من أن النسبة محسوبة بشكل صحيح
+        if (progress.total > 0) {
+          const expectedPercentage = Math.round((progress.completed / progress.total) * 100);
+          expect(progress.percentage).toBe(expectedPercentage);
+        }
       });
     });
 
-    it('يجب أن يعيد 0% للمعايير التي لم يتم تعبئة أي شاهد فيها', async () => {
+    it('يجب أن يعيد 0% و 0 شواهد للمعايير التي لم تبدأ', async () => {
       const result = await caller.standards.getAllProgress();
 
       // معظم المعايير يجب أن تكون 0% للمستخدم الجديد
-      const zeroProgressStandards = Object.values(result).filter(p => p === 0);
+      const zeroProgressStandards = Object.values(result).filter((p: any) => p.percentage === 0 && p.completed === 0);
       expect(zeroProgressStandards.length).toBeGreaterThan(0);
     });
   });
@@ -83,8 +95,10 @@ describe('Visual Enhancements - Progress Indicators', () => {
       // جلب تقدم المعيار المحدد
       const singleProgress = await caller.standards.getProgress({ standardId });
 
-      // التحقق من تطابق النسبة المئوية
-      expect(singleProgress.percentage).toBe(allProgress[standardId]);
+      // التحقق من تطابق النسبة المئوية والأعداد
+      expect(singleProgress.percentage).toBe(allProgress[standardId].percentage);
+      expect(singleProgress.completedCount).toBe(allProgress[standardId].completed);
+      expect(singleProgress.totalCount).toBe(allProgress[standardId].total);
     });
   });
 
@@ -98,11 +112,13 @@ describe('Visual Enhancements - Progress Indicators', () => {
       const allProgress = await caller.standards.getAllProgress();
       expect(Object.keys(allProgress).length).toBe(standards.length);
 
-      // 3. التحقق من أن كل معيار له نسبة تقدم
+      // 3. التحقق من أن كل معيار له نسبة تقدم وعدد شواهد
       standards.forEach((standard: any) => {
         expect(allProgress[standard.id]).toBeDefined();
-        expect(allProgress[standard.id]).toBeGreaterThanOrEqual(0);
-        expect(allProgress[standard.id]).toBeLessThanOrEqual(100);
+        expect(allProgress[standard.id].percentage).toBeGreaterThanOrEqual(0);
+        expect(allProgress[standard.id].percentage).toBeLessThanOrEqual(100);
+        expect(allProgress[standard.id].completed).toBeGreaterThanOrEqual(0);
+        expect(allProgress[standard.id].total).toBeGreaterThanOrEqual(0);
       });
 
       // 4. جلب تقدم معيار محدد (للـ progress bar)
@@ -114,7 +130,9 @@ describe('Visual Enhancements - Progress Indicators', () => {
       expect(singleProgress).toHaveProperty('totalCount');
       expect(singleProgress).toHaveProperty('completedCount');
       expect(singleProgress).toHaveProperty('percentage');
-      expect(singleProgress.percentage).toBe(allProgress[firstStandard.id]);
+      expect(singleProgress.percentage).toBe(allProgress[firstStandard.id].percentage);
+      expect(singleProgress.completedCount).toBe(allProgress[firstStandard.id].completed);
+      expect(singleProgress.totalCount).toBe(allProgress[firstStandard.id].total);
     });
 
     it('يجب أن تكون الألوان منطقية حسب النسبة المئوية', async () => {
@@ -123,9 +141,9 @@ describe('Visual Enhancements - Progress Indicators', () => {
       Object.entries(allProgress).forEach(([standardId, percentage]) => {
         // تحديد اللون المتوقع
         let expectedColor: 'red' | 'orange' | 'green';
-        if (percentage === 0) {
+        if (percentage.percentage === 0) {
           expectedColor = 'red';
-        } else if (percentage === 100) {
+        } else if (percentage.percentage === 100) {
           expectedColor = 'green';
         } else {
           expectedColor = 'orange';
@@ -133,12 +151,12 @@ describe('Visual Enhancements - Progress Indicators', () => {
 
         // التحقق من أن النسبة تتطابق مع اللون المتوقع
         if (expectedColor === 'red') {
-          expect(percentage).toBe(0);
+          expect(percentage.percentage).toBe(0);
         } else if (expectedColor === 'green') {
-          expect(percentage).toBe(100);
+          expect(percentage.percentage).toBe(100);
         } else {
-          expect(percentage).toBeGreaterThan(0);
-          expect(percentage).toBeLessThan(100);
+          expect(percentage.percentage).toBeGreaterThan(0);
+          expect(percentage.percentage).toBeLessThan(100);
         }
       });
     });
@@ -171,9 +189,9 @@ describe('Visual Enhancements - Progress Indicators', () => {
 
       // 4. حساب الإحصائيات العامة
       const totalStandards = standards.length;
-      const completedStandards = Object.values(allProgress).filter(p => p === 100).length;
-      const inProgressStandards = Object.values(allProgress).filter(p => p > 0 && p < 100).length;
-      const notStartedStandards = Object.values(allProgress).filter(p => p === 0).length;
+      const completedStandards = Object.values(allProgress).filter((p: any) => p.percentage === 100).length;
+      const inProgressStandards = Object.values(allProgress).filter((p: any) => p.percentage > 0 && p.percentage < 100).length;
+      const notStartedStandards = Object.values(allProgress).filter((p: any) => p.percentage === 0).length;
 
       // التحقق من صحة الحسابات
       expect(completedStandards + inProgressStandards + notStartedStandards).toBe(totalStandards);

@@ -44,17 +44,17 @@ export default function Statistics() {
   // حساب الإحصائيات العامة
   const totalStandards = standards?.length || 0;
   const completedStandards = allProgress 
-    ? Object.values(allProgress).filter(p => p === 100).length 
+    ? Object.values(allProgress).filter(p => p.percentage === 100).length 
     : 0;
   const inProgressStandards = allProgress 
-    ? Object.values(allProgress).filter(p => p > 0 && p < 100).length 
+    ? Object.values(allProgress).filter(p => p.percentage > 0 && p.percentage < 100).length 
     : 0;
   const notStartedStandards = allProgress 
-    ? Object.values(allProgress).filter(p => p === 0).length 
+    ? Object.values(allProgress).filter(p => p.percentage === 0).length 
     : 0;
   const totalEvidences = userEvidences?.length || 0;
   const overallProgress = allProgress 
-    ? Math.round(Object.values(allProgress).reduce((sum, p) => sum + p, 0) / totalStandards)
+    ? Math.round(Object.values(allProgress).reduce((sum, p) => sum + p.percentage, 0) / totalStandards)
     : 0;
 
   // بيانات الرسم البياني الشريطي (Bar Chart)
@@ -63,15 +63,15 @@ export default function Statistics() {
     datasets: [
       {
         label: 'نسبة الإنجاز (%)',
-        data: standards?.map((s: any) => allProgress?.[s.id] || 0) || [],
+        data: standards?.map((s: any) => allProgress?.[s.id]?.percentage || 0) || [],
         backgroundColor: standards?.map((s: any) => {
-          const progress = allProgress?.[s.id] || 0;
+          const progress = allProgress?.[s.id]?.percentage || 0;
           if (progress === 0) return 'rgba(239, 68, 68, 0.6)'; // أحمر
           if (progress === 100) return 'rgba(34, 197, 94, 0.6)'; // أخضر
           return 'rgba(249, 115, 22, 0.6)'; // برتقالي
         }) || [],
         borderColor: standards?.map((s: any) => {
-          const progress = allProgress?.[s.id] || 0;
+          const progress = allProgress?.[s.id]?.percentage || 0;
           if (progress === 0) return 'rgb(239, 68, 68)';
           if (progress === 100) return 'rgb(34, 197, 94)';
           return 'rgb(249, 115, 22)';
@@ -315,7 +315,7 @@ export default function Statistics() {
                 </thead>
                 <tbody>
                   {standards?.map((standard: any) => {
-                    const progress = allProgress?.[standard.id] || 0;
+                    const progress = allProgress?.[standard.id] || { percentage: 0, completed: 0, total: 0 };
                     return (
                       <tr key={standard.id} className="border-b hover:bg-gray-50">
                         <td className="py-3 px-4 font-bold text-blue-600">
@@ -326,27 +326,27 @@ export default function Statistics() {
                           <div className="flex items-center justify-center gap-2">
                             <div className="w-32 bg-gray-200 rounded-full h-2">
                               <div
-                                className={`h-full rounded-full ${
-                                  progress === 0 ? 'bg-red-500' :
-                                  progress === 100 ? 'bg-green-500' :
+                                className={`h-2 rounded-full transition-all duration-300 ${
+                                  progress.percentage === 0 ? 'bg-red-500' :
+                                  progress.percentage === 100 ? 'bg-green-500' :
                                   'bg-orange-500'
                                 }`}
-                                style={{ width: `${progress}%` }}
+                                style={{ width: `${progress.percentage}%` }}
                               />
                             </div>
-                            <span className="text-sm font-semibold">{progress}%</span>
+                            <span className="text-sm font-semibold">{progress.percentage}%</span>
                           </div>
                         </td>
                         <td className="py-3 px-4 text-center">
                           <span
                             className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
-                              progress === 0 ? 'bg-red-100 text-red-700' :
-                              progress === 100 ? 'bg-green-100 text-green-700' :
+                              progress.percentage === 0 ? 'bg-red-100 text-red-700' :
+                              progress.percentage === 100 ? 'bg-green-100 text-green-700' :
                               'bg-orange-100 text-orange-700'
                             }`}
                           >
-                            {progress === 0 ? '⭕ لم يبدأ' :
-                             progress === 100 ? '✅ مكتمل' :
+                            {progress.percentage === 0 ? '⭕ لم يبدأ' :
+                             progress.percentage === 100 ? '✅ مكتمل' :
                              '🔄 قيد التنفيذ'}
                           </span>
                         </td>

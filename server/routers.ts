@@ -136,8 +136,8 @@ export const appRouter = router({
         // جلب الشواهد المعبأة من قبل المعلم
         const userEvidences = await db.listUserEvidences(ctx.user.id);
         
-        // حساب النسبة لكل معيار
-        const progressMap: Record<number, number> = {};
+        // حساب التقدم لكل معيار (نسبة + عدد)
+        const progressMap: Record<number, { percentage: number; completed: number; total: number }> = {};
         
         for (const standard of standards) {
           const standardTemplates = allTemplates.filter(
@@ -149,9 +149,11 @@ export const appRouter = router({
             (e: any) => e.standardId === standard.id
           ).length;
           
-          progressMap[standard.id] = totalCount > 0 
-            ? Math.round((completedCount / totalCount) * 100) 
-            : 0;
+          progressMap[standard.id] = {
+            percentage: totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0,
+            completed: completedCount,
+            total: totalCount,
+          };
         }
         
         return progressMap;
