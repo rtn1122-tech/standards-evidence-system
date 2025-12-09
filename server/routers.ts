@@ -7,9 +7,6 @@ import { TRPCError } from "@trpc/server";
 import { storagePut } from "./storage";
 import crypto from "crypto";
 import { generatePDF } from "./pdfGenerator";
-import { htmlToPdf } from "./htmlToPdf";
-import * as introPages from "./introPages";
-import { PDFDocument } from 'pdf-lib';
 
 export const appRouter = router({
   // ========================================
@@ -303,54 +300,6 @@ export const appRouter = router({
         return { url: result.url, key: fileKey };
       }),
 
-    // توليد PDF لشاهد موجود
-    generatePDFForEvidence: protectedProcedure
-      .input(z.object({ id: z.number() }))
-      .mutation(async ({ ctx, input }) => {
-        // جلب بيانات الشاهد
-        const evidence = await db.getUserEvidence(input.id);
-        if (!evidence) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: 'الشاهد غير موجود' });
-        }
-
-        // جلب القالب
-        const template = await db.getEvidenceTemplate(evidence.templateId);
-        if (!template) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: 'القالب غير موجود' });
-        }
-
-        // جلب بيانات المعلم
-        const profile = await db.getTeacherProfile(ctx.user.id);
-
-        // تحليل userData
-        const userData = JSON.parse(evidence.userData);
-
-        // تجهيز بيانات PDF
-        const pdfData = {
-          evidenceName: template.evidenceName,
-          subEvidenceName: template.subEvidenceName || undefined,
-          description: userData.description || template.description,
-          userFieldsData: userData.userFieldsData || {},
-          page2BoxesData: userData.page2BoxesData || [],
-          image1Url: evidence.customImageUrl || null,
-          image2Url: null,
-          selectedTheme: evidence.selectedTheme || profile?.preferredTheme || 'white',
-        };
-
-        // توليد PDF
-        const pdfBuffer = await generatePDF(pdfData);
-
-        // رفع PDF إلى S3
-        const randomSuffix = crypto.randomBytes(8).toString('hex');
-        const fileKey = `evidence-pdfs/${ctx.user.id}/${Date.now()}-${randomSuffix}.pdf`;
-        const result = await storagePut(fileKey, pdfBuffer, 'application/pdf');
-
-        // تحديث pdfUrl في قاعدة البيانات
-        await db.updateUserEvidence(input.id, { pdfUrl: result.url });
-
-        return { url: result.url, key: fileKey };
-      }),
-
     create: protectedProcedure
       .input(
         z.object({
@@ -418,115 +367,6 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         await db.deleteUserEvidence(input.id);
         return { success: true };
-      }),
-
-    // توليد PDF شامل لجميع الشواهد
-    generateAllPDF: protectedProcedure
-      .mutation(async ({ ctx }) => {
-        // جلب جميع شواهد المعلم
-        const evidences = await db.listUserEvidences(ctx.user.id);
-        
-        if (!evidences || evidences.length === 0) {
-          throw new TRPCError({ code: 'BAD_REQUEST', message: 'لا توجد شواهد لتحميلها' });
-        }
-
-        // جلب بيانات المعلم
-        const profile = await db.getTeacherProfile(ctx.user.id);
-        if (!profile) {
-          throw new TRPCError({ code: 'BAD_REQUEST', message: 'يرجى إكمال البيانات الأساسية أولاً' });
-        }
-
-        // توليد الصفحات التمهيدية
-        const introPdfBuffers: Buffer[] = [];
-        
-        // 1. صفحة الفهرس (سيتم تحديث أرقام الصفحات لاحقاً)
-        const indexHTML = introPages.generateIndexPage({ standards: [] });
-        introPdfBuffers.push(await htmlToPdf(indexHTML));
-        
-        // 2. بيانات المعلم
-        const teacherInfoHTML = introPages.generateTeacherInfoPage({
-          teacherName: profile.teacherName || ctx.user.name || '',
-          schoolName: profile.schoolName || '',
-          educationDepartment: profile.educationDepartment || '',
-          specialty: profile.subjects || undefined,
-          stage: profile.stage || undefined,
-          licenseNumber: profile.professionalLicenseNumber || undefined,
-          licenseDate: profile.licenseStartDate ? profile.licenseStartDate.toISOString().split('T')[0] : undefined,
-        });
-        introPdfBuffers.push(await htmlToPdf(teacherInfoHTML));
-        
-        // 3. الوثائق
-        const documentsHTML = introPages.generateDocumentsPage();
-        introPdfBuffers.push(await htmlToPdf(documentsHTML));
-        
-        // 4. الرؤية والرسالة
-        const visionHTML = introPages.generateVisionMissionPage();
-        introPdfBuffers.push(await htmlToPdf(visionHTML));
-        
-        // 5. أقوال الملوك
-        const kingsHTML = introPages.generateKingsQuotesPage();
-        introPdfBuffers.push(await htmlToPdf(kingsHTML));
-        
-        // 6. تعريف الأداء المهني
-        const performanceHTML = introPages.generateProfessionalPerformancePage();
-        introPdfBuffers.push(await htmlToPdf(performanceHTML));
-        
-        // 7. قائمة المعايير
-        const allStandards = await db.listStandards();
-        const standardsHTML = introPages.generateStandardsListPage(
-          allStandards.map(s => ({ number: s.id, title: s.title }))
-        );
-        introPdfBuffers.push(await htmlToPdf(standardsHTML));
-
-        // توليد PDF لكل شاهد
-        const pdfBuffers: Buffer[] = [];
-        
-        for (const evidence of evidences) {
-          const template = await db.getEvidenceTemplate(evidence.templateId);
-          if (!template) continue;
-
-          const userData = JSON.parse(evidence.userData);
-          
-          const pdfData = {
-            evidenceName: template.evidenceName,
-            subEvidenceName: template.subEvidenceName || undefined,
-            description: userData.description || template.description,
-            userFieldsData: userData.userFieldsData || {},
-            page2BoxesData: userData.page2BoxesData || [],
-            image1Url: evidence.customImageUrl || null,
-            image2Url: null,
-            selectedTheme: evidence.selectedTheme || profile.preferredTheme || 'white',
-          };
-
-          const pdfBuffer = await generatePDF(pdfData);
-          pdfBuffers.push(pdfBuffer);
-        }
-
-        // دمج جميع PDFs في ملف واحد باستخدام pdf-lib
-        const mergedPdf = await PDFDocument.create();
-        
-        // دمج الصفحات التمهيدية أولاً
-        for (const pdfBuffer of introPdfBuffers) {
-          const pdf = await PDFDocument.load(pdfBuffer);
-          const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-          copiedPages.forEach((page) => mergedPdf.addPage(page));
-        }
-        
-        // ثم دمج صفحات الشواهد
-        for (const pdfBuffer of pdfBuffers) {
-          const pdf = await PDFDocument.load(pdfBuffer);
-          const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-          copiedPages.forEach((page) => mergedPdf.addPage(page));
-        }
-        
-        const finalBuffer = Buffer.from(await mergedPdf.save());
-
-        // رفع PDF النهائي إلى S3
-        const randomSuffix = crypto.randomBytes(8).toString('hex');
-        const fileKey = `evidence-pdfs/${ctx.user.id}/all-evidences-${Date.now()}-${randomSuffix}.pdf`;
-        const result = await storagePut(fileKey, finalBuffer, 'application/pdf');
-
-        return { url: result.url, key: fileKey, count: evidences.length };
       }),
   }),
 

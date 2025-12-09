@@ -37,21 +37,6 @@ export default function MyEvidences() {
     },
   });
 
-  const generatePDFMutation = trpc.userEvidences.generatePDFForEvidence.useMutation();
-
-  // دالة تحميل PDF لشاهد واحد
-  const handleDownloadSinglePDF = async (evidenceId: number) => {
-    try {
-      const result = await generatePDFMutation.mutateAsync({ id: evidenceId });
-      
-      // فتح PDF مباشرة في تاب جديد
-      window.open(result.url, '_blank');
-    } catch (error) {
-      console.error('خطأ في توليد PDF:', error);
-      alert('حدث خطأ أثناء توليد PDF');
-    }
-  };
-
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -85,8 +70,6 @@ export default function MyEvidences() {
 
   const totalCount = (filteredUserEvidences?.length || 0) + (customEvidences?.length || 0);
 
-  const generateAllPDFMutation = trpc.userEvidences.generateAllPDF.useMutation();
-
   // دالة تحميل جميع الشواهد PDF
   const handleDownloadAllPDF = async () => {
     if (!userEvidences || userEvidences.length === 0) {
@@ -98,7 +81,7 @@ export default function MyEvidences() {
     setPdfProgress(0);
 
     try {
-      // محاكاة التقدم
+      // محاكاة التقدم (في الواقع يجب استدعاء API)
       const interval = setInterval(() => {
         setPdfProgress(prev => {
           if (prev >= 90) {
@@ -109,14 +92,17 @@ export default function MyEvidences() {
         });
       }, 500);
 
-      // استدعاء API لتوليد PDF لجميع الشواهد
-      const result = await generateAllPDFMutation.mutateAsync();
+      // TODO: استدعاء API لتوليد PDF لجميع الشواهد
+      // const result = await trpc.userEvidences.generateAllPDF.mutate();
+      
+      // محاكاة التحميل (استبدل هذا باستدعاء حقيقي)
+      await new Promise(resolve => setTimeout(resolve, 5000));
       
       clearInterval(interval);
       setPdfProgress(100);
       
-      // فتح PDF مباشرة في تاب جديد
-      window.open(result.url, '_blank');
+      // TODO: تحميل الملف
+      alert("تم توليد PDF بنجاح! (ميزة قيد التطوير)");
       
       setTimeout(() => {
         setIsGeneratingPDF(false);
@@ -335,15 +321,15 @@ export default function MyEvidences() {
                         عرض
                       </Button>
                       {/* زر تحميل PDF */}
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDownloadSinglePDF(evidence.id)}
-                        disabled={generatePDFMutation.isPending}
-                        title="تحميل PDF"
-                      >
-                        <Download className="h-4 w-4" />
-                      </Button>
+                      {evidence.pdfUrl && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => window.open(evidence.pdfUrl, '_blank')}
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      )}
                       
                       {/* زر تعديل */}
                       <Button

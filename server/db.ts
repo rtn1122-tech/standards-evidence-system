@@ -131,11 +131,11 @@ export async function listEvidenceTemplates(filters?: {
   }
   
   if (filters?.subject) {
-    query += ` AND (subject = '${filters.subject}' OR subject IS NULL OR subject = 'null')`;
+    query += ` AND (subject = '${filters.subject}' OR subject IS NULL)`;
   }
   
   if (filters?.stage) {
-    query += ` AND (stage = '${filters.stage}' OR stage = 'all' OR stage IS NULL)`;
+    query += ` AND (stage = '${filters.stage}' OR stage = 'all')`;
   }
   
   query += ' ORDER BY id';

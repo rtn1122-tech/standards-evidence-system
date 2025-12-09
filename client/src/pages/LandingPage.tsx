@@ -11,18 +11,18 @@ export default function LandingPage() {
   const features = [
     {
       icon: FileText,
-      title: "شواهد جاهزة",
-      description: "174 شاهد معبّأ بالكامل لـ 11 معيار مهني"
+      title: "نماذج جاهزة",
+      description: "11 معيار مهني مع شواهد جاهزة للتعبئة"
     },
     {
       icon: Download,
-      title: "تحميل فوري",
-      description: "حمّل ملفك بصيغة PDF بتصميم احترافي"
+      title: "تحميل PDF",
+      description: "توليد ملف PDF احترافي بثيم وزارة التعليم"
     },
     {
       icon: QrCode,
-      title: "رمز التحقق",
-      description: "رمز QR لكل شاهد للتأكد من المصداقية"
+      title: "باركود للتحقق",
+      description: "QR Code لكل شاهد للتحقق من الصحة"
     },
     {
       icon: Shield,
