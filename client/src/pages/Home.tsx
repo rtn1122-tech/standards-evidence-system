@@ -271,7 +271,7 @@ export default function Home() {
 
         {/* إحصائيات التقدم */}
         <Card className="hover:shadow-lg transition-shadow border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50 cursor-pointer"
-              onClick={() => window.location.href = "/progress"}>
+              onClick={() => window.location.href = "/statistics"}>
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -280,7 +280,7 @@ export default function Home() {
                 </div>
                 <div>
                   <CardTitle className="text-xl">📊 إحصائيات التقدم</CardTitle>
-                  <CardDescription>تتبع تقدمك في إكمال الشواهد</CardDescription>
+                  <CardDescription>تتبع تقدمك في إكمال الشواهد مع رسوم بيانية</CardDescription>
                 </div>
               </div>
               <Button className="bg-purple-600 hover:bg-purple-700">

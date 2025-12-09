@@ -123,6 +123,39 @@ export const appRouter = router({
           percentage: totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0,
         };
       }),
+
+    // حساب تقدم جميع المعايير (للمؤشرات الدائرية)
+    getAllProgress: protectedProcedure
+      .query(async ({ ctx }) => {
+        // جلب جميع المعايير
+        const standards = await db.listStandards();
+        
+        // جلب جميع الشواهد المتاحة
+        const allTemplates = await db.listEvidenceTemplates({});
+        
+        // جلب الشواهد المعبأة من قبل المعلم
+        const userEvidences = await db.listUserEvidences(ctx.user.id);
+        
+        // حساب النسبة لكل معيار
+        const progressMap: Record<number, number> = {};
+        
+        for (const standard of standards) {
+          const standardTemplates = allTemplates.filter(
+            (t: any) => t.standardId === standard.id
+          );
+          const totalCount = standardTemplates.length;
+          
+          const completedCount = userEvidences.filter(
+            (e: any) => e.standardId === standard.id
+          ).length;
+          
+          progressMap[standard.id] = totalCount > 0 
+            ? Math.round((completedCount / totalCount) * 100) 
+            : 0;
+        }
+        
+        return progressMap;
+      }),
   }),
 
   // ========================================

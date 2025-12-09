@@ -115,16 +115,29 @@ export default function StandardDetail() {
             <div className="flex items-center gap-4">
               {/* مؤشر التقدم */}
               {user && progress && (
-                <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
-                  <CheckCircle2 className="w-5 h-5 text-blue-600" />
-                  <div className="text-sm">
-                    <span className="font-bold text-blue-900">{progress.completedCount}</span>
-                    <span className="text-gray-600"> من </span>
-                    <span className="font-bold text-blue-900">{progress.totalCount}</span>
-                    <span className="text-gray-600"> شاهد</span>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
+                    <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                    <div className="text-sm">
+                      <span className="font-bold text-blue-900">{progress.completedCount}</span>
+                      <span className="text-gray-600"> من </span>
+                      <span className="font-bold text-blue-900">{progress.totalCount}</span>
+                      <span className="text-gray-600"> شاهد</span>
+                    </div>
+                    <div className="text-xs text-blue-600 font-semibold">
+                      {progress.percentage}%
+                    </div>
                   </div>
-                  <div className="text-xs text-blue-600 font-semibold">
-                    {progress.percentage}%
+                  {/* Progress Bar */}
+                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        progress.percentage === 0 ? 'bg-red-500' :
+                        progress.percentage === 100 ? 'bg-green-500' :
+                        'bg-orange-500'
+                      }`}
+                      style={{ width: `${progress.percentage}%` }}
+                    />
                   </div>
                 </div>
               )}

@@ -8,6 +8,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function Standards() {
   const [, setLocation] = useLocation();
   const { data: standards, isLoading } = trpc.standards.list.useQuery();
+  const { data: user } = trpc.auth.me.useQuery();
+  
+  // جلب تقدم جميع المعايير (فقط للمستخدمين المسجلين)
+  const { data: allProgress } = trpc.standards.getAllProgress.useQuery(
+    undefined,
+    { enabled: !!user }
+  );
 
   if (isLoading) {
     return (
@@ -78,10 +85,25 @@ export default function Standards() {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mb-3 group-hover:bg-blue-600 transition-colors">
-                      <span className="text-lg font-bold text-blue-600 group-hover:text-white">
-                        {standard.orderIndex}
-                      </span>
+                    <div className="relative inline-block">
+                      <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mb-3 group-hover:bg-blue-600 transition-colors">
+                        <span className="text-lg font-bold text-blue-600 group-hover:text-white">
+                          {standard.orderIndex}
+                        </span>
+                      </div>
+                      {/* مؤشر دائري للتقدم */}
+                      {user && allProgress && allProgress[standard.id] !== undefined && (
+                        <div 
+                          className={`absolute -top-1 -right-1 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-bold ${
+                            allProgress[standard.id] === 0 ? 'bg-red-500 text-white' :
+                            allProgress[standard.id] === 100 ? 'bg-green-500 text-white' :
+                            'bg-orange-500 text-white'
+                          }`}
+                          title={`${allProgress[standard.id]}% مكتمل`}
+                        >
+                          {allProgress[standard.id] === 100 ? '✓' : allProgress[standard.id]}
+                        </div>
+                      )}
                     </div>
                     <CardTitle className="text-xl mb-2 group-hover:text-blue-600 transition-colors">
                       {standard.title}
