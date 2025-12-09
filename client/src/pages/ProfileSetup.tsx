@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { trpc } from "@/lib/trpc";
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Upload, User, ZoomIn } from "lucide-react";
+import { Upload, User, ZoomIn, ArrowRight, Home } from "lucide-react";
 
 import { STAGES, getSubjectsForGrades } from "../../../shared/constants";
 
@@ -134,6 +134,18 @@ export default function ProfileSetup() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8" dir="rtl">
       <div className="max-w-4xl mx-auto">
+        {/* زر الرجوع */}
+        <div className="mb-4">
+          <Button
+            variant="outline"
+            onClick={() => setLocation("/")}
+            className="flex items-center gap-2"
+          >
+            <Home className="w-4 h-4" />
+            الرجوع للرئيسية
+          </Button>
+        </div>
+        
         <Card>
           <CardHeader>
             <CardTitle className="text-3xl">الملف الشخصي الكامل</CardTitle>
@@ -179,8 +191,11 @@ export default function ProfileSetup() {
                 <h3 className="text-xl font-bold text-gray-900 border-b pb-2">المعلومات الأساسية</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="teacherName">الاسم الكامل *</Label>
+                   <div className="space-y-2">
+                    <Label htmlFor="teacherName" className="flex items-center gap-1">
+                      <span className="text-red-500">⭐</span>
+                      اسم المعلم *
+                    </Label>
                     <Input
                       id="teacherName"
                       value={formData.teacherName}
@@ -191,7 +206,10 @@ export default function ProfileSetup() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">البريد الإلكتروني *</Label>
+                    <Label htmlFor="email" className="flex items-center gap-1">
+                      <span className="text-gray-400">📝</span>
+                      البريد الإلكتروني (اختياري)
+                    </Label>
                     <Input
                       id="email"
                       type="email"

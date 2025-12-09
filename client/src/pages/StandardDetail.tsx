@@ -2,15 +2,25 @@ import { useParams, Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, ArrowLeft, FileText, CheckCircle2, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowLeft, FileText, CheckCircle2, Sparkles, MoreVertical, Edit, Zap } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
+import { QuickFillDialog } from "@/components/QuickFillDialog";
 
 export default function StandardDetail() {
   const params = useParams<{ id: string }>();
   const [, setLocation] = useLocation();
   const standardId = parseInt(params.id || "0");
   const { user } = useAuth();
+  const [quickFillTemplate, setQuickFillTemplate] = useState<any>(null);
+  const [isQuickFillOpen, setIsQuickFillOpen] = useState(false);
+  const utils = trpc.useUtils();
 
   // جلب بيانات المعلم
   const { data: profile } = trpc.teacherProfile.get.useQuery(undefined, { enabled: !!user });
@@ -204,19 +214,31 @@ export default function StandardDetail() {
                       </div>
                     )}
 
-                    {/* زر التعبئة */}
-                    <Link href={`/evidence/fill/${template.id}`}>
-                      <Button 
-                        className={`w-full text-base py-6 ${
-                          isCompleted 
-                            ? 'bg-green-600 hover:bg-green-700' 
-                            : 'bg-blue-600 hover:bg-blue-700'
-                        }`}
+                    {/* زر التعبئة + القائمة المنسدلة */}
+                    <div className="flex gap-2">
+                      <Link href={`/evidence/fill/${template.id}`} className="flex-1">
+                        <Button 
+                          className={`w-full text-base py-6 ${
+                            isCompleted 
+                              ? 'bg-green-600 hover:bg-green-700' 
+                              : 'bg-blue-600 hover:bg-blue-700'
+                          }`}
+                        >
+                          <Edit className="mr-2 w-5 h-5" />
+                          {isCompleted ? 'تعديل' : 'تعبئة كاملة'}
+                        </Button>
+                      </Link>
+                      <Button
+                        onClick={() => {
+                          setQuickFillTemplate(template);
+                          setIsQuickFillOpen(true);
+                        }}
+                        className="bg-purple-600 hover:bg-purple-700 text-base py-6 px-4"
+                        title="تعبئة سريعة"
                       >
-                        <ArrowLeft className="mr-2 w-5 h-5" />
-                        {isCompleted ? 'تعديل الشاهد' : 'تعبئة الشاهد'}
+                        <Zap className="w-5 h-5" />
                       </Button>
-                    </Link>
+                    </div>
                   </CardContent>
                 </Card>
               );
@@ -224,6 +246,19 @@ export default function StandardDetail() {
           </div>
         )}
       </div>
+
+      {/* Quick Fill Dialog */}
+      {quickFillTemplate && (
+        <QuickFillDialog
+          template={quickFillTemplate}
+          open={isQuickFillOpen}
+          onOpenChange={setIsQuickFillOpen}
+          onSuccess={() => {
+            utils.userEvidences.list.invalidate();
+            utils.standards.getProgress.invalidate();
+          }}
+        />
+      )}
     </div>
   );
 }
