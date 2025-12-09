@@ -18,19 +18,24 @@ export default function StandardDetail() {
   // جلب بيانات المعيار
   const { data: standard, isLoading: loadingStandard } = trpc.standards.get.useQuery({ id: standardId });
 
-  // تحويل المرحلة من العربي إلى الإنجليزي
-  const convertStageToEnglish = (arabicStage: string) => {
-    const stageMap: Record<string, string> = {
-      'ابتدائي': 'primary',
-      'متوسط': 'middle',
-      'ثانوي': 'high'
-    };
-    return stageMap[arabicStage] || arabicStage;
+  // استخراج المرحلة من الصف الدراسي
+  const extractStage = (gradeString: string) => {
+    if (!gradeString) return undefined;
+    
+    // إذا كان يحتوي على "ابتدائي" أو "الابتدائي"
+    if (gradeString.includes('ابتدائي')) return 'primary';
+    // إذا كان يحتوي على "متوسط" أو "المتوسط"
+    if (gradeString.includes('متوسط')) return 'middle';
+    // إذا كان يحتوي على "ثانوي" أو "الثانوي"
+    if (gradeString.includes('ثانوي')) return 'high';
+    
+    return undefined;
   };
 
   // استخراج المرحلة والمادة من بيانات المعلم
-  const stageArabic = profile?.stage ? (typeof profile.stage === 'string' && profile.stage.startsWith('[') ? JSON.parse(profile.stage)[0] : profile.stage) : undefined;
-  const stage = stageArabic ? convertStageToEnglish(stageArabic) : undefined;
+  const stageArray = profile?.stage ? (typeof profile.stage === 'string' && profile.stage.startsWith('[') ? JSON.parse(profile.stage) : [profile.stage]) : [];
+  const firstGrade = stageArray[0]; // أول صف دراسي
+  const stage = firstGrade ? extractStage(firstGrade) : undefined;
   const subjects = profile?.subjects ? JSON.parse(profile.subjects) : [];
   const subject = subjects[0]; // نأخذ أول مادة
 
