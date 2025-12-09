@@ -100,6 +100,29 @@ export const appRouter = router({
         const uniqueStandardIds = new Set(templates.map((t: any) => t.standardId));
         return { count: uniqueStandardIds.size };
       }),
+
+    // حساب تقدم الشواهد لمعيار محدد
+    getProgress: protectedProcedure
+      .input(z.object({ standardId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        // جلب جميع الشواهد المتاحة للمعيار
+        const templates = await db.listEvidenceTemplates({ standardId: input.standardId });
+        const totalCount = templates.length;
+
+        // جلب الشواهد المعبأة من قبل المعلم
+        const userEvidences = await db.listUserEvidences(ctx.user.id);
+        
+        // حساب عدد الشواهد المعبأة لهذا المعيار
+        const completedCount = userEvidences.filter(
+          (evidence: any) => evidence.standardId === input.standardId
+        ).length;
+
+        return {
+          totalCount,
+          completedCount,
+          percentage: totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0,
+        };
+      }),
   }),
 
   // ========================================

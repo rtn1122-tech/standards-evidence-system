@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { ArrowRight, ArrowLeft, BookOpen } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Standards() {
   const [, setLocation] = useLocation();
@@ -12,9 +13,38 @@ export default function Standards() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-8">
         <div className="container max-w-6xl mx-auto">
+          {/* Header Skeleton */}
+          <div className="text-center mb-12">
+            <Skeleton className="w-16 h-16 rounded-full mx-auto mb-4" />
+            <Skeleton className="h-10 w-96 mx-auto mb-4" />
+            <Skeleton className="h-6 w-[500px] mx-auto" />
+          </div>
+
+          {/* Standards Grid Skeleton */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => (
+              <Card key={i} className="border-2">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <Skeleton className="w-10 h-10 rounded-full mb-3" />
+                      <Skeleton className="h-6 w-full mb-2" />
+                      <Skeleton className="h-4 w-32" />
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-4 w-3/4" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Back Button Skeleton */}
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">جاري تحميل المعايير...</p>
+            <Skeleton className="h-11 w-40 mx-auto" />
           </div>
         </div>
       </div>

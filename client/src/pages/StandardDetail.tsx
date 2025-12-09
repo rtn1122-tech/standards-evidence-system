@@ -2,11 +2,15 @@ import { useParams, Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, ArrowLeft, FileText, Loader2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, FileText, CheckCircle2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function StandardDetail() {
   const params = useParams<{ id: string }>();
   const standardId = parseInt(params.id || "0");
+  
+  // جلب بيانات المستخدم
+  const { data: user } = trpc.auth.me.useQuery();
 
   // جلب بيانات المعيار
   const { data: standard, isLoading: loadingStandard } = trpc.standards.get.useQuery({ id: standardId });
@@ -14,12 +18,69 @@ export default function StandardDetail() {
   // جلب الشواهد المتاحة للمعيار
   const { data: templates, isLoading: loadingTemplates } = trpc.evidenceTemplates.list.useQuery({ standardId });
 
+  // جلب تقدم الشواهد (فقط للمستخدمين المسجلين)
+  const { data: progress } = trpc.standards.getProgress.useQuery(
+    { standardId },
+    { enabled: !!user } // تفعيل فقط إذا كان المستخدم مسجل
+  );
+
+  // Skeleton Loading بدلاً من شاشة التحميل الكاملة
   if (loadingStandard || loadingTemplates) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600">جاري التحميل...</p>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        {/* Header Skeleton */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Skeleton className="h-4 w-40 mb-2" />
+                <Skeleton className="h-6 w-32" />
+              </div>
+              <Skeleton className="h-9 w-32" />
+            </div>
+          </div>
+        </div>
+
+        <div className="container mx-auto px-4 py-8">
+          {/* معلومات المعيار Skeleton */}
+          <Card className="mb-8 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
+              <Skeleton className="h-8 w-3/4 bg-blue-400" />
+              <Skeleton className="h-4 w-32 mt-2 bg-blue-400" />
+            </CardHeader>
+            <CardContent className="pt-6">
+              <Skeleton className="h-4 w-full mb-2" />
+              <Skeleton className="h-4 w-full mb-2" />
+              <Skeleton className="h-4 w-3/4" />
+            </CardContent>
+          </Card>
+
+          {/* عنوان الشواهد Skeleton */}
+          <div className="mb-6">
+            <Skeleton className="h-8 w-48" />
+          </div>
+
+          {/* قائمة الشواهد Skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Card key={i} className="shadow-md">
+                <CardHeader>
+                  <Skeleton className="h-6 w-full mb-2" />
+                  <Skeleton className="h-4 w-3/4" />
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 mb-4">
+                    <div className="flex gap-2">
+                      <Skeleton className="h-6 w-16" />
+                      <Skeleton className="h-6 w-16" />
+                    </div>
+                    <Skeleton className="h-4 w-32" />
+                  </div>
+                  <Skeleton className="h-10 w-full" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -51,12 +112,29 @@ export default function StandardDetail() {
               <p className="text-sm text-gray-500">المملكة العربية السعودية</p>
               <h1 className="text-xl font-bold text-gray-800">وزارة التعليم</h1>
             </div>
-            <Link href="/standards">
-              <Button variant="outline" size="sm">
-                <ArrowRight className="ml-2 w-4 h-4" />
-                العودة للمعايير
-              </Button>
-            </Link>
+            <div className="flex items-center gap-4">
+              {/* مؤشر التقدم */}
+              {user && progress && (
+                <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
+                  <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                  <div className="text-sm">
+                    <span className="font-bold text-blue-900">{progress.completedCount}</span>
+                    <span className="text-gray-600"> من </span>
+                    <span className="font-bold text-blue-900">{progress.totalCount}</span>
+                    <span className="text-gray-600"> شاهد</span>
+                  </div>
+                  <div className="text-xs text-blue-600 font-semibold">
+                    {progress.percentage}%
+                  </div>
+                </div>
+              )}
+              <Link href="/standards">
+                <Button variant="outline" size="sm">
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                  العودة للمعايير
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
