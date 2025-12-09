@@ -1,0 +1,1 @@
+ALTER TABLE `teacherProfiles` ADD `selectedTheme` varchar(100) DEFAULT 'theme1';

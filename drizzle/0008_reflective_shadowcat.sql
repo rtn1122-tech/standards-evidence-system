@@ -1,0 +1,1 @@
+ALTER TABLE `evidenceSubTemplates` ADD `priority` int DEFAULT 0 NOT NULL;

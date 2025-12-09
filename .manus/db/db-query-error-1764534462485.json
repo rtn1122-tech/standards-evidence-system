@@ -1,0 +1,8 @@
+{
+  "query": "CREATE TABLE `evidenceSubTemplates` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`evidenceTemplateId` int NOT NULL,\n\t`standardId` int NOT NULL,\n\t`title` varchar(500) NOT NULL,\n\t`description` text,\n\t`applicableSubjects` text,\n\t`applicableGrades` text,\n\t`applicableStages` text,\n\t`applicableSemesters` text,\n\t`applicableTracks` text,\n\t`orderIndex` int NOT NULL,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `evidenceSubTemplates_id` PRIMARY KEY(`id`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute CREATE TABLE `evidenceSubTemplates` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`evidenceTemplateId` int NOT NULL,\n\t`standardId` int NOT NULL,\n\t`title` varchar(500) NOT NULL,\n\t`description` text,\n\t`applicableSubjects` text,\n\t`applicableGrades` text,\n\t`applicableStages` text,\n\t`applicableSemesters` text,\n\t`applicableTracks` text,\n\t`orderIndex` int NOT NULL,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `evidenceSubTemplates_id` PRIMARY KEY(`id`)\n)",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1050 (42S01) at line 1: Table 'PdwWnVF2DAatRAKFwvgWXk.evidenceSubTemplates' already exists"
+  ]
+}

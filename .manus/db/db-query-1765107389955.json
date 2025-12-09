@@ -1,0 +1,54 @@
+{
+  "query": "SELECT standardId, COUNT(*) as evidence_count \nFROM evidenceTemplates \nGROUP BY standardId \nORDER BY standardId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SELECT standardId, COUNT(*) as evidence_count \nFROM evidenceTemplates \nGROUP BY standardId \nORDER BY standardId;",
+  "rows": [
+    {
+      "standardId": "1",
+      "evidence_count": "6"
+    },
+    {
+      "standardId": "2",
+      "evidence_count": "6"
+    },
+    {
+      "standardId": "3",
+      "evidence_count": "6"
+    },
+    {
+      "standardId": "4",
+      "evidence_count": "5"
+    },
+    {
+      "standardId": "5",
+      "evidence_count": "3"
+    },
+    {
+      "standardId": "6",
+      "evidence_count": "3"
+    },
+    {
+      "standardId": "7",
+      "evidence_count": "3"
+    },
+    {
+      "standardId": "8",
+      "evidence_count": "3"
+    },
+    {
+      "standardId": "9",
+      "evidence_count": "3"
+    },
+    {
+      "standardId": "10",
+      "evidence_count": "3"
+    },
+    {
+      "standardId": "11",
+      "evidence_count": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "standardId\tevidence_count\n1\t6\n2\t6\n3\t6\n4\t5\n5\t3\n6\t3\n7\t3\n8\t3\n9\t3\n10\t3\n11\t3\n",
+  "stderr": "",
+  "execution_time_ms": 1584
+}

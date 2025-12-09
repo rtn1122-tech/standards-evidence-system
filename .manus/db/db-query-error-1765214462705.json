@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, evidenceName, description, page2Box1Content, page2Box2Content, page2Box3Content, page2Box4Content, page2Box5Content, page2Box6Content \nFROM evidences \nWHERE description LIKE '%1.%' \n   OR description LIKE '%2.%' \n   OR description LIKE '%3.%'\n   OR page2Box1Content LIKE '%1.%' \n   OR page2Box2Content LIKE '%1.%'\n   OR page2Box3Content LIKE '%1.%'\n   OR page2Box4Content LIKE '%1.%'\n   OR page2Box5Content LIKE '%1.%'\n   OR page2Box6Content LIKE '%1.%'\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SELECT id, evidenceName, description, page2Box1Content, page2Box2Content, page2Box3Content, page2Box4Content, page2Box5Content, page2Box6Content \nFROM evidences \nWHERE description LIKE '%1.%' \n   OR description LIKE '%2.%' \n   OR description LIKE '%3.%'\n   OR page2Box1Content LIKE '%1.%' \n   OR page2Box2Content LIKE '%1.%'\n   OR page2Box3Content LIKE '%1.%'\n   OR page2Box4Content LIKE '%1.%'\n   OR page2Box5Content LIKE '%1.%'\n   OR page2Box6Content LIKE '%1.%'\nLIMIT 10;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'page2box1content' in 'where clause'"
+  ]
+}

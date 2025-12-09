@@ -1,0 +1,46 @@
+{
+  "query": "SELECT id, title FROM evidenceTemplates WHERE standardId = 3 ORDER BY id",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SELECT id, title FROM evidenceTemplates WHERE standardId = 3 ORDER BY id",
+  "rows": [
+    {
+      "id": "21",
+      "title": "التواصل عبر منصة مدرستي"
+    },
+    {
+      "id": "22",
+      "title": "التواصل عبر الرسائل النصية أو الواتساب"
+    },
+    {
+      "id": "23",
+      "title": "المشاركة في اجتماع أولياء الأمور"
+    },
+    {
+      "id": "24",
+      "title": "إشعار ولي الأمر بالحالة التحصيلية"
+    },
+    {
+      "id": "25",
+      "title": "إشراك ولي الأمر في الخطط العلاجية"
+    },
+    {
+      "id": "26",
+      "title": "الرد على استفسارات أولياء الأمور"
+    },
+    {
+      "id": "27",
+      "title": "تعزيز الشراكة بين البيت والمدرسة"
+    },
+    {
+      "id": "30001",
+      "title": "تبادل الخبرات بين الزملاء"
+    },
+    {
+      "id": "30002",
+      "title": "مجتمعات التعلّم المهنية"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\n21\tالتواصل عبر منصة مدرستي\n22\tالتواصل عبر الرسائل النصية أو الواتساب\n23\tالمشاركة في اجتماع أولياء الأمور\n24\tإشعار ولي الأمر بالحالة التحصيلية\n25\tإشراك ولي الأمر في الخطط العلاجية\n26\tالرد على استفسارات أولياء الأمور\n27\tتعزيز الشراكة بين البيت والمدرسة\n30001\tتبادل الخبرات بين الزملاء\n30002\tمجتمعات التعلّم المهنية\n",
+  "stderr": "",
+  "execution_time_ms": 1536
+}

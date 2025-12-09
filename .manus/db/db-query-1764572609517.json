@@ -1,0 +1,35 @@
+{
+  "query": "SELECT id, title, description FROM evidenceSubTemplates WHERE evidenceTemplateId = 30001 LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SELECT id, title, description FROM evidenceSubTemplates WHERE evidenceTemplateId = 30001 LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "title": "الجمع بالعد التصاعدي",
+      "description": "3.1 - الجمع بالعد التصاعدي"
+    },
+    {
+      "id": "2",
+      "title": "المخلوقات الحية",
+      "description": "3.2 - المخلوقات الحية"
+    },
+    {
+      "id": "3",
+      "title": "تنوين الفتح",
+      "description": "3.3 - تنوين الفتح"
+    },
+    {
+      "id": "4",
+      "title": "الصلاة",
+      "description": "3.4 - الصلاة"
+    },
+    {
+      "id": "5",
+      "title": "أنا وطن",
+      "description": "3.5 - أنا وطن"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tdescription\n1\tالجمع بالعد التصاعدي\t3.1 - الجمع بالعد التصاعدي\n2\tالمخلوقات الحية\t3.2 - المخلوقات الحية\n3\tتنوين الفتح\t3.3 - تنوين الفتح\n4\tالصلاة\t3.4 - الصلاة\n5\tأنا وطن\t3.5 - أنا وطن\n",
+  "stderr": "",
+  "execution_time_ms": 1545
+}

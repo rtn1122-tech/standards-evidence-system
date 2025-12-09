@@ -1,0 +1,37 @@
+{
+  "query": "SHOW CREATE TABLE teacherProfiles",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SHOW CREATE TABLE teacherProfiles",
+  "rows": [
+    {
+      "Table": "teacherProfiles",
+      "Create Table": "CREATE TABLE `teacherProfiles` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `userId` int(11) NOT NULL,",
+    "  `educationDepartment` varchar(255) DEFAULT NULL,",
+    "  `schoolName` varchar(255) DEFAULT NULL,",
+    "  `teacherName` varchar(255) DEFAULT NULL,",
+    "  `principalName` varchar(255) DEFAULT NULL,",
+    "  `gender` enum('male','female') NOT NULL,",
+    "  `stage` varchar(100) DEFAULT NULL,",
+    "  `subjects` text DEFAULT NULL,",
+    "  `selectedBackground` varchar(100) DEFAULT 'default',",
+    "  `email` varchar(255) DEFAULT NULL,",
+    "  `phoneNumber` varchar(20) DEFAULT NULL,",
+    "  `professionalLicenseNumber` varchar(100) DEFAULT NULL,",
+    "  `licenseStartDate` date DEFAULT NULL,",
+    "  `licenseEndDate` date DEFAULT NULL,",
+    "  `employeeNumber` varchar(100) DEFAULT NULL,",
+    "  `jobTitle` varchar(255) DEFAULT NULL,",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  UNIQUE KEY `teacherProfiles_userId_unique` (`userId`)",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin AUTO_INCREMENT=30001"
+  ],
+  "stdout": "Table\tCreate Table\nteacherProfiles\tCREATE TABLE `teacherProfiles` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `userId` int(11) NOT NULL,\n  `educationDepartment` varchar(255) DEFAULT NULL,\n  `schoolName` varchar(255) DEFAULT NULL,\n  `teacherName` varchar(255) DEFAULT NULL,\n  `principalName` varchar(255) DEFAULT NULL,\n  `gender` enum('male','female') NOT NULL,\n  `stage` varchar(100) DEFAULT NULL,\n  `subjects` text DEFAULT NULL,\n  `selectedBackground` varchar(100) DEFAULT 'default',\n  `email` varchar(255) DEFAULT NULL,\n  `phoneNumber` varchar(20) DEFAULT NULL,\n  `professionalLicenseNumber` varchar(100) DEFAULT NULL,\n  `licenseStartDate` date DEFAULT NULL,\n  `licenseEndDate` date DEFAULT NULL,\n  `employeeNumber` varchar(100) DEFAULT NULL,\n  `jobTitle` varchar(255) DEFAULT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  UNIQUE KEY `teacherProfiles_userId_unique` (`userId`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin AUTO_INCREMENT=30001\n",
+  "stderr": "",
+  "execution_time_ms": 1620
+}
