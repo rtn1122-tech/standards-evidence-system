@@ -7,6 +7,8 @@ import { TRPCError } from "@trpc/server";
 import { storagePut } from "./storage";
 import crypto from "crypto";
 import { generatePDF } from "./pdfGenerator";
+import { htmlToPdf } from "./htmlToPdf";
+import * as introPages from "./introPages";
 import { PDFDocument } from 'pdf-lib';
 
 export const appRouter = router({
@@ -434,6 +436,48 @@ export const appRouter = router({
           throw new TRPCError({ code: 'BAD_REQUEST', message: 'يرجى إكمال البيانات الأساسية أولاً' });
         }
 
+        // توليد الصفحات التمهيدية
+        const introPdfBuffers: Buffer[] = [];
+        
+        // 1. صفحة الفهرس (سيتم تحديث أرقام الصفحات لاحقاً)
+        const indexHTML = introPages.generateIndexPage({ standards: [] });
+        introPdfBuffers.push(await htmlToPdf(indexHTML));
+        
+        // 2. بيانات المعلم
+        const teacherInfoHTML = introPages.generateTeacherInfoPage({
+          teacherName: profile.teacherName || ctx.user.name || '',
+          schoolName: profile.schoolName || '',
+          educationDepartment: profile.educationDepartment || '',
+          specialty: profile.subjects || undefined,
+          stage: profile.stage || undefined,
+          licenseNumber: profile.professionalLicenseNumber || undefined,
+          licenseDate: profile.licenseStartDate ? profile.licenseStartDate.toISOString().split('T')[0] : undefined,
+        });
+        introPdfBuffers.push(await htmlToPdf(teacherInfoHTML));
+        
+        // 3. الوثائق
+        const documentsHTML = introPages.generateDocumentsPage();
+        introPdfBuffers.push(await htmlToPdf(documentsHTML));
+        
+        // 4. الرؤية والرسالة
+        const visionHTML = introPages.generateVisionMissionPage();
+        introPdfBuffers.push(await htmlToPdf(visionHTML));
+        
+        // 5. أقوال الملوك
+        const kingsHTML = introPages.generateKingsQuotesPage();
+        introPdfBuffers.push(await htmlToPdf(kingsHTML));
+        
+        // 6. تعريف الأداء المهني
+        const performanceHTML = introPages.generateProfessionalPerformancePage();
+        introPdfBuffers.push(await htmlToPdf(performanceHTML));
+        
+        // 7. قائمة المعايير
+        const allStandards = await db.listStandards();
+        const standardsHTML = introPages.generateStandardsListPage(
+          allStandards.map(s => ({ number: s.id, title: s.title }))
+        );
+        introPdfBuffers.push(await htmlToPdf(standardsHTML));
+
         // توليد PDF لكل شاهد
         const pdfBuffers: Buffer[] = [];
         
@@ -461,6 +505,14 @@ export const appRouter = router({
         // دمج جميع PDFs في ملف واحد باستخدام pdf-lib
         const mergedPdf = await PDFDocument.create();
         
+        // دمج الصفحات التمهيدية أولاً
+        for (const pdfBuffer of introPdfBuffers) {
+          const pdf = await PDFDocument.load(pdfBuffer);
+          const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+          copiedPages.forEach((page) => mergedPdf.addPage(page));
+        }
+        
+        // ثم دمج صفحات الشواهد
         for (const pdfBuffer of pdfBuffers) {
           const pdf = await PDFDocument.load(pdfBuffer);
           const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
