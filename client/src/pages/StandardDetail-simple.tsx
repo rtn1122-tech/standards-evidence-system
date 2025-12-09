@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, ArrowLeft, FileText, CheckCircle2, Sparkles } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function StandardDetail() {
   const params = useParams<{ id: string }>();

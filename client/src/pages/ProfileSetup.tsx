@@ -66,8 +66,8 @@ export default function ProfileSetup() {
         licenseIssueDate: profile.licenseStartDate ? (profile.licenseStartDate instanceof Date ? profile.licenseStartDate.toISOString().split('T')[0] : profile.licenseStartDate) : "",
         licenseExpiryDate: profile.licenseEndDate ? (profile.licenseEndDate instanceof Date ? profile.licenseEndDate.toISOString().split('T')[0] : profile.licenseEndDate) : "",
         teacherLevel: (profile.jobTitle === "practitioner" || profile.jobTitle === "advanced" || profile.jobTitle === "expert") ? profile.jobTitle : "practitioner",
-        preferredTheme: profile.preferredTheme || "modern",
-        preferredCoverTheme: profile.preferredCoverTheme || "classic",
+        preferredTheme: profile.preferredTheme || "white",
+        preferredCoverTheme: profile.preferredCoverTheme || "theme1",
       });
       if (profile.profileImage) {
         setImagePreview(profile.profileImage);
@@ -321,18 +321,17 @@ export default function ProfileSetup() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="licenseNumber">رقم الرخصة المهنية *</Label>
+                    <Label htmlFor="licenseNumber">رقم الرخصة المهنية (اختياري)</Label>
                     <Input
                       id="licenseNumber"
                       value={formData.licenseNumber}
                       onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
-                      required
                       placeholder="مثال: 123456789"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="teacherLevel">مستوى المعلم *</Label>
+                    <Label htmlFor="teacherLevel">مستوى المعلم (اختياري)</Label>
                     <Select
                       value={formData.teacherLevel}
                       onValueChange={(value) => setFormData({ ...formData, teacherLevel: value as any })}
@@ -349,24 +348,22 @@ export default function ProfileSetup() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="licenseIssueDate">تاريخ إصدار الرخصة *</Label>
+                    <Label htmlFor="licenseIssueDate">تاريخ إصدار الرخصة (اختياري)</Label>
                     <Input
                       id="licenseIssueDate"
                       type="date"
                       value={formData.licenseIssueDate}
                       onChange={(e) => setFormData({ ...formData, licenseIssueDate: e.target.value })}
-                      required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="licenseExpiryDate">تاريخ انتهاء الرخصة *</Label>
+                    <Label htmlFor="licenseExpiryDate">تاريخ انتهاء الرخصة (اختياري)</Label>
                     <Input
                       id="licenseExpiryDate"
                       type="date"
                       value={formData.licenseExpiryDate}
                       onChange={(e) => setFormData({ ...formData, licenseExpiryDate: e.target.value })}
-                      required
                     />
                   </div>
                 </div>

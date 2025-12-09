@@ -223,11 +223,12 @@ export default function Home() {
                     <FileText className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-2xl group-hover:text-green-600 transition-colors">
+                    <CardTitle className="text-2xl group-hover:text-green-600 transition-colors flex items-center gap-2">
                       2️⃣ شواهدي
+                      <Sparkles className="w-6 h-6 text-yellow-500" />
                     </CardTitle>
-                    <CardDescription className="text-base">
-                      عرض وإدارة شواهدك
+                    <CardDescription className="text-base font-semibold text-green-700">
+                      174 شاهد جاهز ومعبّأ بالكامل!
                     </CardDescription>
                   </div>
                 </div>
@@ -235,8 +236,8 @@ export default function Home() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 mb-4">
-                راجع شواهدك المكتملة وحمّلها كملف PDF
+              <p className="text-gray-700 mb-4 font-medium">
+                أضف بياناتك الشخصية وصورك فقط → حمّل ملفك فوراً!
               </p>
               <Button className="w-full bg-green-600 hover:bg-green-700 text-lg py-6">
                 <FileText className="ml-2 w-5 h-5" />
