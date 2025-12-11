@@ -5,8 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowRight, Save, Loader2, X, Upload, Eye, Check } from "lucide-react";
+import { ArrowRight, Save, Loader2, X, Upload, Eye, Check, ZoomIn, Palette } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface Box {
   title: string;
@@ -40,6 +41,8 @@ export default function FillEvidence() {
   });
 
   const [autoSaveStatus, setAutoSaveStatus] = useState<string>("");
+  const [showThemePreview, setShowThemePreview] = useState(false);
+  const [selectedThemeForPreview, setSelectedThemeForPreview] = useState<string>("white");
   const image1InputRef = useRef<HTMLInputElement>(null);
   const image2InputRef = useRef<HTMLInputElement>(null);
 
@@ -92,6 +95,12 @@ export default function FillEvidence() {
         image1Url: "",
         image2Url: "",
       });
+      
+      // تحميل الثيم المحفوظ إن وجد
+      const savedTheme = localStorage.getItem(`evidence_theme_${templateId}`);
+      if (savedTheme) {
+        setSelectedThemeForPreview(savedTheme);
+      }
     }
   }, [template, templateId]);
 
@@ -509,6 +518,20 @@ export default function FillEvidence() {
         {/* أزرار الحفظ والمعاينة */}
         <div className="flex gap-4 pt-6">
           <Button
+            onClick={() => setShowThemePreview(true)}
+            variant="outline"
+            size="lg"
+            className="flex-1 bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border-purple-300"
+          >
+            <Palette className="ml-2 w-4 h-4" />
+            اختيار الثيم
+            {selectedThemeForPreview !== 'white' && (
+              <span className="mr-2 text-xs bg-purple-500 text-white px-2 py-0.5 rounded-full">
+                {selectedThemeForPreview === 'theme1' ? 'ثيم 1' : selectedThemeForPreview === 'theme2' ? 'ثيم 2' : 'ثيم 3'}
+              </span>
+            )}
+          </Button>
+          <Button
             onClick={handlePreviewPDF}
             variant="outline"
             size="lg"
@@ -543,6 +566,154 @@ export default function FillEvidence() {
           </Link>
         </div>
       </div>
+
+      {/* Dialog معاينة الثيمات */}
+      <Dialog open={showThemePreview} onOpenChange={setShowThemePreview}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl text-center mb-4">اختر ثيم الشاهد</DialogTitle>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
+            {/* ورقة بيضاء */}
+            <div
+              onClick={() => setSelectedThemeForPreview('white')}
+              className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
+                selectedThemeForPreview === 'white'
+                  ? 'border-green-500 shadow-xl'
+                  : 'border-gray-200 hover:border-blue-300'
+              }`}
+            >
+              <div className="relative bg-white aspect-[3/4] flex items-center justify-center border">
+                <div className="text-center p-4">
+                  <div className="text-6xl mb-2">📄</div>
+                  <p className="text-sm text-gray-600">ورقة بيضاء</p>
+                </div>
+                {selectedThemeForPreview === 'white' && (
+                  <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              <div className="p-2 bg-gray-50 text-center">
+                <p className="text-sm font-medium">ورقة بيضاء</p>
+                <p className="text-xs text-gray-500">الافتراضي</p>
+              </div>
+            </div>
+
+            {/* ثيم 1 */}
+            <div
+              onClick={() => setSelectedThemeForPreview('theme1')}
+              className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
+                selectedThemeForPreview === 'theme1'
+                  ? 'border-green-500 shadow-xl'
+                  : 'border-gray-200 hover:border-blue-300'
+              }`}
+            >
+              <div className="relative">
+                <img
+                  src="/themes/evidences/evidence-theme1.png"
+                  alt="ثيم الشواهد 1"
+                  className="w-full aspect-[3/4] object-cover"
+                />
+                {selectedThemeForPreview === 'theme1' && (
+                  <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              <div className="p-2 bg-gray-50 text-center">
+                <p className="text-sm font-medium">ثيم الشواهد 1</p>
+                <p className="text-xs text-gray-500">كلاسيكي</p>
+              </div>
+            </div>
+
+            {/* ثيم 2 */}
+            <div
+              onClick={() => setSelectedThemeForPreview('theme2')}
+              className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
+                selectedThemeForPreview === 'theme2'
+                  ? 'border-green-500 shadow-xl'
+                  : 'border-gray-200 hover:border-blue-300'
+              }`}
+            >
+              <div className="relative">
+                <img
+                  src="/themes/evidences/evidence-theme2.png"
+                  alt="ثيم الشواهد 2"
+                  className="w-full aspect-[3/4] object-cover"
+                />
+                {selectedThemeForPreview === 'theme2' && (
+                  <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              <div className="p-2 bg-gray-50 text-center">
+                <p className="text-sm font-medium">ثيم الشواهد 2</p>
+                <p className="text-xs text-gray-500">حديث</p>
+              </div>
+            </div>
+
+            {/* ثيم 3 */}
+            <div
+              onClick={() => setSelectedThemeForPreview('theme3')}
+              className={`cursor-pointer rounded-lg overflow-hidden border-4 transition-all hover:scale-105 hover:shadow-lg ${
+                selectedThemeForPreview === 'theme3'
+                  ? 'border-green-500 shadow-xl'
+                  : 'border-gray-200 hover:border-blue-300'
+              }`}
+            >
+              <div className="relative">
+                <img
+                  src="/themes/evidences/evidence-theme3.png"
+                  alt="ثيم الشواهد 3"
+                  className="w-full aspect-[3/4] object-cover"
+                />
+                {selectedThemeForPreview === 'theme3' && (
+                  <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              <div className="p-2 bg-gray-50 text-center">
+                <p className="text-sm font-medium">ثيم الشواهد 3</p>
+                <p className="text-xs text-gray-500">وردي</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-4 mt-6">
+            <Button
+              onClick={() => {
+                // حفظ الثيم المختار في localStorage للاستخدام عند توليد PDF
+                localStorage.setItem(`evidence_theme_${templateId}`, selectedThemeForPreview);
+                setShowThemePreview(false);
+              }}
+              className="flex-1"
+            >
+              <Check className="ml-2 w-4 h-4" />
+              تطبيق الثيم
+            </Button>
+            <Button
+              onClick={() => setShowThemePreview(false)}
+              variant="outline"
+              className="flex-1"
+            >
+              <X className="ml-2 w-4 h-4" />
+              إلغاء
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
