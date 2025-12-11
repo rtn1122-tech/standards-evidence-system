@@ -1,0 +1,9 @@
+{
+  "query": "SELECT id, title, defaultImage1Url, defaultImage2Url FROM evidenceSubTemplates WHERE id BETWEEN 101 AND 111;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SELECT id, title, defaultImage1Url, defaultImage2Url FROM evidenceSubTemplates WHERE id BETWEEN 101 AND 111;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1505
+}

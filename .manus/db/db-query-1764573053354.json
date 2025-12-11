@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, title, standardId FROM evidenceTemplates WHERE title LIKE '%الحضور%' OR title LIKE '%الانصراف%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SELECT id, title, standardId FROM evidenceTemplates WHERE title LIKE '%الحضور%' OR title LIKE '%الانصراف%';",
+  "rows": [
+    {
+      "id": "1",
+      "title": "الحضور والانصراف",
+      "standardId": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tstandardId\n1\tالحضور والانصراف\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1620
+}

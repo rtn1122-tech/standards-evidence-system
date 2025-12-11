@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE teacherProfiles \nADD COLUMN preferredTheme VARCHAR(100) DEFAULT 'white',\nADD COLUMN preferredCoverTheme VARCHAR(100) DEFAULT 'theme1',\nADD COLUMN profileImage TEXT;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute ALTER TABLE teacherProfiles \nADD COLUMN preferredTheme VARCHAR(100) DEFAULT 'white',\nADD COLUMN preferredCoverTheme VARCHAR(100) DEFAULT 'theme1',\nADD COLUMN profileImage TEXT;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3076
+}

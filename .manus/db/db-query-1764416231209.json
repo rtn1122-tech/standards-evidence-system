@@ -1,0 +1,42 @@
+{
+  "query": "SELECT id, title FROM evidenceTemplates WHERE standardId = 2 ORDER BY orderIndex;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SELECT id, title FROM evidenceTemplates WHERE standardId = 2 ORDER BY orderIndex;",
+  "rows": [
+    {
+      "id": "13",
+      "title": "حضور ورش العمل"
+    },
+    {
+      "id": "14",
+      "title": "حضور الدورات التدريبية"
+    },
+    {
+      "id": "15",
+      "title": "المشاركة في المؤتمرات"
+    },
+    {
+      "id": "16",
+      "title": "المشاركة في مجتمعات التعلّم المهنية"
+    },
+    {
+      "id": "17",
+      "title": "دعم المعلمين الجدد"
+    },
+    {
+      "id": "18",
+      "title": "المشاركة في قروب المدرسة الرسمي"
+    },
+    {
+      "id": "19",
+      "title": "تبادل الخبرات المهنية"
+    },
+    {
+      "id": "20",
+      "title": "تنفيذ مبادرات مهنية مشتركة"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\n13\tحضور ورش العمل\n14\tحضور الدورات التدريبية\n15\tالمشاركة في المؤتمرات\n16\tالمشاركة في مجتمعات التعلّم المهنية\n17\tدعم المعلمين الجدد\n18\tالمشاركة في قروب المدرسة الرسمي\n19\tتبادل الخبرات المهنية\n20\tتنفيذ مبادرات مهنية مشتركة\n",
+  "stderr": "",
+  "execution_time_ms": 1622
+}

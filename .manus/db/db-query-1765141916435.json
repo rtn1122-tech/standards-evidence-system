@@ -1,0 +1,65 @@
+{
+  "query": "SELECT s.id, s.title, COUNT(et.id) as evidence_count FROM standards s LEFT JOIN evidenceTemplates et ON s.id = et.standardId GROUP BY s.id, s.title ORDER BY s.orderIndex",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3YLZPes1ubcofMz.root --database PdwWnVF2DAatRAKFwvgWXk --execute SELECT s.id, s.title, COUNT(et.id) as evidence_count FROM standards s LEFT JOIN evidenceTemplates et ON s.id = et.standardId GROUP BY s.id, s.title ORDER BY s.orderIndex",
+  "rows": [
+    {
+      "id": "1",
+      "title": "أداء الواجبات الوظيفية",
+      "evidence_count": "3"
+    },
+    {
+      "id": "2",
+      "title": "التفاعل مع المجتمع المهني",
+      "evidence_count": "3"
+    },
+    {
+      "id": "3",
+      "title": "التفاعل مع أولياء الأمور",
+      "evidence_count": "3"
+    },
+    {
+      "id": "4",
+      "title": "التنوع في استراتيجيات التدريس",
+      "evidence_count": "3"
+    },
+    {
+      "id": "5",
+      "title": "تحسين نتائج المتعلمين",
+      "evidence_count": "3"
+    },
+    {
+      "id": "6",
+      "title": "إعداد وتنفيذ خطة التعلم",
+      "evidence_count": "3"
+    },
+    {
+      "id": "7",
+      "title": "توظيف تقنيات ووسائل التعلم",
+      "evidence_count": "3"
+    },
+    {
+      "id": "8",
+      "title": "تهيئة بيئة تعليمية",
+      "evidence_count": "3"
+    },
+    {
+      "id": "9",
+      "title": "الإدارة الصفية",
+      "evidence_count": "3"
+    },
+    {
+      "id": "10",
+      "title": "تحليل نتائج المتعلمين",
+      "evidence_count": "3"
+    },
+    {
+      "id": "11",
+      "title": "تنوع أساليب التقويم",
+      "evidence_count": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tevidence_count\n1\tأداء الواجبات الوظيفية\t3\n2\tالتفاعل مع المجتمع المهني\t3\n3\tالتفاعل مع أولياء الأمور\t3\n4\tالتنوع في استراتيجيات التدريس\t3\n5\tتحسين نتائج المتعلمين\t3\n6\tإعداد وتنفيذ خطة التعلم\t3\n7\tتوظيف تقنيات ووسائل التعلم\t3\n8\tتهيئة بيئة تعليمية\t3\n9\tالإدارة الصفية\t3\n10\tتحليل نتائج المتعلمين\t3\n11\tتنوع أساليب التقويم\t3\n",
+  "stderr": "",
+  "execution_time_ms": 1670
+}
